@@ -10,6 +10,7 @@ const SignupPage = () => {
 
   const handleBack = () => {
     navigate('/');
+    window.location.reload();
   };
 
   return (
