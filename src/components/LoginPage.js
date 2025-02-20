@@ -11,7 +11,7 @@ const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [facialImage, setFacialImage] = useState(null);
-
+ 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!username) {

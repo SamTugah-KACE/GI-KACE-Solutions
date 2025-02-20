@@ -35,7 +35,7 @@ const Dashboard = () => {
       )}
       {/* {showDesigner && <DashboardDesigner onClose={() => setShowDesigner(false)} />} */}
       {/* <AlertNotifier /> */}
-      {/* <Inbox /> */}
+      {/* <Inbox /> */} 
     </div>
   );
 };
