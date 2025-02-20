@@ -1,0 +1,22 @@
+/* Dashboard.css */
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .dashboard-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  .main-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    /* background-color: inherit; */
+    background-color: var(--background);
+  }
+  

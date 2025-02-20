@@ -174,8 +174,8 @@ const OrganizationDataForm = ({ data, updateData }) => {
         <label>Country*:</label>
         <select name="country" value={localData.country} onChange={handleChange} required>
           <option value="">Select Country</option>
-          {countries.map((c) => (
-            <option key={c} value={c}>{c}</option>
+          {countries.map((k, c, ) => (
+            <option key={`${c}-${k}`} value={c}>{c}</option>
           ))}
         </select>
       </div>
@@ -206,7 +206,7 @@ const OrganizationDataForm = ({ data, updateData }) => {
             key={index}
             src={logo}
             alt={`Logo ${index + 1}`}
-            style={{ width: '50px', height: '50px', objectFit: 'cover', margin: '10px' }}
+            style={{ width: '64px',  height: '64px', objectFit: 'cover', margin: '10px' }}
           />
         ))}
       </div>

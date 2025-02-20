@@ -1,0 +1,72 @@
+.dashboard-table {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.table-header {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 10px;
+  text-align: left;
+}
+
+tbody td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.attachment-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.file-name {
+  font-weight: bold;
+}
+
+.file-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.table-btn {
+  padding: 6px 12px;
+  margin: 0 2px;
+  border: none;
+  background-color: var(--primary-color);
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  margin: 0 2px;
+  border: none;
+  background-color: var(--primary-color);
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

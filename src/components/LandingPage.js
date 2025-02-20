@@ -44,7 +44,11 @@ const LandingPage = () => {
 
   const handleGetStarted = (product) => {
     // Pass along the selected product if needed
+    if (product.id == 2) 
     navigate('/signup', { state: { product } });
+  else{
+    alert("Oops!, Sorry Product will be ready soon.")
+  }
   };
 
   return (

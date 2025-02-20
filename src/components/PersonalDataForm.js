@@ -4,6 +4,7 @@ import './PersonalDataForm.css'; // add your styling
 
 const titles = ["Prof.", "PhD", "Dr.", "Mr.", "Mrs.", "Ms.", "Esq.", "Hon.", "Rev.", "Msgr.", "Other"];
 const genders = ["Male", "Female", "Other"];
+const roles = ["CEO", "Manager", "HR Manager"];
 
 const PersonalDataForm = ({ data, updateData }) => {
   const [localData, setLocalData] = useState({
@@ -63,8 +64,8 @@ const PersonalDataForm = ({ data, updateData }) => {
         <label>Title*:</label>
         <select name="title" value={localData.title} onChange={handleChange} required>
           <option value="">Select Title</option>
-          {titles.map((title) => (
-            <option key={title} value={title}>{title}</option>
+          {titles.map((title, index) => (
+            <option key={`${title}-${index}`} value={title}>{title}</option>
           ))}
         </select>
       </div>
@@ -94,8 +95,8 @@ const PersonalDataForm = ({ data, updateData }) => {
         <label>Gender*:</label>
         <select name="gender" value={localData.gender} onChange={handleChange} required>
           <option value="">Select Gender</option>
-          {genders.map((g) => (
-            <option key={g} value={g}>{g}</option>
+          {genders.map((k,g) => (
+            <option key={`${k}-${g}`} value={g}>{g}</option>
           ))}
         </select>
       </div>
@@ -106,6 +107,15 @@ const PersonalDataForm = ({ data, updateData }) => {
       <div className="form-group">
         <label>Contact | Residential Addr. | GPS Info*:</label>
         <textarea name="contactInfo" value={localData.contactInfo} onChange={handleChange} required></textarea>
+      </div>
+      <div className="form-group">
+        <label>Role*:</label>
+        <select name="role" value={localData.role} onChange={handleChange} required>
+          <option value="">Select Your Role</option>
+          {roles.map((g) => (
+            <option key={g} value={g}>{g}</option>
+          ))}
+        </select>
       </div>
       <div className="form-group">
         <label>Profile Image*:</label>
@@ -121,13 +131,14 @@ const PersonalDataForm = ({ data, updateData }) => {
             audio={false}
             ref={webcamRef}
             width="100px"
+            margin-left="45%"
             height="100px"
             screenshotFormat="image/jpeg"
             videoConstraints={{ facingMode: 'user' }}
           />
           <button type="button" onClick={handleCapture}>Capture Image</button>
           {localData.capturedImage && (
-            <img src={localData.capturedImage} alt="Captured"  width="100px"  height="100px" className="preview-image" />
+            <img src={localData.capturedImage} alt="Captured"  width="100px"  style={{"margin-left":"45%"}}  height="100px" className="preview-image" />
           )}
         </div>
       )}
@@ -135,7 +146,7 @@ const PersonalDataForm = ({ data, updateData }) => {
         <div className="form-group">
           <input type="file" accept="image/*" onChange={handleFileUpload} required />
           {localData.uploadedImage && (
-            <img src={localData.uploadedImage} alt="Uploaded" width="50px"  height="50px" className="preview-image" />
+            <img src={localData.uploadedImage} alt="Uploaded" width="64px" style={{"margin-left":"45%"}}  height="64px" className="preview-image" />
           )}
         </div>
       )}
