@@ -46,4 +46,19 @@
     border: 1px solid #ccc;
     border-radius: 4px;
   }
+
+  .error {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 4px;
+    display: block;
+  }
+  
+  .error-border {
+    border-color: #ff0000 !important;
+  }
+  
+  .subscription-card.error-border {
+    border: 2px solid #ff0000;
+  }
   

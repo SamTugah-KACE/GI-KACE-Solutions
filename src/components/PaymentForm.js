@@ -8,35 +8,87 @@ const PaymentForm = ({ data, updateData, billingData }) => {
     paymentMethod: ''
   });
 
-  useEffect(() => {
-    // Update the amount when billingData changes
-    setLocalData((prev) => ({
-      ...prev,
-      amountToBePaid: billingData.billAmount || 0
-    }));
-  }, [billingData.billAmount]);
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const validateForm = () => {
+    const validationErrors = {};
+    
+    if (!localData.paymentMethod.trim()) {
+      validationErrors.paymentMethod = 'Payment method is required';
+    }
+
+    if (!localData.amountToBePaid || localData.amountToBePaid <= 0) {
+      validationErrors.amountToBePaid = 'Invalid payment amount';
+    }
+
+    if (!localData.paymentDate) {
+      validationErrors.paymentDate = 'Payment date is required';
+    }
+
+    setErrors(validationErrors);
+    const isValid = Object.keys(validationErrors).length === 0;
+    return isValid;
+  };
 
   useEffect(() => {
-    updateData(localData);
-  }, [localData, updateData]);
+    setLocalData(prev => ({
+      ...prev,
+      amountToBePaid: billingData?.billAmount || 0
+    }));
+  }, [billingData?.billAmount]);
+
+  useEffect(() => {
+    const isValid = validateForm();
+    updateData(localData, isValid);
+  }, [localData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setLocalData((prev) => ({
+    setLocalData(prev => ({
       ...prev,
       [name]: value
     }));
+    setTouched(prev => ({
+      ...prev,
+      [name]: true
+    }));
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched(prev => ({
+      ...prev,
+      [name]: true
+    }));
+    validateForm();
   };
 
   return (
     <div className="payment-form">
       <div className="form-group">
         <label>Amount to be paid:</label>
-        <input type="number" name="amountToBePaid" value={localData.amountToBePaid} readOnly />
+        <input 
+          type="number" 
+          name="amountToBePaid" 
+          value={localData.amountToBePaid} 
+          readOnly 
+        />
+        {touched.amountToBePaid && errors.amountToBePaid && 
+          <span className="error">{errors.amountToBePaid}</span>
+        }
       </div>
       <div className="form-group">
         <label>Date:</label>
-        <input type="date" name="paymentDate" value={localData.paymentDate} readOnly />
+        <input 
+          type="date" 
+          name="paymentDate" 
+          value={localData.paymentDate} 
+          readOnly 
+        />
+        {touched.paymentDate && errors.paymentDate && 
+          <span className="error">{errors.paymentDate}</span>
+        }
       </div>
       <div className="form-group">
         <label>Payment Methods*:</label>
@@ -45,9 +97,13 @@ const PaymentForm = ({ data, updateData, billingData }) => {
           name="paymentMethod"
           value={localData.paymentMethod}
           onChange={handleChange}
+          onBlur={handleBlur}
           required
           placeholder="e.g., Credit Card, PayPal"
         />
+        {touched.paymentMethod && errors.paymentMethod && 
+          <span className="error">{errors.paymentMethod}</span>
+        }
       </div>
     </div>
   );

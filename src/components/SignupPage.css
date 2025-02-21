@@ -23,4 +23,11 @@
     padding: 10px 0;
     border-bottom: 1px solid #ddd;
   }
+
+  .error {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 4px;
+    display: block;
+  }
   

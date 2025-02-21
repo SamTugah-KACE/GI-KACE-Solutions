@@ -15,126 +15,110 @@ const steps = [
 ];
 
 const MultiStepForm = ({ selectedProduct }) => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    personalData: {},
-    organizationData: {},
-    productData: {},
-    billingData: {},
-    paymentData: {}
+    personal: {},
+    organization: {},
+    product: {},
+    billing: {},
+    payment: {}
   });
+  const [isStepValid, setIsStepValid] = useState(false);
 
-  const updateFormData = (section, data) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [section]: { ...prevData[section], ...data }
+  const updateData = (step, data, isValid = false) => {
+    setFormData(prev => ({
+      ...prev,
+      [step]: data
     }));
-  };
-
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep((prev) => prev + 1);
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1);
-    }
-  };
-
-  const handleSubmit = () => {
-    // Securely submit the data to your backend
-    console.log('Form Data Submitted:', formData);
-    alert('Form submitted successfully!');
-    // Reset or redirect as needed
-  };
-
-  // Basic validation: here we simply check that the current section has some data.
-  const validateStep = () => {
-    const sectionKey = 
-      currentStep === 0 ? 'personalData' :
-      currentStep === 1 ? 'organizationData' :
-      currentStep === 2 ? 'productData' :
-      currentStep === 3 ? 'billingData' :
-      currentStep === 4 ? 'paymentData' : '';
-    return formData[sectionKey] && Object.keys(formData[sectionKey]).length > 0;
+    setIsStepValid(isValid);
   };
 
   const renderStep = () => {
     switch (currentStep) {
-      case 0:
-        return (
-          <PersonalDataForm
-            data={formData.personalData}
-            updateData={(data) => updateFormData('personalData', data)}
-          />
-        );
       case 1:
-        return (
-          <OrganizationDataForm
-            data={formData.organizationData}
-            updateData={(data) => updateFormData('organizationData', data)}
-          />
-        );
+        return <PersonalDataForm 
+          data={formData.personal} 
+          updateData={(data, isValid) => updateData('personal', data, isValid)} 
+        />;
       case 2:
-        return (
-          <ProductDataForm
-            data={formData.productData}
-            updateData={(data) => updateFormData('productData', data)}
-            selectedProduct={selectedProduct}
-          />
-        );
+        return <OrganizationDataForm 
+          data={formData.organization} 
+          updateData={(data, isValid) => updateData('organization', data, isValid)} 
+        />;
       case 3:
-        return (
-          <BillingForm
-            data={formData.billingData}
-            updateData={(data) => updateFormData('billingData', data)}
-            productData={formData.productData}
-          />
-        );
+        return <ProductDataForm 
+          data={formData.product} 
+          updateData={(data, isValid) => updateData('product', data, isValid)}
+          selectedProduct={selectedProduct} 
+        />;
       case 4:
-        return (
-          <PaymentForm
-            data={formData.paymentData}
-            updateData={(data) => updateFormData('paymentData', data)}
-            billingData={formData.billingData}
-          />
-        );
+        return <BillingForm 
+          data={formData.billing} 
+          updateData={(data, isValid) => updateData('billing', data, isValid)}
+          productData={formData.product}
+        />;
+      case 5:
+        return <PaymentForm 
+          data={formData.payment} 
+          updateData={(data, isValid) => updateData('payment', data, isValid)}
+          billingData={formData.billing} 
+        />;
       default:
         return null;
     }
   };
 
+  const handleNext = () => {
+    if (currentStep < 5) {
+      setCurrentStep(prev => prev + 1);
+      setIsStepValid(false); // Reset validation for new step
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+      setIsStepValid(false); // Reset validation for new step
+    }
+  };
+
+  const handleSubmit = () => {
+    // Handle form submission
+    console.log('Form submitted:', formData);
+  };
+
+  const progress = (currentStep / 5) * 100;
+
   return (
     <div className="multi-step-form">
-      <h2>{steps[currentStep]}</h2>
       <div className="progress-bar">
-        <div
-          className="progress"
-          style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-        ></div>
+        <div className="progress" style={{ width: `${progress}%` }}></div>
       </div>
-      <form>
-        {renderStep()}
-        <div className="navigation-buttons">
-          {currentStep > 0 && (
-            <button type="button" onClick={handleBack}>
-              Back
-            </button>
-          )}
-          {currentStep < steps.length - 1 && (
-            <button type="button" onClick={handleNext} disabled={!validateStep()}>
-              Next
-            </button>
-          )}
-          {currentStep === steps.length - 1 && (
-            <button type="button" onClick={handleSubmit} disabled={!validateStep()}>
-              Submit
-            </button>
-          )}
-        </div>
-      </form>
+      {renderStep()}
+      <div className="navigation-buttons">
+        {currentStep > 1 && (
+          <button 
+            onClick={handlePrevious}
+          >
+            Back
+          </button>
+        )}
+        {currentStep < 5 ? (
+          <button 
+            onClick={handleNext}
+            disabled={!isStepValid}
+          >
+            Next
+          </button>
+        ) : (
+          <button 
+            onClick={handleSubmit}
+            disabled={!isStepValid}
+          >
+            Submit
+          </button>
+        )}
+      </div>
     </div>
   );
 };

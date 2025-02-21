@@ -40,7 +40,7 @@ const countries = [
   "Colombia",
   "Comoros",
   "Costa Rica",
-  "Côte d’Ivoire",
+  "Côte d'Ivoire",
   "Croatia",
   "Cuba",
   "Cyprus",
@@ -131,75 +131,199 @@ const countries = [
 
 const OrganizationDataForm = ({ data, updateData }) => {
   const [localData, setLocalData] = useState({
-    organizationName: '',
-    organizationalEmail: '',
-    country: '',
-    organizationType: '',
-    nature: '',
-    logos: []
+    organizationName: data?.organizationName || '',
+    organizationalEmail: data?.organizationalEmail || '',
+    country: data?.country || '',
+    organizationType: data?.organizationType || '',
+    nature: data?.nature || '',
+    logos: data?.logos || []
   });
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
-  useEffect(() => {
-    updateData(localData);
-  }, [localData, updateData]);
+  const validateForm = () => {
+    const validationErrors = {};
+    
+    if (!localData.organizationName.trim()) {
+      validationErrors.organizationName = 'Organization Name is required';
+    }
+
+    if (!localData.organizationalEmail.trim()) {
+      validationErrors.organizationalEmail = 'Organizational Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(localData.organizationalEmail)) {
+      validationErrors.organizationalEmail = 'Invalid email format';
+    }
+
+    if (!localData.country.trim()) {
+      validationErrors.country = 'Country is required';
+    }
+
+    if (!localData.organizationType.trim()) {
+      validationErrors.organizationType = 'Organization Type is required';
+    }
+
+    if (!localData.nature.trim()) {
+      validationErrors.nature = 'Nature is required';
+    }
+
+    if (!localData.logos.length) {
+      validationErrors.logos = 'Please upload at least one logo';
+    } else if (localData.logos.length > 3) {
+      validationErrors.logos = 'Maximum 3 logos allowed';
+    }
+
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setLocalData((prev) => ({
+    setLocalData(prev => ({
       ...prev,
       [name]: value
     }));
+    setTouched(prev => ({
+      ...prev,
+      [name]: true
+    }));
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched(prev => ({
+      ...prev,
+      [name]: true
+    }));
+    validateForm();
   };
 
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files).slice(0, 3);
     const logos = files.map((file) => URL.createObjectURL(file));
-    setLocalData((prev) => ({
+    setLocalData(prev => ({
       ...prev,
       logos
     }));
+    setTouched(prev => ({
+      ...prev,
+      logos: true
+    }));
   };
+
+  useEffect(() => {
+    const isValid = validateForm();
+    updateData(localData, isValid);
+  }, [localData]);
 
   return (
     <div className="organization-data-form">
       <div className="form-group">
         <label>Organization Name*:</label>
-        <input type="text" name="organizationName" value={localData.organizationName} onChange={handleChange} required />
+        <input 
+          type="text" 
+          name="organizationName" 
+          value={localData.organizationName} 
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={touched.organizationName && errors.organizationName ? 'error-border' : ''}
+          required 
+        />
+        {touched.organizationName && errors.organizationName && 
+          <span className="error">{errors.organizationName}</span>
+        }
       </div>
+
       <div className="form-group">
         <label>Organizational Email*:</label>
-        <input type="email" name="organizationalEmail" value={localData.organizationalEmail} onChange={handleChange} required />
+        <input 
+          type="email" 
+          name="organizationalEmail" 
+          value={localData.organizationalEmail} 
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={touched.organizationalEmail && errors.organizationalEmail ? 'error-border' : ''}
+          required 
+        />
+        {touched.organizationalEmail && errors.organizationalEmail && 
+          <span className="error">{errors.organizationalEmail}</span>
+        }
       </div>
+
       <div className="form-group">
         <label>Country*:</label>
-        <select name="country" value={localData.country} onChange={handleChange} required>
+        <select 
+          name="country" 
+          value={localData.country} 
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={touched.country && errors.country ? 'error-border' : ''}
+          required
+        >
           <option value="">Select Country</option>
           {countries.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
+        {touched.country && errors.country && 
+          <span className="error">{errors.country}</span>
+        }
       </div>
+
       <div className="form-group">
         <label>Organization Type*:</label>
-        <select name="organizationType" value={localData.organizationType} onChange={handleChange} required>
+        <select 
+          name="organizationType" 
+          value={localData.organizationType} 
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={touched.organizationType && errors.organizationType ? 'error-border' : ''}
+          required
+        >
           <option value="">Select Type</option>
           <option value="Government">Government</option>
           <option value="Private">Private</option>
           <option value="NGO">NGO</option>
         </select>
+        {touched.organizationType && errors.organizationType && 
+          <span className="error">{errors.organizationType}</span>
+        }
       </div>
+
       <div className="form-group">
         <label>Nature*:</label>
-        <select name="nature" value={localData.nature} onChange={handleChange} required>
+        <select 
+          name="nature" 
+          value={localData.nature} 
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={touched.nature && errors.nature ? 'error-border' : ''}
+          required
+        >
           <option value="">Select Nature</option>
           <option value="Single Managed">Single Managed</option>
           <option value="Branched Managed">Branched Managed</option>
         </select>
+        {touched.nature && errors.nature && 
+          <span className="error">{errors.nature}</span>
+        }
       </div>
+
       <div className="form-group">
         <label>Upload Logos* (max 3):</label>
-        <input type="file" accept="image/*" multiple onChange={handleFileUpload} />
+        <input 
+          type="file" 
+          accept="image/*" 
+          multiple 
+          onChange={handleFileUpload}
+          onBlur={handleBlur}
+          name="logos"
+          className={touched.logos && errors.logos ? 'error-border' : ''}
+        />
+        {touched.logos && errors.logos && 
+          <span className="error">{errors.logos}</span>
+        }
       </div>
+
       <div className="logos-preview">
         {localData.logos.map((logo, index) => (
           <img
