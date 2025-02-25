@@ -55,6 +55,9 @@ const LoginPage = () => {
     {slugError}
     
     </div>;
+  
+  // Add a safeguard in case org is still null (should not happen if slugError is false)
+  if (!org) return <div style={{ padding: '40px', textAlign: 'center' }}>No organization information available.</div>;
 
   // Use a fallback for org.name if org is null.
   const organizationName = org?.name || "Your Organization";
@@ -107,7 +110,7 @@ const LoginPage = () => {
       login(token, user);
       // In LoginPage.js, after successful login:
        localStorage.setItem('orgData', JSON.stringify(org));
-      navigate(`/${orgSlug}/dashboard`);
+      navigate(`/${orgSlug}/dashboard`, { replace: true });
       // navigate(`/${orgSlug}/dashboard`, {state: {org} });
 
     } catch (error) {
