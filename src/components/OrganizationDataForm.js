@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './OrganizationDataForm.css'; // add your styling
-
+import { Field, ErrorMessage, useFormikContext } from 'formik';
 // For brevity, only a few countries are listed; in production use a full alphabetical list.
 const countries = [
   "Afghanistan",
@@ -129,84 +129,176 @@ const countries = [
 
 ];
 
-const OrganizationDataForm = ({ data, updateData }) => {
-  const [localData, setLocalData] = useState({
-    organizationName: '',
-    organizationalEmail: '',
-    country: '',
-    organizationType: '',
-    nature: '',
-    logos: []
-  });
+// const OrganizationDataForm = ({ data, updateData }) => {
+//   const [localData, setLocalData] = useState({
+//     organizationName: '',
+//     organizationalEmail: '',
+//     country: '',
+//     organizationType: '',
+//     nature: '',
+//     logos: []
+//   });
+
+//   useEffect(() => {
+//     updateData(localData);
+//   }, [localData, updateData]);
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setLocalData((prev) => ({
+//       ...prev,
+//       [name]: value
+//     }));
+//   };
+
+//   const handleFileUpload = (e) => {
+//     const files = Array.from(e.target.files).slice(0, 3);
+//     const logos = files.map((file) => URL.createObjectURL(file));
+//     setLocalData((prev) => ({
+//       ...prev,
+//       logos
+//     }));
+//   };
+
+//   return (
+//     <div className="organization-data-form">
+//       <div className="form-group">
+//         <label>Organization Name*:</label>
+//         <input type="text" name="organizationName" value={localData.organizationName} onChange={handleChange} required />
+//       </div>
+//       <div className="form-group">
+//         <label>Organizational Email*:</label>
+//         <input type="email" name="organizationalEmail" value={localData.organizationalEmail} onChange={handleChange} required />
+//       </div>
+//       <div className="form-group">
+//         <label>Country*:</label>
+//         <select name="country" value={localData.country} onChange={handleChange} required>
+//           <option value="">Select Country</option>
+//           {countries.map((k, c, ) => (
+//             <option key={`${c}-${k}`} value={c}>{c}</option>
+//           ))}
+//         </select>
+//       </div>
+//       <div className="form-group">
+//         <label>Organization Type*:</label>
+//         <select name="organizationType" value={localData.organizationType} onChange={handleChange} required>
+//           <option value="">Select Type</option>
+//           <option value="Government">Government</option>
+//           <option value="Private">Private</option>
+//           <option value="NGO">NGO</option>
+//         </select>
+//       </div>
+//       <div className="form-group">
+//         <label>Nature*:</label>
+//         <select name="nature" value={localData.nature} onChange={handleChange} required>
+//           <option value="">Select Nature</option>
+//           <option value="Single Managed">Single Managed</option>
+//           <option value="Branched Managed">Branched Managed</option>
+//         </select>
+//       </div>
+//       <div className="form-group">
+//         <label>Upload Logos* (max 3):</label>
+//         <input type="file" accept="image/*" multiple onChange={handleFileUpload} />
+//       </div>
+//       <div className="logos-preview">
+//         {localData.logos.map((logo, index) => (
+//           <img
+//             key={index}
+//             src={logo}
+//             alt={`Logo ${index + 1}`}
+//             style={{ width: '64px',  height: '64px', objectFit: 'cover', margin: '10px' }}
+//           />
+//         ))}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default OrganizationDataForm;
+
+
+
+const OrganizationDataForm = () => {
+  const { values, setFieldValue } = useFormikContext();
+  const [logoPreviews, setLogoPreviews] = useState([]);
 
   useEffect(() => {
-    updateData(localData);
-  }, [localData, updateData]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setLocalData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+    if (values.orgLogo) {
+      // If orgLogo is a FileList or array of Files, create preview URLs.
+      const files = Array.isArray(values.orgLogo) ? values.orgLogo : [values.orgLogo];
+      const previews = files.map(file => URL.createObjectURL(file));
+      setLogoPreviews(previews);
+      // Cleanup: revoke object URLs when component unmounts or when files change.
+      return () => {
+        previews.forEach(url => URL.revokeObjectURL(url));
+      };
+    } else {
+      setLogoPreviews([]);
+    }
+  }, [values.orgLogo]);
 
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files).slice(0, 3);
-    const logos = files.map((file) => URL.createObjectURL(file));
-    setLocalData((prev) => ({
-      ...prev,
-      logos
-    }));
+    setFieldValue("orgLogo", files);
   };
 
   return (
     <div className="organization-data-form">
       <div className="form-group">
         <label>Organization Name*:</label>
-        <input type="text" name="organizationName" value={localData.organizationName} onChange={handleChange} required />
+        <Field name="name" type="text" required />
+        <ErrorMessage name="name" component="div" className="error" />
       </div>
       <div className="form-group">
         <label>Organizational Email*:</label>
-        <input type="email" name="organizationalEmail" value={localData.organizationalEmail} onChange={handleChange} required />
+        <Field name="orgEmail" type="email" required />
+        <ErrorMessage name="orgEmail" component="div" className="error" />
       </div>
       <div className="form-group">
         <label>Country*:</label>
-        <select name="country" value={localData.country} onChange={handleChange} required>
+        <Field as="select" name="country" required>
           <option value="">Select Country</option>
-          {countries.map((k, c, ) => (
-            <option key={`${c}-${k}`} value={c}>{c}</option>
+          {countries.map((country, index) => (
+            <option key={`${country}-${index}`} value={country}>{country}</option>
           ))}
-        </select>
+        </Field>
+        <ErrorMessage name="country" component="div" className="error" />
       </div>
       <div className="form-group">
         <label>Organization Type*:</label>
-        <select name="organizationType" value={localData.organizationType} onChange={handleChange} required>
+        <Field as="select" name="type" required>
           <option value="">Select Type</option>
           <option value="Government">Government</option>
           <option value="Private">Private</option>
           <option value="NGO">NGO</option>
-        </select>
+        </Field>
+        <ErrorMessage name="type" component="div" className="error" />
       </div>
       <div className="form-group">
         <label>Nature*:</label>
-        <select name="nature" value={localData.nature} onChange={handleChange} required>
+        <Field as="select" name="nature" required>
           <option value="">Select Nature</option>
           <option value="Single Managed">Single Managed</option>
           <option value="Branched Managed">Branched Managed</option>
-        </select>
+        </Field>
+        <ErrorMessage name="nature" component="div" className="error" />
+      </div>
+      <div className="form-group">
+        <label>Employee Range*:</label>
+        <Field name="employeeRange" type="text" required />
+        <ErrorMessage name="employeeRange" component="div" className="error" />
       </div>
       <div className="form-group">
         <label>Upload Logos* (max 3):</label>
         <input type="file" accept="image/*" multiple onChange={handleFileUpload} />
       </div>
       <div className="logos-preview">
-        {localData.logos.map((logo, index) => (
+        {logoPreviews.map((logo, index) => (
           <img
             key={index}
             src={logo}
             alt={`Logo ${index + 1}`}
-            style={{ width: '64px',  height: '64px', objectFit: 'cover', margin: '10px' }}
+            style={{ width: '64px', height: '64px', objectFit: 'cover', margin: '10px' }}
           />
         ))}
       </div>

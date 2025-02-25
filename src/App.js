@@ -15,7 +15,7 @@ function useTheme() {
   useEffect(() => {
     const hour = new Date().getHours();
     // Example: if between 7am and 7pm use light theme, otherwise dark theme
-    if (hour >= 7 && hour < 19) {
+    if (hour >= 7 && hour < 17) {
       document.body.classList.remove('dark-theme');
       document.body.classList.add('light-theme');
     } else {

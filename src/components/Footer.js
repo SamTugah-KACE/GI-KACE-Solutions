@@ -22,9 +22,9 @@ const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer-content">
-        <p>&copy; {new Date().getFullYear()} SaaS Program. All rights reserved.</p>
+       
         <div className="powered-by">
-          <span>Powered by:</span>
+        <p>&copy; {new Date().getFullYear()} SaaS Program. All rights reserved.<span>  Powered by:</span> </p>
           <img src={orgLogo} alt="Organization Logo" className="org-logo" />
         </div>
       </div>

@@ -1,5 +1,5 @@
 // src/components/LoginPage.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './LoginPage.css';
 import request from './request';
 import { useNavigate } from 'react-router-dom';
@@ -7,10 +7,20 @@ import FacialAuth from './FacialAuth';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [orgLogo, setOrgLogo] = useState(null);
   const [loginMode, setLoginMode] = useState("password"); // "password" or "facial"
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [facialImage, setFacialImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // On mount, retrieve the organization's logo URL
+  useEffect(() => {
+    const logo = localStorage.getItem('orgLogo');
+    if (logo) {
+      setOrgLogo(logo);
+    }
+  }, []);
  
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,17 +28,21 @@ const LoginPage = () => {
       alert("Username is required.");
       return;
     }
+
+    setLoading(true);
     let formData = new FormData();
     formData.append("username", username);
     if (loginMode === "password") {
       if (!password) {
         alert("Password is required for traditional login.");
+        setLoading(false);
         return;
       }
       formData.append("password", password);
     } else {
       if (!facialImage) {
         alert("Please capture your facial image for authentication.");
+        setLoading(false);
         return;
       }
       // Convert facialImage dataURL to Blob then File
@@ -45,11 +59,18 @@ const LoginPage = () => {
       navigate("/dashboard");
     } catch (error) {
       alert("Login failed: " + error.message);
+    }finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="login-page">
+    <div className="login-page" 
+    style={{
+      backgroundImage: orgLogo ? `url(${orgLogo})` : 'url(/default-background.jpg)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
+    }}>
       <div className="login-container">
         <h2>Sign In</h2>
         <form onSubmit={handleLogin}>
@@ -94,7 +115,10 @@ const LoginPage = () => {
             <FacialAuth onCapture={setFacialImage} />
           )}
 
-          <button type="submit" className="login-btn">Login</button>
+          <button type="submit" className="login-btn" disabled={loading}>
+          {loading ? <div className="spinner"></div> : "Login"}
+
+          </button>
         </form>
       </div>
     </div>
