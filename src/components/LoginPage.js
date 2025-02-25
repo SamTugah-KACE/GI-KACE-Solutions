@@ -110,7 +110,7 @@ const LoginPage = () => {
       login(token, user);
       // In LoginPage.js, after successful login:
        localStorage.setItem('orgData', JSON.stringify(org));
-      navigate(`/${orgSlug}/dashboard`, { replace: true });
+      navigate(`/${orgSlug}/dashboard`, { replace: true }); 
       // navigate(`/${orgSlug}/dashboard`, {state: {org} });
 
     } catch (error) {
