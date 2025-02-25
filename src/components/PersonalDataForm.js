@@ -172,7 +172,7 @@ const PersonalDataForm = () => {
   const [fetchedRoles, setFetchedRoles] = useState([]);
 
   // Fetch default roles from API
-  useEffect(() => {
+  useEffect(() => { 
     fetch('https://staff-records-backend.onrender.com/api/default/fetch-all/?skip=0&limit=100')
       .then((res) => res.json())
       .then((data) => {
