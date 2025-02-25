@@ -83,9 +83,10 @@ const LoginPage = () => {
     }
 
     try {
-      const response = await request.post("/auth/login", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      // const response = await request.post("/auth/login", formData, {
+      //   headers: { "Content-Type": "multipart/form-data" }
+      // });.
+      const response = await request.post("/auth/login", formData);
       // Assume the API returns a token and user info
       const { token, user } = response.data;
       login(token, user);

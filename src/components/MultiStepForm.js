@@ -264,8 +264,10 @@ const MultiStepForm = ({ selectedProduct, onSubmit = (data) => console.log("Subm
     // window.location.reload();
     // navigate(`${access_url}/signin`);
     window.location.href = `${access_url}/signin`;
+    window.location.reload();
   } else {
     window.location.href = `${access_url}/signin`;
+    window.location.reload();
   }
     } catch (error) {
       console.error("Error during organization signup:", error);
