@@ -33,7 +33,7 @@ function useTheme() {
 
 
 function App() {
-  useTheme();
+  // useTheme();
   return (
     <AuthProvider>
     <Routes>
