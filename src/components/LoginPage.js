@@ -42,6 +42,7 @@ const LoginPage = () => {
     if (logo) {
       // setOrgLogo(logo);
       const safeLogoUrl = logo ? encodeURI(logo) : null;
+      console.log("safe logo uirl: ", safeLogoUrl)
      setOrgLogo(safeLogoUrl);
     }
   }, [org]);
