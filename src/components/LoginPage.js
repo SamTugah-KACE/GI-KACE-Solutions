@@ -102,7 +102,7 @@ const LoginPage = () => {
   return (
     <div className="login-page" 
     style={{
-      backgroundImage: orgLogo ? `url(${orgLogo})` : 'url(/stock-photo.jpg)',
+      backgroundImage: orgLogo ? `url(${orgLogo})` : 'url(/assets/images/stock-photo.jpg)',
       backgroundSize: 'cover',
       backgroundPosition: 'center'
     }}>
