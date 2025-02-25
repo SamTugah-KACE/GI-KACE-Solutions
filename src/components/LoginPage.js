@@ -83,7 +83,7 @@ const LoginPage = () => {
     }
 
     try {
-      const response = await request.post("/login", formData, {
+      const response = await request.post("/auth/login", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
       // Assume the API returns a token and user info
@@ -106,7 +106,7 @@ const LoginPage = () => {
       backgroundPosition: 'center'
     }}>
       <div className="login-container">
-        <h2>Sign In to your {organizationName}</h2>
+        <h2> {organizationName}</h2>
         <form onSubmit={handleLogin}>
           <label>Username:</label>
           <input
