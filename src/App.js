@@ -6,6 +6,9 @@ import LandingPage from './components/LandingPage';
 import SignupPage from './components/SignupPage';
 import SigninPage from './components/LoginPage'
 import Dashboard from './components/snr_management/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
+import UnauthorizedPage from './components/UnauthorizedPage';
+import { AuthProvider } from './context/AuthContext';
 // import AlertNotifier from './components/AlertNotifier';
 
 
@@ -32,33 +35,20 @@ function useTheme() {
 function App() {
   useTheme();
   return (
+    <AuthProvider>
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/signup" element={<SignupPage />} />
-      <Route path="/signin" element={<SigninPage />}   />
-      <Route path="/dashboard" element={<Dashboard />} />
-      {/* <Route element={<AlertNotifier />}  /> */}
+      <Route path="/:orgSlug/signin" element={<SigninPage />}   />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
+       {/* Wrap protected routes */}
+       <Route element={<ProtectedRoute />}>
+          <Route path="/:orgSlug/dashboard" element={<Dashboard />} />
+        </Route>
     </Routes>
+     </AuthProvider>
   );
 
-  // return ( 
-  //   <div className="App">
-  //     <header className="App-header">
-  //       <img src={logo} className="App-logo" alt="logo" />
-  //       <p>
-  //         Edit <code>src/App.js</code> and save to reload.
-  //       </p>
-  //       <a
-  //         className="App-link"
-  //         href="https://reactjs.org"
-  //         target="_blank"
-  //         rel="noopener noreferrer"
-  //       >
-  //         Learn React
-  //       </a>
-  //     </header>
-  //   </div>
-  // );
 }
 
 export default App;

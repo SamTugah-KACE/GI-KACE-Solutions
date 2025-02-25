@@ -2,11 +2,20 @@
 import React, { useEffect, useState } from 'react';
 import './LoginPage.css';
 import request from './request';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import FacialAuth from './FacialAuth';
+import useValidateSlug from '../hooks/useValidateSlug';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { orgSlug } = useParams();
+  const { loadin: slugLoading, org, error:slugError } = useValidateSlug(orgSlug);
+
+  const { login } = useAuth();
+
+
+  
   const [orgLogo, setOrgLogo] = useState(null);
   const [loginMode, setLoginMode] = useState("password"); // "password" or "facial"
   const [username, setUsername] = useState("");
@@ -14,13 +23,35 @@ const LoginPage = () => {
   const [facialImage, setFacialImage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // On mount, retrieve the organization's logo URL
+  // On mount (or when org data is available), try to get the logo:
   useEffect(() => {
-    const logo = localStorage.getItem('orgLogo');
+    // Try localStorage first
+    let logo = localStorage.getItem('orgLogo');
+    if (!logo && org && org.logos) {
+      // org.logos is a dictionary; choose one of the logos (for example, the first one)
+      const logos = Object.values(org.logos);
+      if (logos.length > 0) {
+        logo = logos[0];
+        // Optionally store it for future visits:
+        localStorage.setItem('orgLogo', logo);
+      }
+    }
     if (logo) {
       setOrgLogo(logo);
     }
-  }, []);
+  }, [org]);
+
+
+  if (slugLoading) return <div>Loading organization info...</div>;
+  if (slugError) return <div style={{ padding: '40px', textAlign: 'center' }}>
+    <h1>This site can't be reached</h1>
+    
+    {slugError}
+    
+    </div>;
+
+  // Use a fallback for org.name if org is null.
+  const organizationName = org?.name || "Your Organization";
  
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -55,8 +86,11 @@ const LoginPage = () => {
       const response = await request.post("/login", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-      // On success, navigate to dashboard
-      navigate("/dashboard");
+      // Assume the API returns a token and user info
+      const { token, user } = response.data;
+      login(token, user);
+      navigate(`/${orgSlug}/dashboard`);
+
     } catch (error) {
       alert("Login failed: " + error.message);
     }finally {
@@ -67,12 +101,12 @@ const LoginPage = () => {
   return (
     <div className="login-page" 
     style={{
-      backgroundImage: orgLogo ? `url(${orgLogo})` : 'url(/default-background.jpg)',
+      backgroundImage: orgLogo ? `url(${orgLogo})` : 'url(../assets/images/stock-photo.jpg)',
       backgroundSize: 'cover',
       backgroundPosition: 'center'
     }}>
       <div className="login-container">
-        <h2>Sign In</h2>
+        <h2>Sign In to your {organizationName}</h2>
         <form onSubmit={handleLogin}>
           <label>Username:</label>
           <input
