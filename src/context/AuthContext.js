@@ -11,9 +11,18 @@ export const AuthProvider = ({ children }) => {
   // Load auth state from localStorage on mount
   useEffect(() => {
     const storedToken = localStorage.getItem('authToken');
-    const storedUser = localStorage.getItem('authUser');
+    const storedUserStr = localStorage.getItem('authUser');
+    let storedUser = null;
+    if (storedUserStr) {
+        try {
+          storedUser = JSON.parse(storedUserStr);
+        } catch (error) {
+          console.error('Error parsing stored user:', error);
+        }
+      }
+
     if (storedToken && storedUser) {
-      setAuth({ token: storedToken, user: JSON.parse(storedUser) });
+      setAuth({ token: storedToken, user: storedUser });
     }
   }, []);
 
