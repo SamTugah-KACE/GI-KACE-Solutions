@@ -6,6 +6,7 @@ import SearchBar from '../pages/SearchBar';
 import SummaryCards from '../pages/SummaryCards';
 import DashboardTable from '../pages/DashboardTable';
 import NewUserModal from '../pages/NewUserModal';
+// import { useLocation } from 'react-router-dom';
 // import AlertNotifier from '../AlertNotifier';
 // import Inbox from '../pages/InboxButton';
 // import DashboardDesigner from '../DashboardDesigner';
@@ -14,11 +15,19 @@ import './Dashboard.css';
 import ProfileCard from '../pages/ProfileCard';
 
 const Dashboard = () => {
+  // const { state } = useLocation();
+  // In DashboardHeader.js:
+const org = JSON.parse(localStorage.getItem('orgData') || '{}');
+// const organizationName = orgData.name || "Your Organization";
+  // If state.org is not provided, you might fallback to a default value or fetch it from context/localStorage.
+  // const org = state?.org;
+
+
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   // const [showDesigner, setShowDesigner] = useState(false);
   return (
     <div className="dashboard-container">
-      <Header />
+      <Header org={org} />
       <ProfileCard /> {/* Positioned immediately below header */}
       <div className="dashboard-content">
         <Sidebar 

@@ -40,7 +40,9 @@ const LoginPage = () => {
       }
     }
     if (logo) {
-      setOrgLogo(logo);
+      // setOrgLogo(logo);
+      const safeLogoUrl = logo ? encodeURI(logo) : null;
+     setOrgLogo(safeLogoUrl);
     }
   }, [org]);
 
@@ -102,7 +104,10 @@ const LoginPage = () => {
       // Assume the API returns a token and user info
       const { token, user } = response.data;
       login(token, user);
+      // In LoginPage.js, after successful login:
+       localStorage.setItem('orgData', JSON.stringify(org));
       navigate(`/${orgSlug}/dashboard`);
+      // navigate(`/${orgSlug}/dashboard`, {state: {org} });
 
     } catch (error) {
       alert("Login failed: " + error.message);
@@ -114,7 +119,7 @@ const LoginPage = () => {
   return (
     <div className="login-page" 
     style={{
-      backgroundImage: orgLogo ? `url(${orgLogo})` : `url(${stockPhoto})`,
+      backgroundImage: orgLogo ? `url(${encodeURI(orgLogo)})` : `url(${stockPhoto})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center'
     }}>

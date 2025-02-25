@@ -5,12 +5,25 @@ import rightLogo from '../../assets/images/gi-kace.png';
 // import userAvatar from '../../assets/images/avatar.jpeg';
 // import ProfileDropdown from './ProfileDropdown';
 
-const Header = () => {
+const Header = ({  org }) => {
+  // Assume org.logos is a dictionary. We convert it to an array of URLs.
+  const logos = org?.logos ? Object.values(org.logos).map(url => encodeURI(url)) : [];
+  // Choose first logo for the left, second for the right if available.
+  const leftLogo = logos[0] || null;
+  const rightLogo = logos[1] || null;
+  const organizationName = org?.name || "Your Organization";
+
   return (
     <header className="dashboard-header">
-      <img src={leftLogo} alt="Left Logo" className="header-logo" />
-      <h1 className="org-name">Your Organization Name</h1>
-      <div className="header-right">
+      {/* <img src={leftLogo} alt="Left Logo" className="header-logo" /> */}
+      {leftLogo && (
+        <img src={leftLogo} alt="Left Logo" className="header-logo left-logo" />
+      )}
+      <h1 className="org-name">{organizationName}</h1>
+      {rightLogo && (
+        <img src={rightLogo} alt="Right Logo" className="header-logo right-logo" />
+      )}
+      {/* <div className="header-right">
         <img src={rightLogo} alt="Right Logo" className="header-logo" />
         
         <br/>
@@ -24,7 +37,7 @@ const Header = () => {
         </div> */}
         
         {/* <ProfileDropdown /> */}
-      </div>
+      {/* </div> } */}
       
     </header>
   );
