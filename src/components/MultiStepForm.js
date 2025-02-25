@@ -259,7 +259,7 @@ const MultiStepForm = ({ selectedProduct, onSubmit = (data) => console.log("Subm
 
   console.log("env: ", process.env.NODE_ENV);
   if (process.env.NODE_ENV === 'development') {
-
+  console.log("\n development** ")
     window.history.pushState({}, '', `${access_url}/signin`);
     window.location.reload();
     // navigate('/signin');
