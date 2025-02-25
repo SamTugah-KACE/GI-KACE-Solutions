@@ -265,6 +265,11 @@ const MultiStepForm = ({ selectedProduct, onSubmit = (data) => console.log("Subm
     // navigate(`${access_url}/signin`);
     window.location.href = `${access_url}/signin`;
     window.location.reload();
+
+    ///// Extract the slug from access_url. If access_url = "https://gi-kace-solutions.onrender.com/ghana-india-kofi-annan-centre-of-excellence-in-ict"
+// then slug = "ghana-india-kofi-annan-centre-of-excellence-in-ict"
+//const slug = access_url.split('/').pop(); // or your custom extraction logic
+// navigate(`/${slug}/signin`);
   } else {
     window.location.href = `${access_url}/signin`;
     window.location.reload();

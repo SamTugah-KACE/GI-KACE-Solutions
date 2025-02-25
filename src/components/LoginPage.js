@@ -6,6 +6,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import FacialAuth from './FacialAuth';
 import useValidateSlug from '../hooks/useValidateSlug';
 import { useAuth } from '../context/AuthContext';
+import stockPhoto from '../assets/images/stock-photo.jpg'; // Import the default background image
+
+
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -63,13 +66,20 @@ const LoginPage = () => {
     setLoading(true);
     let formData = new FormData();
     formData.append("username", username);
+
+    let url = "/auth/login"; // Base endpoint
+
+
     if (loginMode === "password") {
       if (!password) {
         alert("Password is required for traditional login.");
         setLoading(false);
         return;
       }
-      formData.append("password", password);
+      // formData.append("password", password);
+       // If your backend expects the password as a query parameter, append it here
+       url += `?password=${encodeURIComponent(password)}`;
+       // Do NOT append password to formData in this case.
     } else {
       if (!facialImage) {
         alert("Please capture your facial image for authentication.");
@@ -86,7 +96,9 @@ const LoginPage = () => {
       // const response = await request.post("/auth/login", formData, {
       //   headers: { "Content-Type": "multipart/form-data" }
       // });.
-      const response = await request.post("/auth/login", formData);
+      // const response = await request.post("/auth/login", formData);
+
+      const response = await request.post(url, formData);
       // Assume the API returns a token and user info
       const { token, user } = response.data;
       login(token, user);
@@ -102,7 +114,7 @@ const LoginPage = () => {
   return (
     <div className="login-page" 
     style={{
-      backgroundImage: orgLogo ? `url(${orgLogo})` : 'url(../assets/images/stock-photo.jpg)',
+      backgroundImage: orgLogo ? `url(${orgLogo})` : `url(${stockPhoto})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center'
     }}>
