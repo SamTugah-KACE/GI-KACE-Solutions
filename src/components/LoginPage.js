@@ -116,8 +116,8 @@ const LoginPage = () => {
       
       console.log("\nlogin response: ", response);
       console.log("\nlogin response.data: ", response.data);
-      const { token, user } = response.data;
-      login(token, user);
+      const { token, username } = response.data;
+      login(token, username);
       // In LoginPage.js, after successful login:
        localStorage.setItem('orgData', JSON.stringify(org));
 
@@ -127,7 +127,7 @@ const LoginPage = () => {
        // Decide which dashboard to navigate to based on user's permissions.
       // Adjust these keys as per your backend response.
       let targetRoute = "";
-      const perms = response.permissions || {};
+      const perms = response.data.permissions || {};
       console.log("perms: ", perms);
       console.log("is_admin: ", perms['admin']);
       if (
