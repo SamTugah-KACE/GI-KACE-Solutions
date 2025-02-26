@@ -129,9 +129,9 @@ const LoginPage = () => {
       let targetRoute = "";
       const perms = response.data.permissions || {};
       console.log("perms: ", perms);
-      console.log("is_admin: ", perms['admin']);
+      console.log("is_admin: ", perms.admin);
       if (
-        perms['admin']     ||
+        perms.admin     ||
         perms.add_new_staff ||
         perms['Add New Role'] ||
         perms['Approve|Decline Requests']
