@@ -43,7 +43,8 @@ const LoginPage = () => {
       // setOrgLogo(logo);
       const safeLogoUrl = logo ? encodeURI(logo) : null;
       console.log("safe logo uirl: ", safeLogoUrl)
-     setOrgLogo(safeLogoUrl);
+     setOrgLogo(logo);
+     console.log("\norgLogo: ", orgLogo)
     }
   }, [org]);
 
@@ -123,7 +124,7 @@ const LoginPage = () => {
   return (
     <div className="login-page" 
     style={{
-      backgroundImage: orgLogo ? `url(${encodeURI(orgLogo)})` : `url(${stockPhoto})`,
+      backgroundImage: orgLogo ? `url(${orgLogo})` : `url(${stockPhoto})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center'
     }}>

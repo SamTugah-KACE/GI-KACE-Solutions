@@ -10,7 +10,7 @@ const useValidateSlug = (slug) => {
   useEffect(() => {
     const fetchOrg = async () => {
       try {
-        const response = await request.get(`/organizations/organizations/slug/${slug}`);
+        const response = await request.get(`/organizations/slug/${slug}`);
         setOrg(response.data);
       } catch (err) {
         setError(err.response?.data?.detail || 

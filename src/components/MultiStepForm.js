@@ -244,7 +244,7 @@ const MultiStepForm = ({ selectedProduct, onSubmit = (data) => console.log("Subm
 
     try {
       setLoading(true);
-      const response = await request.post("/organizations/organizations/create-form/", fd, {
+      const response = await request.post("/organizations/create-form/", fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       console.log("Response from API:", response.data);
