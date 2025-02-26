@@ -1,11 +1,14 @@
 import React from 'react';
 import './Header.css';
+import { useOrganization } from '../../context/OrganizationContext';
 // import leftLogo from '../../assets/images/moc.jpg';    // ensure these files exist
 // import rightLogo from '../../assets/images/gi-kace.png';
 // import userAvatar from '../../assets/images/avatar.jpeg';
 // import ProfileDropdown from './ProfileDropdown';
 
-const Header = ({  org }) => {
+const Header = () => {
+
+  const { org } = useOrganization();
   // Assume org.logos is a dictionary. We convert it to an array of URLs.
   const logos = org?.logos ? Object.values(org.logos).map(url => encodeURI(url)) : [];
   // Choose first logo for the left, second for the right if available.

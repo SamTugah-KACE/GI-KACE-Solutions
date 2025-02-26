@@ -13,21 +13,23 @@ import NewUserModal from '../pages/NewUserModal';
 import './Dashboard.css';
 // import ProfileDropdown from '../pages/ProfileDropdown';
 import ProfileCard from '../pages/ProfileCard';
+// import { useOrganization } from '../../context/OrganizationContext';
 
 const Dashboard = () => {
   // const { state } = useLocation();
   // In DashboardHeader.js:
-const org = JSON.parse(localStorage.getItem('orgData') || '{}');
+// const org = JSON.parse(localStorage.getItem('orgData') || '{}');
 // const organizationName = orgData.name || "Your Organization";
   // If state.org is not provided, you might fallback to a default value or fetch it from context/localStorage.
   // const org = state?.org;
 
+  // const { org } = useOrganization();
 
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   // const [showDesigner, setShowDesigner] = useState(false);
   return (
     <div className="dashboard-container">
-      <Header org={org} />
+      <Header  />
       <ProfileCard /> {/* Positioned immediately below header */}
       <div className="dashboard-content">
         <Sidebar 

@@ -6,6 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import FacialAuth from './FacialAuth';
 import useValidateSlug from '../hooks/useValidateSlug';
 import { useAuth } from '../context/AuthContext';
+import { useOrganization } from '../context/OrganizationContext';
 import stockPhoto from '../assets/images/stock-photo.jpg'; // Import the default background image
 
 
@@ -16,6 +17,7 @@ const LoginPage = () => {
   const { loadin: slugLoading, org, error:slugError } = useValidateSlug(orgSlug);
 
   const { login } = useAuth();
+  const { setOrgData } = useOrganization();
 
 
   
@@ -28,6 +30,8 @@ const LoginPage = () => {
 
   // On mount (or when org data is available), try to get the logo:
   useEffect(() => {
+    if (org) {
+      setOrgData(org);
     // Try localStorage first
     let logo = localStorage.getItem('orgLogo');
     if (!logo && org && org.logos) {
@@ -47,7 +51,8 @@ const LoginPage = () => {
      console.log("\norgLogo: ", orgLogo)
      console.log("\nencodinURL: ", encodeURI(orgLogo))
     }
-  }, [org]);
+  }
+  }, [org, setOrgData]);
 
 
   if (slugLoading) return <div>Loading organization info...</div>;
@@ -62,7 +67,7 @@ const LoginPage = () => {
   if (!org) return <div style={{ padding: '40px', textAlign: 'center' }}>No organization information available.</div>;
 
   // Use a fallback for org.name if org is null.
-  const organizationName = org?.name || "Your Organization";
+  const organizationName = org?.name || "";
  
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -112,6 +117,37 @@ const LoginPage = () => {
       login(token, user);
       // In LoginPage.js, after successful login:
        localStorage.setItem('orgData', JSON.stringify(org));
+
+
+      /*
+
+       // Decide which dashboard to navigate to based on user's permissions.
+      // Adjust these keys as per your backend response.
+      let targetRoute = "";
+      const perms = user.permissions || {};
+      if (
+        perms.add_new_staff ||
+        perms['Add New Role'] ||
+        perms['Approve|Decline Requests']
+      ) {
+        targetRoute = "/dashboard";
+      } else if (
+        perms.view_security_logs ||
+        perms.systems_administration
+      ) {
+        targetRoute = "/systems";
+      } else {
+        targetRoute = "/staff";
+      }
+      // Navigate to the appropriate route using the orgSlug and replace the history entry.
+      navigate(`/${orgSlug}${targetRoute}`, { replace: true });
+
+
+      */
+
+
+
+
       navigate(`/${orgSlug}/dashboard`, { replace: true }); 
       // navigate(`/${orgSlug}/dashboard`, {state: {org} });
 
