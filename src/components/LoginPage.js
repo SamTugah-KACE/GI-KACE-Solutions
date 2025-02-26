@@ -174,7 +174,7 @@ const LoginPage = () => {
     }}>
       <div className="login-container">
         <h2> {organizationName}</h2>
-        <img src={orgLogo} alt="orgLogo"/>
+        
         
 
         <form onSubmit={handleLogin}>
