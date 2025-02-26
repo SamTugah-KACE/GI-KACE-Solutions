@@ -125,8 +125,10 @@ const LoginPage = () => {
       // Adjust these keys as per your backend response.
       let targetRoute = "";
       const perms = user.permissions || {};
+      console.log("perms: ", perms);
+      console.log("is_admin: ", perms['admin']);
       if (
-        perms.admin     ||
+        perms['admin']     ||
         perms.add_new_staff ||
         perms['Add New Role'] ||
         perms['Approve|Decline Requests']
