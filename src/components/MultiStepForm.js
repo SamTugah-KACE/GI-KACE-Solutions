@@ -262,17 +262,18 @@ const MultiStepForm = ({ selectedProduct, onSubmit = (data) => console.log("Subm
   console.log("\n development** ")
     // window.history.pushState({}, '', `${access_url}/signin`);
     // window.location.reload();
-    // navigate(`${access_url}/signin`);
-    window.location.href = `${access_url}/signin`;
-    window.location.reload();
+    navigate(`/${access_url}/signin`,  { replace: true });
+    // window.location.href = `/${access_url}/signin`;
+    // window.location.reload();
 
     ///// Extract the slug from access_url. If access_url = "https://gi-kace-solutions.onrender.com/ghana-india-kofi-annan-centre-of-excellence-in-ict"
 // then slug = "ghana-india-kofi-annan-centre-of-excellence-in-ict"
 //const slug = access_url.split('/').pop(); // or your custom extraction logic
 // navigate(`/${slug}/signin`);
   } else {
-    window.location.href = `${access_url}/signin`;
-    window.location.reload();
+    navigate(`/${access_url}/signin`,  { replace: true });
+    // window.location.href = `/${access_url}/signin`;
+    // window.location.reload();
   }
     } catch (error) {
       console.error("Error during organization signup:", error);
