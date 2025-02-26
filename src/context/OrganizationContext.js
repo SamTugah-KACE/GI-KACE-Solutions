@@ -1,5 +1,5 @@
 // src/context/OrganizationContext.js
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Create the context.
 const OrganizationContext = createContext();
@@ -19,7 +19,7 @@ export const OrganizationProvider = ({ children }) => {
       }
     }
   }, []);
-  
+
   // Function to set organization data.
   const setOrgData = (orgData) => {
     setOrganization(orgData);
