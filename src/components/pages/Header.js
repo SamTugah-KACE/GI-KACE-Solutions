@@ -9,7 +9,7 @@ import { useOrganization } from '../../context/OrganizationContext';
 const Header = () => {
 
   const { org } = useOrganization();
-  console.log("org: ", org.name);
+  console.log("org in header: ", org.name);
   // Assume org.logos is a dictionary. We convert it to an array of URLs.
   const logos = org?.logos ? Object.values(org.logos).map(url => encodeURI(url)) : [];
   // Choose first logo for the left, second for the right if available.

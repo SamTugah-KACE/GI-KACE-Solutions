@@ -19,7 +19,7 @@ const LoginPage = () => {
   const { login } = useAuth();
   const { setOrgData } = useOrganization();
 
-
+ console.log("\nsetOrgData in header: ", setOrgData)
   
   const [orgLogo, setOrgLogo] = useState(null);
   const [loginMode, setLoginMode] = useState("password"); // "password" or "facial"
@@ -49,7 +49,7 @@ const LoginPage = () => {
       console.log("safe logo uirl: ", safeLogoUrl)
      setOrgLogo(encodeURI(logo));
      console.log("\norgLogo: ", orgLogo)
-     console.log("\nencodinURL: ", encodeURI(orgLogo))
+    //  console.log("\nencodinURL: ", encodeURI(orgLogo))
     }
   }
   }, [org, setOrgData]);
@@ -174,6 +174,9 @@ const LoginPage = () => {
     }}>
       <div className="login-container">
         <h2> {organizationName}</h2>
+        <img src={orgLogo} alt="orgLogo"/>
+        <img src={safeLogoUrl} alt="safeLogoUrl" />
+
         <form onSubmit={handleLogin}>
           <label>Username:</label>
           <input

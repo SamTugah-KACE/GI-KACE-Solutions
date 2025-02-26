@@ -25,7 +25,7 @@ export const OrganizationProvider = ({ children }) => {
   // Function to set organization data.
   const setOrgData = (orgData) => {
     setOrganization(orgData);
-    console.log("setOrgData: ", organization);
+    console.log("setOrgData in context: ", organization);
     // Optionally store in localStorage for persistence across sessions.
     localStorage.setItem('orgData', JSON.stringify(orgData));
   };
