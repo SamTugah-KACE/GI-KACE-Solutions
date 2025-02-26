@@ -113,6 +113,9 @@ const LoginPage = () => {
 
       const response = await request.post(url, formData);
       // Assume the API returns a token and user info
+      
+      console.log("\nlogin response: ", response);
+      console.log("\nlogin response.data: ", response.data);
       const { token, user } = response.data;
       login(token, user);
       // In LoginPage.js, after successful login:
@@ -124,7 +127,7 @@ const LoginPage = () => {
        // Decide which dashboard to navigate to based on user's permissions.
       // Adjust these keys as per your backend response.
       let targetRoute = "";
-      const perms = user.permissions || {};
+      const perms = response.permissions || {};
       console.log("perms: ", perms);
       console.log("is_admin: ", perms['admin']);
       if (
@@ -155,6 +158,7 @@ const LoginPage = () => {
       // navigate(`/${orgSlug}/dashboard`, {state: {org} });
 
     } catch (error) {
+      console.log("\n\nlogin failed with error: ", error.message);
       alert("Login failed: " + error.message);
     }finally {
       setLoading(false);
