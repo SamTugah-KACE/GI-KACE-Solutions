@@ -22,7 +22,9 @@ const Header = () => {
       {leftLogo && (
         <img src={leftLogo} alt="Left Logo" className="header-logo left-logo" />
       )}
+      
       <h1 className="org-name">{organizationName}</h1>
+      
       {rightLogo && (
         <img src={rightLogo} alt="Right Logo" className="header-logo right-logo" />
       )}

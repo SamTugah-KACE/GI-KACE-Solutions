@@ -9,11 +9,13 @@ import { OrganizationProvider } from './context/OrganizationContext';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+     <AuthProvider>
     <OrganizationProvider>
      <BrowserRouter>
      <App />
      </BrowserRouter>
      </OrganizationProvider>
+     </AuthProvider>
   </React.StrictMode>
 );
 

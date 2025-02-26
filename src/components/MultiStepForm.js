@@ -263,7 +263,7 @@ const MultiStepForm = ({ selectedProduct, onSubmit = (data) => console.log("Subm
     // window.history.pushState({}, '', `${access_url}/signin`);
     // window.location.reload();
     // navigate(`${access_url}/signin`,  { re/place: true });
-    window.location.href = `${access_url}/signin`;
+    window.location.replace = `${access_url}/signin`;
     // window.location.reload();
 
     ///// Extract the slug from access_url. If access_url = "https://gi-kace-solutions.onrender.com/ghana-india-kofi-annan-centre-of-excellence-in-ict"
@@ -271,8 +271,9 @@ const MultiStepForm = ({ selectedProduct, onSubmit = (data) => console.log("Subm
 //const slug = access_url.split('/').pop(); // or your custom extraction logic
 // navigate(`/${slug}/signin`);
   } else {
+    console.log("\n\nexpect prod.***: ",process.env.NODE_ENV);
     // navigate(`${access_url}/signin`,  { replace: true });
-    window.location.href = `${access_url}/signin`;
+    window.location.replace = `${access_url}/signin`;
     // window.location.reload();
   }
     } catch (error) {

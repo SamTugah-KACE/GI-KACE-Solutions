@@ -8,6 +8,18 @@ const OrganizationContext = createContext();
 export const OrganizationProvider = ({ children }) => {
   const [organization, setOrganization] = useState(null);
 
+  // On mount, try to load from localStorage
+  useEffect(() => {
+    const storedOrg = localStorage.getItem('orgData');
+    if (storedOrg) {
+      try {
+        setOrganization(JSON.parse(storedOrg));
+      } catch (error) {
+        console.error("Error parsing orgData from localStorage:", error);
+      }
+    }
+  }, []);
+  
   // Function to set organization data.
   const setOrgData = (orgData) => {
     setOrganization(orgData);

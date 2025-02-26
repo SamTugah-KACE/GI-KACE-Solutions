@@ -74,8 +74,13 @@ import './ProfileCard.css';
 import userAvatar from '../../assets/images/avatar.jpeg';
 import { FaEnvelope } from 'react-icons/fa';
 import InboxModal from './InboxModal';
+import { useAuth } from '../../context/AuthContext';
 
 const ProfileCard = () => {
+  const { auth } = useAuth();
+  const user = auth.user || {};
+
+
   // Simulated profile data and unread count
   const [profile, setProfile] = useState({ username: 'John Doe', role: 'CEO', avatar: userAvatar });
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -99,14 +104,19 @@ const ProfileCard = () => {
 
   return (
     <div className="profile-card-container">
+     
       <button className="inbox-btn" onClick={openInboxModal}>
         <FaEnvelope className="inbox-icon" />
         {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
       </button>
+
+
       <div className="profile-card" onClick={openProfileModal}>
-        <img src={profile.avatar} alt="Profile" className="profile-card-avatar" />
+        {/* <img src={profile.avatar} alt="Profile" className="profile-card-avatar" /> */}
+        <img src={user.image_path || profile.avatar} alt="Profile" className="profile-card-avatar" />
+        
         <div className="profile-card-info">
-          <span className="profile-card-username">{profile.username}</span>
+          <span className="profile-card-username">{profile.name}</span>
           <span className="profile-card-role">{profile.role}</span>
         </div>
       </div>

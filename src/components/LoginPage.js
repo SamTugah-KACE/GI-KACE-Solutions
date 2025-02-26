@@ -119,13 +119,14 @@ const LoginPage = () => {
        localStorage.setItem('orgData', JSON.stringify(org));
 
 
-      /*
+      
 
        // Decide which dashboard to navigate to based on user's permissions.
       // Adjust these keys as per your backend response.
       let targetRoute = "";
       const perms = user.permissions || {};
       if (
+        perms["admin"]     ||
         perms.add_new_staff ||
         perms['Add New Role'] ||
         perms['Approve|Decline Requests']
@@ -143,12 +144,12 @@ const LoginPage = () => {
       navigate(`/${orgSlug}${targetRoute}`, { replace: true });
 
 
-      */
+      
 
 
 
 
-      navigate(`/${orgSlug}/dashboard`, { replace: true }); 
+      // navigate(`/${orgSlug}/dashboard`, { replace: true }); 
       // navigate(`/${orgSlug}/dashboard`, {state: {org} });
 
     } catch (error) {
