@@ -19,7 +19,7 @@ const LoginPage = () => {
   const { login } = useAuth();
   const { setOrgData } = useOrganization();
 
- console.log("\nsetOrgData in header: ", setOrgData)
+ 
   
   const [orgLogo, setOrgLogo] = useState(null);
   const [loginMode, setLoginMode] = useState("password"); // "password" or "facial"
