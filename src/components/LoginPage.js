@@ -45,6 +45,7 @@ const LoginPage = () => {
       console.log("safe logo uirl: ", safeLogoUrl)
      setOrgLogo(logo);
      console.log("\norgLogo: ", orgLogo)
+     console.log("\nencodinURL: ", encodeURI(orgLogo))
     }
   }, [org]);
 
