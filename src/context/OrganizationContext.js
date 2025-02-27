@@ -13,9 +13,9 @@ export const OrganizationProvider = ({ children }) => {
     const storedOrg = localStorage.getItem('orgData');
     if (storedOrg) {
       try {
-        // setOrganization(JSON.parse(storedOrg));
-        setOrganization(storedOrg);
-        console.log("setOrganization:: ", organization)
+        setOrganization(JSON.parse(storedOrg));
+        // setOrganization(storedOrg);
+        console.log("Organization loaded from storage:", JSON.parse(storedOrg));
       } catch (error) {
         console.error("Error parsing orgData from localStorage:", error);
       }

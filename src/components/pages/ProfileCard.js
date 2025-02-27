@@ -1,72 +1,3 @@
-// // src/components/ProfileCard.js
-// import React, { useState } from 'react';
-// import './ProfileCard.css';
-// import userAvatar from '../../assets/images/avatar.jpeg';
-// import { FaEnvelope } from 'react-icons/fa';
-
-// const ProfileCard = () => {
-//   // Simulate profile data and unread count
-//   const [profile, setProfile] = useState({ username: 'John Doe', role: 'CEO', avatar: userAvatar });
-//   const [showModal, setShowModal] = useState(false);
-//   const [unreadCount, setUnreadCount] = useState(3); // example unread messages count
-
-//   // Open the profile update modal when clicking the profile card
-//   const openProfileModal = () => setShowModal(true);
-//   const handleUpdate = () => {
-//     // Here you would normally call an API to update profile info
-//     alert('Profile updated!');
-//     setShowModal(false);
-//   };
-
-//   return (
-//     <div className="profile-card-container">
-      
-      
-//       {/* <button className="inbox-btn" onClick={() => alert('Open Inbox Modal')}>
-//         <FaEnvelope className="inbox-icon" />
-//         {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
-//       </button> */}
-
-//       <div className="profile-card" onClick={openProfileModal}>
-//         <img src={profile.avatar} alt="Profile" className="profile-card-avatar" />
-//         <div className="profile-card-info">
-//           <span className="profile-card-username">{profile.username}</span>
-//           <span className="profile-card-role">{profile.role}</span>
-//         </div>
-//       </div>
-      
-//       {showModal && (
-//         <div className="modal-overlay" onClick={() => setShowModal(false)}>
-//           <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
-//             <h3>Update Profile</h3>
-//             <img src={profile.avatar} alt="Profile" className="profile-modal-avatar" />
-//             <input
-//               type="text"
-//               value={profile.username}
-//               onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-//               className="profile-modal-input"
-//             />
-//             <div className="profile-modal-actions">
-//               <button onClick={handleUpdate}>Update</button>
-//               <button onClick={() => setShowModal(false)}>Close</button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-
-//     </div>
-//   );
-// };
-
-// export default ProfileCard;
-
-
-
-
-
-
-
 
 // src/components/ProfileCard.js
 import React, { useState } from 'react';
@@ -78,8 +9,9 @@ import { useAuth } from '../../context/AuthContext';
 
 const ProfileCard = () => {
   const { auth } = useAuth();
-  const user = auth.user || {};
-
+  const user = auth.user || {username: "Guest", role: "Guest", image_path: userAvatar};
+ const name = auth.user_name;
+ const role = auth.role;
 
   // Simulated profile data and unread count
   const [profile, setProfile] = useState({ username: 'John Doe', role: 'CEO', avatar: userAvatar });
@@ -113,11 +45,11 @@ const ProfileCard = () => {
 
       <div className="profile-card" onClick={openProfileModal}>
         {/* <img src={profile.avatar} alt="Profile" className="profile-card-avatar" /> */}
-        <img src={user.image_path || profile.avatar} alt="Profile" className="profile-card-avatar" />
+        <img src={user.image_path || userAvatar} alt="Profile" className="profile-card-avatar" />
         
         <div className="profile-card-info">
-          <span className="profile-card-username">{profile.name}</span>
-          <span className="profile-card-role">{profile.role}</span>
+          <span className="profile-card-username">{name}</span>
+          <span className="profile-card-role">{role}</span>
         </div>
       </div>
 
@@ -125,10 +57,10 @@ const ProfileCard = () => {
         <div className="modal-overlay" onClick={() => setShowProfileModal(false)}>
           <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
             <h3>Update Profile</h3>
-            <img src={profile.avatar} alt="Profile" className="profile-modal-avatar" />
+            <img src={user.image_path} alt="Profile" className="profile-modal-avatar" />
             <input
               type="text"
-              value={profile.username}
+              value={user.username}
               onChange={(e) => setProfile({ ...profile, username: e.target.value })}
               className="profile-modal-input"
             />

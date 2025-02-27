@@ -1,55 +1,32 @@
+// src/pages/Header.js
 import React from 'react';
 import './Header.css';
 import { useOrganization } from '../../context/OrganizationContext';
-// import leftLogo from '../../assets/images/moc.jpg';    // ensure these files exist
-// import rightLogo from '../../assets/images/gi-kace.png';
-// import userAvatar from '../../assets/images/avatar.jpeg';
-// import ProfileDropdown from './ProfileDropdown';
 
 const Header = () => {
+  const { organization } = useOrganization();
 
-  const { org } = useOrganization();
-
-  const leftLogo = null; 
-  const rightLogo = null;
-  if (org){
-  console.log("org in header: ", org.name);
-  // Assume org.logos is a dictionary. We convert it to an array of URLs.
-  const logos = org?.logos ? Object.values(org.logos).map(url => encodeURI(url)) : [];
-  // Choose first logo for the left, second for the right if available.
-  leftLogo = logos[0] || null;
-   rightLogo = logos[1] || null;
+  // Use let so we can assign values conditionally.
+  let leftLogo = null;
+  let rightLogo = null;
+  if (organization && organization.logos) {
+    // Convert logos dictionary to an array of encoded URLs.
+    const logos = Object.values(organization.logos).map(url => encodeURI(url));
+    // const logos = org?.logos ? Object.values(org.logos).map(url => encodeURI(url)) : [];
+    leftLogo = logos[0] || null;
+    rightLogo = logos[1] || null;
   }
-  const organizationName = org?.name || "Your Organization";
+  const organizationName = organization?.name || "Your Organization";
 
   return (
     <header className="dashboard-header">
-      {/* <img src={leftLogo} alt="Left Logo" className="header-logo" /> */}
       {leftLogo && (
         <img src={leftLogo} alt="Left Logo" className="header-logo left-logo" />
       )}
-      
       <h1 className="org-name">{organizationName}</h1>
-      
       {rightLogo && (
         <img src={rightLogo} alt="Right Logo" className="header-logo right-logo" />
       )}
-      {/* <div className="header-right">
-        <img src={rightLogo} alt="Right Logo" className="header-logo" />
-        
-        <br/>
-      
-      {/* <div className="profile-card">
-          <img src={userAvatar} alt="User" className="profile-avatar" />
-          <div className="profile-info">
-            <span className="profile-name">John Doe</span>
-            <span className="profile-role">CEO</span>
-          </div>
-        </div> */}
-        
-        {/* <ProfileDropdown /> */}
-      {/* </div> } */}
-      
     </header>
   );
 };

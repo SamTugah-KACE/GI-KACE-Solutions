@@ -11,6 +11,7 @@ const useValidateSlug = (slug) => {
     const fetchOrg = async () => {
       try {
         const response = await request.get(`/organizations/slug/${slug}`);
+        console.log("\nfetch org data using slug in useValidateSlug: ", response.data );
         setOrg(response.data);
       } catch (err) {
         setError(err.response?.data?.detail || 
