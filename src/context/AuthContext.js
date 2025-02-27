@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('authToken', token);
     localStorage.setItem('authUser', JSON.stringify(user));
     localStorage.setItem('authUserName', user_name);
-    localStorage.setItem('authUserRole');
+    localStorage.setItem('authUserRole', role);
 
     setAuth({ token, user, user_name, role });
   };
