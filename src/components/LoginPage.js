@@ -168,9 +168,15 @@ const LoginPage = () => {
   return (
     <div className="login-page" 
     style={{
-      backgroundImage: orgLogo ? `url(${orgLogo})` : `url(${stockPhoto})`,
+      backgroundImage: orgLogo 
+          ? `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${orgLogo})`
+          : `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${stockPhoto})`,
       backgroundSize: 'cover',
-      backgroundPosition: 'center'
+      backgroundPosition: 'center',
+      height: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
     }}>
       <div className="login-container">
         <h2> {organizationName}</h2>
