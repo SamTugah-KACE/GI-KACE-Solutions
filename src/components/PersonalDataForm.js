@@ -194,24 +194,60 @@ const PersonalDataForm = () => {
   // Update preview when user_images changes.
   useEffect(() => {
     if (values.user_images) {
-      if (typeof values.user_images === 'string') {
-        setPreviewImage(values.user_images);
-      } else if (values.user_images instanceof File) {
+      // if (typeof values.user_images === 'string') {
+      //   setPreviewImage(values.user_images);
+      // } else if (values.user_images instanceof File) {
+      //   const objectUrl = URL.createObjectURL(values.user_images);
+      //   setPreviewImage(objectUrl);
+      //   return () => URL.revokeObjectURL(objectUrl);
+      // }
+
+        console.log("personal image: ", values.user_images);
+        console.log("instance:: ", typeof values.user_images);
+      
+      if (values.user_images instanceof File) {
         const objectUrl = URL.createObjectURL(values.user_images);
         setPreviewImage(objectUrl);
         return () => URL.revokeObjectURL(objectUrl);
+      }else {
+        setPreviewImage(values.user_images);
       }
     } else {
       setPreviewImage(null);
     }
   }, [values.user_images]);
 
+
+   // Convert data URL to File
+   const dataURLtoFile = (dataurl, filename) => {
+    const timestamp = new Date().getTime(); // Get the current timestamp
+    const filename = `${filenamePrefix}-${timestamp}.jpg`;
+    let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, {type:mime});
+  };
+
+
+  // const handleCapture = () => {
+  //   if (webcamRef.current) {
+  //     const imageSrc = webcamRef.current.getScreenshot();
+  //     setFieldValue("user_images", imageSrc);
+  //   }
+  // };
+
   const handleCapture = () => {
     if (webcamRef.current) {
       const imageSrc = webcamRef.current.getScreenshot();
-      setFieldValue("user_images", imageSrc);
+      // Convert the data URL into a File (we use a fixed filename; you can add a timestamp if needed)
+      const file = dataURLtoFile(imageSrc, "captured-face");
+      setFieldValue("user_images", file);
     }
   };
+
+
 
   const handleUploadChange = (e) => {
     setFieldValue("user_images", e.currentTarget.files[0]);
