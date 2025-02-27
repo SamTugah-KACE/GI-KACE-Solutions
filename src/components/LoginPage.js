@@ -116,8 +116,8 @@ const LoginPage = () => {
       
       console.log("\nlogin response: ", response);
       console.log("\nlogin response.data: ", response.data);
-      const { token, username } = response.data;
-      login(token, username);
+      const { token, user, name, role } = response.data;
+      login(token, user, name, role);
       // In LoginPage.js, after successful login:
        localStorage.setItem('orgData', JSON.stringify(org));
 
