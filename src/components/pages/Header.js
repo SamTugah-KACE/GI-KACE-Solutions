@@ -9,12 +9,17 @@ import { useOrganization } from '../../context/OrganizationContext';
 const Header = () => {
 
   const { org } = useOrganization();
+
+  const leftLogo = null; 
+  const rightLogo = null;
+  if (org){
   console.log("org in header: ", org.name);
   // Assume org.logos is a dictionary. We convert it to an array of URLs.
   const logos = org?.logos ? Object.values(org.logos).map(url => encodeURI(url)) : [];
   // Choose first logo for the left, second for the right if available.
-  const leftLogo = logos[0] || null;
-  const rightLogo = logos[1] || null;
+  leftLogo = logos[0] || null;
+   rightLogo = logos[1] || null;
+  }
   const organizationName = org?.name || "Your Organization";
 
   return (
