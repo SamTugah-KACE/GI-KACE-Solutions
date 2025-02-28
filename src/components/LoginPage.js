@@ -89,9 +89,9 @@ const LoginPage = () => {
         setLoading(false);
         return;
       }
-      formData.append("password", password);
+      // formData.append("password", password);
        // If your backend expects the password as a query parameter, append it here
-      //  url += `?password=${encodeURIComponent(password)}`;
+       url += `?password=${encodeURIComponent(password)}`;
        // Do NOT append password to formData in this case.
     } else {
       if (!facialImage) {
