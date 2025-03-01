@@ -1,14 +1,53 @@
 // src/components/Sidebar.js
 import React, { useState } from 'react';
 import './Sidebar.css';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import request from './request';
+import LogoutConfirmationModal from './LogoutConfirmationModal';
+
 
 const Sidebar = ({ onNewUserClick, onDesignerClick, onPromotionClick }) => {
   const [expanded, setExpanded] = useState(true);
   const [activeMenu, setActiveMenu] = useState(null);
 
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+
+    // Retrieve orgSlug from the URL for multi-tenant navigation
+    const { orgSlug } = useParams();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
   const toggleExpanded = () => setExpanded(!expanded);
   const toggleSubmenu = (menu) =>
     setActiveMenu((prev) => (prev === menu ? null : menu));
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+
+  const handleConfirmLogout = async () => {
+    try {
+      // Call the backend logout API with the token in the header
+      await request.post('/auth/logout', null, {
+        headers: { 'Authorization': `Bearer ${auth.token}` }
+      });
+    } catch (error) {
+      console.error('Logout API error:', error);
+      // Optionally, show an error message to the user
+    }
+    // Clear auth state and redirect to the organization's signin page
+    logout();
+    setShowLogoutModal(false);
+    // Navigate to /:orgSlug/signin so that the slug remains in the URL
+    navigate(`/${orgSlug}/signin`, { replace: true });
+  };
+  const handleCancelLogout = () => {
+    setShowLogoutModal(false);
+  };
+
 
   return (
     <aside className={`sidebar ${expanded ? 'expanded' : 'collapsed'}`}>
@@ -47,10 +86,16 @@ const Sidebar = ({ onNewUserClick, onDesignerClick, onPromotionClick }) => {
         </li>
       </ul>
       <div className="logout-container">
-        <button className="logout-btn">
+        <button className="logout-btn"  onClick={handleLogoutClick}>
           {expanded ? 'Log Out' : <span className="logout-icon">⎋</span>}
         </button>
       </div>
+      {showLogoutModal && (
+        <LogoutConfirmationModal
+          onConfirm={handleConfirmLogout}
+          onCancel={handleCancelLogout}
+        />
+      )}
     </aside>
   );
 };
