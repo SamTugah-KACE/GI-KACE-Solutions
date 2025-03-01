@@ -17,7 +17,7 @@ const Sidebar = ({ onNewUserClick, onDesignerClick, onPromotionClick }) => {
     // Retrieve orgSlug from the URL for multi-tenant navigation
     const { orgSlug } = useParams();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { auth, logout } = useAuth();
 
   const toggleExpanded = () => setExpanded(!expanded);
   const toggleSubmenu = (menu) =>
@@ -31,6 +31,7 @@ const Sidebar = ({ onNewUserClick, onDesignerClick, onPromotionClick }) => {
   const handleConfirmLogout = async () => {
     console.log("\n\norgSlug in logout function: ", orgSlug);
     try {
+      console.log("\n\nuser's toekn: ",auth.token);
       // Call the backend logout API with the token in the header
       await request.post('/auth/logout', null, {
         headers: { 'Authorization': `Bearer ${auth.token}` }
