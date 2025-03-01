@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import './Sidebar.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import request from './request';
+import request from '../request';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
 
 
