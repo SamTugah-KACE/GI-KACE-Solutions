@@ -29,6 +29,7 @@ const Sidebar = ({ onNewUserClick, onDesignerClick, onPromotionClick }) => {
 
 
   const handleConfirmLogout = async () => {
+    console.log("\n\norgSlug in logout function: ", orgSlug);
     try {
       // Call the backend logout API with the token in the header
       await request.post('/auth/logout', null, {
