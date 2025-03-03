@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import './Sidebar.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+// import { useOrganization } from '../../context/OrganizationContext';
 import request from '../request';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
 import ViewDepartmentsModal from '../snr_management/ViewDepartmentsModal'; // Import the modal
@@ -21,7 +22,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick }) => 
     const { orgSlug } = useParams();
   const navigate = useNavigate();
   const { auth, logout } = useAuth();
-  const { organization } = useOrganization();
+  // const { organization } = useOrganization();
 
 
   const toggleExpanded = () => setExpanded(!expanded);
