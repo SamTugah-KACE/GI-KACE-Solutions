@@ -63,14 +63,16 @@
   cursor: pointer;
 }
 
-.modal-actions button:first-of-type {
-  background-color: #ccc;
+.cancel-btn {
+  background-color: #aaa;
+  color: #fff;
 }
 
-.modal-actions button:last-of-type {
+.submit-btn {
   background-color: var(--primary-color);
   color: #fff;
 }
+
 
 
 

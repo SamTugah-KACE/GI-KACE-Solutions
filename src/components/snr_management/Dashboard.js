@@ -7,33 +7,27 @@ import SummaryCards from '../pages/SummaryCards';
 import DashboardTable from '../pages/DashboardTable';
 import NewUserModal from '../pages/NewUserModal';
 import AddDepartmentModal from './AddDepartmentModal';
-// import { useLocation } from 'react-router-dom';
-// import AlertNotifier from '../AlertNotifier';
-// import Inbox from '../pages/InboxButton';
-// import DashboardDesigner from '../DashboardDesigner';
+import AddBranchModal from './AddBranchModal';
 import './Dashboard.css';
-// import ProfileDropdown from '../pages/ProfileDropdown';
 import ProfileCard from '../pages/ProfileCard';
 // import { useOrganization } from '../../context/OrganizationContext';
 
 const Dashboard = () => {
-  // const { state } = useLocation();
-  // In DashboardHeader.js:
-// const org = JSON.parse(localStorage.getItem('orgData') || '{}');
-// const organizationName = orgData.name || "Your Organization";
-  // If state.org is not provided, you might fallback to a default value or fetch it from context/localStorage.
-  // const org = state?.org;
 
-  // const { org } = useOrganization();
 
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [showAddDeptModal, setShowAddDeptModal] = useState(false);
-  // const [showDesigner, setShowDesigner] = useState(false);
+  const [showAddBranchModal, setShowAddBranchModal] = useState(false);
 
 
   const handleDepartmentAdded = (newDept) => {
     // Update your state or refresh the department list as needed.
     console.log("New department added:", newDept);
+  };
+
+  const handleBranchAdded = (newBranch) => {
+    console.log("New branch added:", newBranch);
+    // Refresh the branch list as needed.
   };
 
   return (
@@ -44,7 +38,7 @@ const Dashboard = () => {
         <Sidebar 
         onNewUserClick={() => setShowNewUserModal(true)} 
         onNewDepartmentClick={() => setShowAddDeptModal(true)}
-        // onDesignerClick={() => setShowDesigner(true)}
+        onNewBranchClick={() => setShowAddBranchModal(true)}
           />
         <main className="main-panel">
           <SearchBar />
@@ -62,10 +56,13 @@ const Dashboard = () => {
           onDepartmentAdded={handleDepartmentAdded}
         />
       )}
-
-      {/* {showDesigner && <DashboardDesigner onClose={() => setShowDesigner(false)} />} */}
-      {/* <AlertNotifier /> */}
-      {/* <Inbox /> */} 
+      
+      {showAddBranchModal && (
+        <AddBranchModal
+          onClose={() => setShowAddBranchModal(false)}
+          onBranchAdded={handleBranchAdded}
+        />
+      )}
 
       <Footer />
     </div>

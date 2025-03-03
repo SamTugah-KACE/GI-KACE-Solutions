@@ -7,9 +7,10 @@ import { useOrganization } from '../../context/OrganizationContext';
 import request from '../request';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
 import ViewDepartmentsModal from '../snr_management/ViewDepartmentsModal'; // Import the modal
+// import AddDepartmentModal from '../snr_management/AddDepartmentModal';
+import AddBranchModal from '../snr_management/AddBranchModal';
 
-
-const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick }) => {
+const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNewBranchClick  }) => {
   const [expanded, setExpanded] = useState(true);
   const [activeMenu, setActiveMenu] = useState(null);
 
@@ -17,6 +18,8 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick }) => 
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  // const [showAddDeptModal, setShowAddDeptModal] = useState(false);
+  const [showAddBranchModal, setShowAddBranchModal] = useState(false);
 
     // Retrieve orgSlug from the URL for multi-tenant navigation
     const { orgSlug } = useParams();
@@ -95,7 +98,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick }) => 
             Branch <span className="dropdown-indicator">▼</span>
             {expanded && activeMenu === 'branch' && (
               <ul className="submenu">
-                <li onClick={() => alert("Add New Branch modal")}>Add New Branch</li>
+                <li onClick={() => setShowAddBranchModal(true)}>Add New Branch</li>
                 <li onClick={() => alert("View Branches modal")}>View Branches</li>
                 <li onClick={() => alert("Assign Branch Manager modal")}>Assign Branch Manager</li>
                 <li onClick={() => alert("Update Branch modal")}>Update Branch</li>
@@ -131,6 +134,12 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick }) => 
         <ViewDepartmentsModal onClose={() => setShowViewDeptModal(false)} />
       )}
 
+      {showAddBranchModal && (
+        <AddBranchModal
+          onClose={() => setShowAddBranchModal(false)}
+          onBranchAdded={() => alert("Branch added")}
+        />
+      )}
     </aside>
   );
 };
