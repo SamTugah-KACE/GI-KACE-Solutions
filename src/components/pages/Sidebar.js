@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import './Sidebar.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-// import { useOrganization } from '../../context/OrganizationContext';
+import { useOrganization } from '../../context/OrganizationContext';
 import request from '../request';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
 import ViewDepartmentsModal from '../snr_management/ViewDepartmentsModal'; // Import the modal
@@ -22,8 +22,9 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick }) => 
     const { orgSlug } = useParams();
   const navigate = useNavigate();
   const { auth, logout } = useAuth();
-  // const { organization } = useOrganization();
+  const { organization } = useOrganization();
 
+  const isBranchManaged = organization?.nature?.toLowerCase().includes('branch');
 
   const toggleExpanded = () => setExpanded(!expanded);
   const toggleSubmenu = (menu) =>
@@ -83,24 +84,26 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick }) => 
             <ul className="submenu">
               <li onClick={onNewDepartmentClick}>Add New Department</li>
               <li onClick={() => setShowViewDeptModal(true)}>View Departments</li>
-              <li onClick={() => alert("Assign Head of Department modal")}>Assign Head of Department(HoD)</li>
+              <li onClick={() => alert("Assign Head of Department modal")}>Assign Head of Department<br/>(HoD)</li>
               <li onClick={() => alert("Update Department modal")}>Update Department</li>
               <li onClick={() => alert("Delete Department modal")}>Delete Department</li>
             </ul>
           )}
         </li>
-        <li className="menu-item" onClick={() => toggleSubmenu('branch')}>
-          Branch <span className="dropdown-indicator">▼</span>
-          {expanded && activeMenu === 'branch' && (
-            <ul className="submenu">
-              <li onClick={onNewDepartmentClick}>Add New Branch</li>
-              <li onClick={() => alert("View Departments modal")}>View Departments</li>
-              <li onClick={() => alert("Assign Branch Manager modal")}>Assign Branch Manager</li>
-              <li onClick={() => alert("Update Branch modal")}>Update Branch</li>
-              <li onClick={() => alert("Delete Branch modal")}>Delete Branch</li>
-            </ul>
-          )}
-        </li>
+        {isBranchManaged && (
+          <li className="menu-item" onClick={() => toggleSubmenu('branch')}>
+            Branch <span className="dropdown-indicator">▼</span>
+            {expanded && activeMenu === 'branch' && (
+              <ul className="submenu">
+                <li onClick={() => alert("Add New Branch modal")}>Add New Branch</li>
+                <li onClick={() => alert("View Branches modal")}>View Branches</li>
+                <li onClick={() => alert("Assign Branch Manager modal")}>Assign Branch Manager</li>
+                <li onClick={() => alert("Update Branch modal")}>Update Branch</li>
+                <li onClick={() => alert("Delete Branch modal")}>Delete Branch</li>
+              </ul>
+            )}
+          </li>
+        )}
         <li className="menu-item" onClick={() => toggleSubmenu('promotion')}>
           Promotions <span className="dropdown-indicator">▼</span>
           {expanded && activeMenu === 'promotion' && (
