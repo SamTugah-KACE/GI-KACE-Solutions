@@ -10,7 +10,7 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    color: #fff;
+    color:#000;
   }
   
   .logout-modal {
