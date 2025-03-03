@@ -7,7 +7,7 @@ import request from '../request';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
 
 
-const Sidebar = ({ onNewUserClick, onDesignerClick, onPromotionClick }) => {
+const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick }) => {
   const [expanded, setExpanded] = useState(true);
   const [activeMenu, setActiveMenu] = useState(null);
 
@@ -75,7 +75,7 @@ const Sidebar = ({ onNewUserClick, onDesignerClick, onPromotionClick }) => {
           Department <span className="dropdown-indicator">▼</span>
           {expanded && activeMenu === 'dept' && (
             <ul className="submenu">
-              <li onClick={() => alert("New Department modal")}>New Department</li>
+              <li onClick={onNewDepartmentClick}>New Department</li>
               <li onClick={() => alert("Existing Departments modal")}>Existing Departments</li>
             </ul>
           )}

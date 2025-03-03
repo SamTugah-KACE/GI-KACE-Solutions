@@ -6,6 +6,7 @@ import SearchBar from '../pages/SearchBar';
 import SummaryCards from '../pages/SummaryCards';
 import DashboardTable from '../pages/DashboardTable';
 import NewUserModal from '../pages/NewUserModal';
+import AddDepartmentModal from './AddDepartmentModal';
 // import { useLocation } from 'react-router-dom';
 // import AlertNotifier from '../AlertNotifier';
 // import Inbox from '../pages/InboxButton';
@@ -26,7 +27,15 @@ const Dashboard = () => {
   // const { org } = useOrganization();
 
   const [showNewUserModal, setShowNewUserModal] = useState(false);
+  const [showAddDeptModal, setShowAddDeptModal] = useState(false);
   // const [showDesigner, setShowDesigner] = useState(false);
+
+
+  const handleDepartmentAdded = (newDept) => {
+    // Update your state or refresh the department list as needed.
+    console.log("New department added:", newDept);
+  };
+
   return (
     <div className="dashboard-container">
       <Header  />
@@ -34,6 +43,7 @@ const Dashboard = () => {
       <div className="dashboard-content">
         <Sidebar 
         onNewUserClick={() => setShowNewUserModal(true)} 
+        onNewDepartmentClick={() => setShowAddDeptModal(true)}
         // onDesignerClick={() => setShowDesigner(true)}
           />
         <main className="main-panel">
@@ -45,6 +55,14 @@ const Dashboard = () => {
       {showNewUserModal && (
         <NewUserModal onClose={() => setShowNewUserModal(false)} />
       )}
+
+     {showAddDeptModal && (
+        <AddDepartmentModal
+          onClose={() => setShowAddDeptModal(false)}
+          onDepartmentAdded={handleDepartmentAdded}
+        />
+      )}
+
       {/* {showDesigner && <DashboardDesigner onClose={() => setShowDesigner(false)} />} */}
       {/* <AlertNotifier /> */}
       {/* <Inbox /> */} 
