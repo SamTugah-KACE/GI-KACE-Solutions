@@ -5,7 +5,7 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import Select from 'react-select';
 import request from '../request';
-import { useOrganization } from '.././context/OrganizationContext';
+import { useOrganization } from '../../context/OrganizationContext';
 
 const AddBranchModal = ({ onClose, onBranchAdded }) => {
   const { organization } = useOrganization();
