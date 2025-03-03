@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
-import { useOrganization } from '../context/OrganizationContext';
+import { useOrganization } from '../../context/OrganizationContext';
 import './AddDepartmentModal.css'; // create and style as needed
 
 const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
