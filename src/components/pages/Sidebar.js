@@ -36,15 +36,19 @@ const Sidebar = ({ onNewUserClick, onDesignerClick, onPromotionClick }) => {
       await request.post('/auth/logout', null, {
         headers: { 'Authorization': `Bearer ${auth.token}` }
       });
-    } catch (error) {
-      console.error('Logout API error:', error);
-      // Optionally, show an error message to the user
-    }
-    // Clear auth state and redirect to the organization's signin page
-    logout();
+
+      logout();
     setShowLogoutModal(false);
     // Navigate to /:orgSlug/signin so that the slug remains in the URL
     navigate(`/${orgSlug}/signin`, { replace: true });
+
+    } catch (error) {
+      console.error('Logout API error:', error);
+      alert(error);
+      // Optionally, show an error message to the user
+    }
+    // Clear auth state and redirect to the organization's signin page
+    
   };
   const handleCancelLogout = () => {
     setShowLogoutModal(false);
