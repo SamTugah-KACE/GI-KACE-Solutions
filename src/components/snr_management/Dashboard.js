@@ -7,6 +7,7 @@ import SummaryCards from '../pages/SummaryCards';
 import DashboardTable from '../pages/DashboardTable';
 import NewUserModal from '../pages/NewUserModal';
 import AddDepartmentModal from './AddDepartmentModal';
+import UpdateDepartmentModal from './UpdateDepartmentModal';
 import AddBranchModal from './AddBranchModal';
 import './Dashboard.css';
 import ProfileCard from '../pages/ProfileCard';
@@ -17,6 +18,7 @@ const Dashboard = () => {
 
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [showAddDeptModal, setShowAddDeptModal] = useState(false);
+  const [showUpdateDeptModal, setShowUpdateDeptModal] = useState(false);
   const [showAddBranchModal, setShowAddBranchModal] = useState(false);
 
 
@@ -38,6 +40,7 @@ const Dashboard = () => {
         <Sidebar 
         onNewUserClick={() => setShowNewUserModal(true)} 
         onNewDepartmentClick={() => setShowAddDeptModal(true)}
+        onUpdateDepartmenthClick={() => setShowUpdateDeptModal(true)}
         onNewBranchClick={() => setShowAddBranchModal(true)}
           />
         <main className="main-panel">
@@ -54,6 +57,13 @@ const Dashboard = () => {
         <AddDepartmentModal
           onClose={() => setShowAddDeptModal(false)}
           onDepartmentAdded={handleDepartmentAdded}
+        />
+      )}
+
+{showUpdateDeptModal && (
+        <UpdateDepartmentModal
+          onClose={() => setShowUpdateDeptModal(false)}
+          // onDepartmentAdded={handleDepartmentAdded}
         />
       )}
       

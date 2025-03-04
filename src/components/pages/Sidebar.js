@@ -7,7 +7,7 @@ import { useOrganization } from '../../context/OrganizationContext';
 import request from '../request';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
 import ViewDepartmentsModal from '../snr_management/ViewDepartmentsModal'; // Import the modal
-// import AddDepartmentModal from '../snr_management/AddDepartmentModal';
+import UpdateDepartmentModal from '../snr_management/UpdateDepartmentModal';
 import AddBranchModal from '../snr_management/AddBranchModal';
 
 const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNewBranchClick  }) => {
@@ -15,6 +15,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
   const [activeMenu, setActiveMenu] = useState(null);
 
   const [showViewDeptModal, setShowViewDeptModal] = useState(false);
+  const [showUpdateDeptModal, setShowUpdateDeptModal] = useState(false);
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -88,7 +89,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
               <li onClick={onNewDepartmentClick}>Add New Department</li>
               <li onClick={() => setShowViewDeptModal(true)}>View Departments</li>
               <li onClick={() => alert("Assign Head of Department modal")}>Assign Head of Department<br/>(HoD)</li>
-              <li onClick={() => alert("Update Department modal")}>Update Department</li>
+              <li onClick={() =>  setShowUpdateDeptModal(true)}>Update Department</li>
               <li onClick={() => alert("Delete Department modal")}>Delete Department</li>
             </ul>
           )}
