@@ -132,11 +132,15 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
       )}
 
      {showUpdateDeptModal && (
-        <UpdateDepartmentModal onClose={() => setShowUpdateDeptModal(false)} />
+        <UpdateDepartmentModal onClose={() => setShowUpdateDeptModal(false)} 
+        onDepartmentUpdated={() => alert("Department Updated")}
+
+        />
       )}
 
       {showViewDeptModal && (
-        <ViewDepartmentsModal onClose={() => setShowViewDeptModal(false)} />
+        <ViewDepartmentsModal onClose={() => setShowViewDeptModal(false)} 
+        />
       )}
 
       {showAddBranchModal && (

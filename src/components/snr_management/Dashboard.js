@@ -27,6 +27,13 @@ const Dashboard = () => {
     console.log("New department added:", newDept);
   };
 
+
+  const handleDepartmentUpdated = (newDept) => {
+    // Update your state or refresh the department list as needed.
+    console.log("Department Updated:", newDept);
+  };
+
+  
   const handleBranchAdded = (newBranch) => {
     console.log("New branch added:", newBranch);
     // Refresh the branch list as needed.
@@ -40,7 +47,7 @@ const Dashboard = () => {
         <Sidebar 
         onNewUserClick={() => setShowNewUserModal(true)} 
         onNewDepartmentClick={() => setShowAddDeptModal(true)}
-        onUpdateDepartmenthClick={() => setShowUpdateDeptModal(true)}
+        onUpdateDepartmentClick={() => setShowUpdateDeptModal(true)}
         onNewBranchClick={() => setShowAddBranchModal(true)}
           />
         <main className="main-panel">
@@ -63,7 +70,7 @@ const Dashboard = () => {
       {showUpdateDeptModal && (
         <UpdateDepartmentModal
           onClose={() => setShowUpdateDeptModal(false)}
-          // onDepartmentAdded={handleDepartmentAdded}
+          onDepartmentUpdated={handleDepartmentUpdated}
         />
       )}
       
