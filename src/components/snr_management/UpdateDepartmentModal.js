@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import './UpdateDepartmentModal.css';
 import request from '../request';
-import { useOrganization } from '../context/OrganizationContext';
+import { useOrganization } from '../../context/OrganizationContext';
 import EditableDepartmentRow from './EditableDepartmentRow';
 
 const UpdateDepartmentModal = ({ onClose, onDepartmentUpdated }) => {

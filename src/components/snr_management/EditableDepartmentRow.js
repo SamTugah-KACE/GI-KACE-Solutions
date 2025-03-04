@@ -64,7 +64,7 @@ const EditableDepartmentRow = ({
       setIsDirty(false);
     } catch (err) {
       console.error('Error updating department:', err);
-      setError(err.response?.data?.detail || 'Update failed.');
+      setError(error.response?.data?.detail || 'Update failed.');
     } finally {
       setUpdating(false);
     }
