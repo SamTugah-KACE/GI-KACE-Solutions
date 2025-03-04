@@ -60,7 +60,7 @@ const Dashboard = () => {
         />
       )}
 
-{showUpdateDeptModal && (
+      {showUpdateDeptModal && (
         <UpdateDepartmentModal
           onClose={() => setShowUpdateDeptModal(false)}
           // onDepartmentAdded={handleDepartmentAdded}

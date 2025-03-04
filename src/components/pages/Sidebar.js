@@ -131,6 +131,10 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
         />
       )}
 
+     {showUpdateDeptModal && (
+        <UpdateDepartmentModal onClose={() => setShowUpdateDeptModal(false)} />
+      )}
+
       {showViewDeptModal && (
         <ViewDepartmentsModal onClose={() => setShowViewDeptModal(false)} />
       )}
