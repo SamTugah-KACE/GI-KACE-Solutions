@@ -8,9 +8,9 @@ const instance = axios.create({
 // Interceptors can be added here for auth tokens, logging, etc.
 instance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    console.error('API error:', error);
-    return Promise.reject(error);
+  (erro) => {
+    console.error('API error:', erro);
+    return Promise.reject(erro);
   }
 );
 
