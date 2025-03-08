@@ -191,6 +191,10 @@ const MultiStepForm = ({ selectedProduct, onSubmit = (data) => console.log("Subm
             : values.user_images.name
           : "",
         organization_id: organizationId,
+        rank_id:null,
+        department_id:null,
+        last_promotion_date: new Date().toISOString().slice(0, 10),
+        employee_type_id: null,
       },
     ];
 
