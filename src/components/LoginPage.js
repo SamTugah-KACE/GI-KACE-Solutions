@@ -131,10 +131,12 @@ const LoginPage = () => {
       console.log("perms: ", perms);
       console.log("is_admin: ", perms.admin);
       if (
-        perms.admin     ||
-        perms.add_new_staff ||
-        perms['Add New Role'] ||
-        perms['Approve|Decline Requests']
+        perms.includes("hr:dashboard") 
+        // ||
+        // perms.admin     ||
+        // perms.add_new_staff ||
+        // perms['Add New Role'] ||
+        // perms['Approve|Decline Requests']
       ) {
         targetRoute = "/dashboard";
       } else if (

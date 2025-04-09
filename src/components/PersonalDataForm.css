@@ -40,3 +40,20 @@
     border-radius: 5px;
   }
   
+  /* New CSS for spinner overlay */
+.form-container {
+  position: relative;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7); /* semi-transparent white */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
