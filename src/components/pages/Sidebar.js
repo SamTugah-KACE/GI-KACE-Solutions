@@ -9,6 +9,11 @@ import LogoutConfirmationModal from './LogoutConfirmationModal';
 import ViewDepartmentsModal from '../snr_management/ViewDepartmentsModal'; // Import the modal
 import UpdateDepartmentModal from '../snr_management/UpdateDepartmentModal';
 import AddBranchModal from '../snr_management/AddBranchModal';
+import UserFormBuilderModal from '../snr_management/CreateUserFormBuilder'; // Import the modal
+import AddUserForm from '../snr_management/AddUserForm';
+
+
+
 
 const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNewBranchClick  }) => {
   const [expanded, setExpanded] = useState(true);
@@ -19,6 +24,9 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  const [showUserFormBuilderModal, setShowUserFormBuilderModal] = useState(false);
+  const [showAddUserForm, setShowAddUserForm] = useState(false);
+  
   // const [showAddDeptModal, setShowAddDeptModal] = useState(false);
   const [showAddBranchModal, setShowAddBranchModal] = useState(false);
 
@@ -72,7 +80,16 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
         {expanded ? '<<' : '>>'}
       </button>
       <ul className="menu-list">
-        <li className="menu-item" onClick={onNewUserClick}>New User</li>
+        <li className="menu-item" onClick={() => toggleSubmenu('users')}>
+          New User <span className="dropdown-indicator">▼</span>
+          {expanded && activeMenu === 'users' && (
+            <ul className="submenu">
+              <li onClick={setShowAddUserForm(true)}>Add New User</li>
+              <li onClick={() => alert("Existing Users modal")}>Existing Users</li>
+              <li onClick={() => setShowUserFormBuilderModal(true)}>User Registration Form</li>
+            </ul>
+          )}
+        </li>
         <li className="menu-item" onClick={() => toggleSubmenu('roles')}>
           System Roles <span className="dropdown-indicator">▼</span>
           {expanded && activeMenu === 'roles' && (
@@ -130,6 +147,26 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
           onCancel={handleCancelLogout}
         />
       )}
+    
+    {
+        showUserFormBuilderModal && (
+          <UserFormBuilderModal
+            onClose={() => setShowUserFormBuilderModal(false)}
+            onSaveSuccess={() => alert("Form saved successfully")}
+          />
+        )
+    }
+
+    {
+        showAddUserForm && (
+          <AddUserForm
+            organizationId={organization.id} // Pass the organization ID from context
+            userId={auth.user_id}  // Pass the user ID from auth context
+            onClose={() => setShowAddUserForm(false)}
+            onUserAdded={() => alert("User added")}
+          />
+        )
+    }
 
      {showUpdateDeptModal && (
         <UpdateDepartmentModal onClose={() => setShowUpdateDeptModal(false)} 

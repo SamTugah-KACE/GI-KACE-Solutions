@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
+  // baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
   baseURL: process.env.REACT_APP_API_URL || 'https://staff-records-backend.onrender.com/api',
   timeout: 100000,
 });
