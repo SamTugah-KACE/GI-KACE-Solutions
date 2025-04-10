@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import './FormBuilderModal.css';
 import request from '../request';
+import { motion } from 'framer-motion';
 
 // Available field definitions; note the added "role_select" option.
 const availableFields = [
@@ -14,6 +15,10 @@ const availableFields = [
   { id: 'checkbox', label: 'Checkboxes' },
   { id: 'file', label: 'File Upload' },
   { id: 'role_select', label: 'Role Selection' },
+  { id: 'submit', label: 'Submit Button' },
+  {id: 'text_area', label: 'Text Area'},
+  {id: 'number', label: 'Number Input'},
+  {id: 'select', label: 'Dropdown Select'},
   // add other fields as needed
 ];
 
@@ -29,11 +34,11 @@ const CreateUserFormBuilderBuilder = ({ organizationId, onClose, onSaveSuccess }
   useEffect(() => {
     const fetchCreateUrl = async () => {
       try {
-        const res = await request.get('/create-url', {
+        const res = await request.get('/organizations/create-url', {
           method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
+          // headers: {
+          //   Authorization: `Bearer ${localStorage.getItem('token')}`,
+          // },
         });
         if (!res.ok) throw new Error('Failed to fetch create URL');
         const data = await res.json();
@@ -53,9 +58,9 @@ const CreateUserFormBuilderBuilder = ({ organizationId, onClose, onSaveSuccess }
         let res = await request.get(
           `/fetch?organization_id=${organizationId}&skip=0&limit=100`,
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+            // headers: {
+            //   Authorization: `Bearer ${localStorage.getItem('token')}`,
+            // },
           }
         );
         let data = await res.json();
@@ -92,6 +97,63 @@ const CreateUserFormBuilderBuilder = ({ organizationId, onClose, onSaveSuccess }
     return result;
   };
 
+  // Field configuration component renders inline controls for updating field properties.
+  const FieldConfiguration = ({ field, index, onFieldUpdate }) => {
+    const handleChange = (e) => {
+      const { name, value, type, checked } = e.target;
+      const newVal = type === 'checkbox' ? checked : value;
+      onFieldUpdate(index, { [name]: newVal });
+    };
+
+    return (
+      <div className="field-config">
+        <div className="config-group">
+          <label>Label</label>
+          <input
+            type="text"
+            name="label"
+            value={field.label}
+            onChange={handleChange}
+            placeholder="Field label"
+          />
+        </div>
+        {['radio', 'checkbox', 'select'].includes(field.id) && (
+          <div className="config-group">
+            <label>Options (comma separated)</label>
+            <input
+              type="text"
+              name="choices"
+              value={field.options?.choices ? field.options.choices.join(',') : ''}
+              onChange={(e) =>
+                onFieldUpdate(index, { options: { ...field.options, choices: e.target.value.split(',').map(opt => opt.trim()) } })
+              }
+              placeholder="e.g., Option1, Option2"
+            />
+          </div>
+        )}
+        <div className="config-group">
+          <label>
+            <input
+              type="checkbox"
+              name="required"
+              checked={field.required || false}
+              onChange={handleChange}
+            />{' '}
+            Required
+          </label>
+        </div>
+      </div>
+    );
+  };
+
+  const updateField = (index, updateProps) => {
+    setFormFields(prev => {
+      const newFields = [...prev];
+      newFields[index] = { ...newFields[index], ...updateProps };
+      return newFields;
+    });
+  };
+
   // Drag and drop handler.
   const onDragEnd = (result) => {
     const { source, destination, draggableId } = result;
@@ -103,7 +165,10 @@ const CreateUserFormBuilderBuilder = ({ organizationId, onClose, onSaveSuccess }
       // For role selection field, attach an empty options array that will be replaced by roleOptions.
       const newField = {
         ...field,
-        options: field.id === 'role_select' ? roleOptions : {},
+        // If field is role_select, set options to roleOptions; else initialize empty options object.
+        options: ['role_select', 'radio', 'checkbox', 'select'].includes(field.id)
+          ? { choices: [] }
+          : {},
         required: false,
         validation:
           field.id === 'phone'
@@ -244,7 +309,7 @@ const CreateUserFormBuilderBuilder = ({ organizationId, onClose, onSaveSuccess }
       submitCode: ""
     };
     try {
-      const res = await request.post('/dashboards', {
+      const res = await request.post('/dashboards/dashboards', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json', 
@@ -260,6 +325,8 @@ const CreateUserFormBuilderBuilder = ({ organizationId, onClose, onSaveSuccess }
       alert(error.message);
     }
   };
+
+  
 
   return (
     <div className="modal-overlay">
@@ -298,64 +365,24 @@ const CreateUserFormBuilderBuilder = ({ organizationId, onClose, onSaveSuccess }
                 {(provided) => (
                   <div ref={provided.innerRef} {...provided.droppableProps}>
                     {formFields.map((field, index) => (
-                      <div key={index} className="form-field">
-                        <strong>{field.label}</strong>
-                        {/* Render inputs based on field type */}
-                        {['text', 'email', 'url', 'date'].includes(field.id) && (
-                          <input type={field.id} id={field.id} placeholder={field.label} />
-                        )}
-                        {['radio', 'checkbox'].includes(field.id) && (
-                          <input
-                            type="text"
-                            placeholder="Enter options (comma separated)"
-                            onBlur={(e) => updateFieldOptions(index, { choices: e.target.value.split(',') })}
-                          />
-                        )}
-                        {field.id === 'file' && (
-                          <>
-                            <input
-                              type="text"
-                              placeholder="Accepted file types (e.g., jpg,png)"
-                              onBlur={(e) => updateFieldOptions(index, { acceptedFiles: e.target.value.split(',') })}
-                            />
-                            <input
-                              type="number"
-                              placeholder="Max number of files"
-                              onBlur={(e) => updateFieldOptions(index, { maxFiles: Number(e.target.value) })}
-                            />
-                          </>
-                        )}
-                        {field.id === 'phone' && (
-                          <>
-                            <select onBlur={(e) => updateFieldOptions(index, { selectedCountryCode: e.target.value })}>
-                              <option value="+1">+1</option>
-                              <option value="+44">+44</option>
-                              <option value="+91">+91</option>
-                              {/* Additional country codes */}
-                            </select>
-                            <input type="tel" id={field.id} placeholder="Enter phone number" />
-                          </>
-                        )}
-                        {field.id === 'role_select' && (
-                          <>
-                            <select id={field.id}>
-                              <option value="">Select a Role</option>
-                              {roleOptions.map(role => (
-                                <option key={role.id} value={role.id}>{role.name}</option>
-                              ))}
-                            </select>
-                          </>
-                        )}
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={field.required || false}
-                            onChange={() => toggleRequired(index)}
-                          /> Required
-                        </label>
-                      </div>
+                      <motion.div
+                      key={index}
+                      className="form-field"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                       <div className="field-display">
+                          <strong>{field.label}</strong>
+                        </div>
+                        <FieldConfiguration
+                          field={field}
+                          index={index}
+                          onFieldUpdate={updateField}
+                        />
+                      </motion.div>
                     ))}
-                    {provided.placeholder}
+                      {provided.placeholder}
                   </div>
                 )}
               </Droppable>
