@@ -25,9 +25,9 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
       }
       const formData = new FormData();
       formData.append('file', selectedFile);
-      formData.append('organizationId', organizationId);
+      formData.append('organization_id', organizationId);
       console.log("\n\nFormData: ", formData.get('file'));
-      console.log("Organization ID: ", formData.get('organizationId'));
+      console.log("Organization ID: ", formData.get('organization_id'));
       setUploading(true);
       try {
         const response = await request.post('/users/bulk_insert_employee_data_api', {
@@ -66,7 +66,7 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
               <input 
                 type="file" 
                 id="bulkFile" 
-                accept=".csv" 
+                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                 onChange={handleFileChange} 
               />
             </div>
