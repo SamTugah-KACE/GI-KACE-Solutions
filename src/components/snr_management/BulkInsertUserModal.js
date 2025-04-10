@@ -26,14 +26,15 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('organizationId', organizationId);
-  
+      console.log("\n\nFormData: ", formData.get('file'));
+      console.log("Organization ID: ", formData.get('organizationId'));
       setUploading(true);
       try {
         const response = await request.post('/users/bulk_insert_employee_data_api', {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          },
+        //   headers: {
+        //     Authorization: `Bearer ${localStorage.getItem('token')}`
+        //   },
           body: formData
         });
         if (!response.ok) {
