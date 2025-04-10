@@ -30,13 +30,15 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
       console.log("Organization ID: ", formData.get('organization_id'));
       setUploading(true);
       try {
-        const response = await request.post('/users/bulk_insert_employee_data_api', {
-          method: 'POST',
-        //   headers: {
-        //     Authorization: `Bearer ${localStorage.getItem('token')}`
-        //   },
-          body: formData
-        });
+        const response = await request.post('/users/bulk_insert_employee_data_api', formData
+        // {
+        //   method: 'POST',
+        // //   headers: {
+        // //     Authorization: `Bearer ${localStorage.getItem('token')}`
+        // //   },
+        //   body: formData
+        // }
+        );
         if (!response.ok) {
           const errData = await response.json();
           throw new Error(errData.detail || "Bulk insert failed");
