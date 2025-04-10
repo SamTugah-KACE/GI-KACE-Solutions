@@ -51,10 +51,31 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
       }
     };
   
-    const handleDownloadSample = () => {
-      // In production, the sample file URL might be dynamic.
-      window.open('/sample/bulk_insert_template.csv', '_blank');
-    };
+    // Efficiently download the sample file using the download API.
+  const handleDownloadSample = async () => {
+    try {
+      // Send a GET request to the download API.
+      const response = await request.get('/download/download-file', { method: 'GET' });
+      if (!response.ok) {
+        throw new Error("Failed to download sample file");
+      }
+      // Convert the response to a Blob.
+      const blob = await response.blob();
+      // Create a temporary object URL and trigger download.
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      // Optionally, set the filename. You can also get this from response headers.
+      a.download = "sample.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download error:", error);
+      alert(error.message);
+    }
+  };
   
     return (
       <div className="modal-overlay">

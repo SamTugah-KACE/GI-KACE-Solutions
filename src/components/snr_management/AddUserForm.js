@@ -9,7 +9,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
 
   // Establish websocket connection to prefetch the form design.
   useEffect(() => {
-    const wsUrl = `wss://staff-records-backend.onrender.com/ws/form-design/${organizationId}/${userId}`;
+    const wsUrl = `ws://staff-records-backend.onrender.com/ws/form-design/${organizationId}/${userId}`;
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => console.info("WebSocket connected to form-design endpoint.");
