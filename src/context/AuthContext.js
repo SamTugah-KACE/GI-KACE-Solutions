@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { toast } from 'react-toastify'; // For user notifications
+
 
 // Create the context
 const AuthContext = createContext();
@@ -37,16 +39,24 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('authUserRole', role);
 
     setAuth({ token, user, user_name, role });
+    toast.success('Login successful.');
   };
 
   // Function to log out a user
   const logout = () => {
+    try{
     localStorage.removeItem('authToken');
     localStorage.removeItem('authUser');
     localStorage.removeItem('authUserName')
     localStorage.removeItem('authUserRole');
 
     setAuth({ token: null, user: null, user_name: null, role: null });
+    toast.info('Logged out successfully.');
+    }catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Logout failed. Please try again.');
+      // Sentry.captureException(error);
+    }
   };
 
   return (

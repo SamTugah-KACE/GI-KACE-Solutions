@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import './Modal.css';
-import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
-import Select from 'react-select';
+// import { Formik, Form, Field } from 'formik';
+// import * as Yup from 'yup';
+// import Select from 'react-select';
 import request from '../request';
+import { toast } from 'react-toastify';
 
 
 // Modal for Existing Users
@@ -14,16 +15,19 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        const response = await request.get(`/users?organizationId=${organizationId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+        const response = await request.get(`/users?organizationId=${organizationId}`, 
+        //     {
+        //   headers: {
+        //     Authorization: `Bearer ${localStorage.getItem('token')}`
+        //   }
+        // }
+    );
         const data = await response.json();
         setUsers(data.users || []);
       } catch (error) {
         console.error("Error fetching users:", error);
-        alert("Failed to load users.");
+        toast.error("Error fetching users.");
+        // alert("Failed to load users.");
       } finally {
         setLoading(false);
       }
@@ -35,18 +39,21 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
   
     const handleUpdate = (user) => {
       // Logic to update user – update button remains disabled until changes.
-      alert(`Update user ${user.name}`);
+      toast.info(`Update user ${user.name}`);
+    //   alert(`Update user ${user.name}`);
     };
   
     const handleArchive = (user) => {
       if (window.confirm(`Archive user ${user.name}?`)) {
-        alert(`User ${user.name} archived (soft delete).`);
+        // alert(`User ${user.name} archived (soft delete).`);
+        toast.info(`User ${user.name} archived (soft delete).`);
       }
     };
   
     const handleDelete = (user) => {
       if (window.confirm(`Delete user ${user.name}? This is permanent.`)) {
-        alert(`User ${user.name} deleted.`);
+        toast.info(`User ${user.name} deleted.`);
+        // alert(`User ${user.name} deleted.`);
       }
     };
   

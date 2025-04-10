@@ -34,12 +34,14 @@ const CreateUserFormBuilderBuilder = ({ organizationId, onClose, onSaveSuccess }
   useEffect(() => {
     const fetchCreateUrl = async () => {
       try {
-        const res = await request.get('/organizations/create-url', {
-          method: 'GET',
-          // headers: {
-          //   Authorization: `Bearer ${localStorage.getItem('token')}`,
-          // },
-        });
+        const res = await request.get('/organizations/create-url', 
+        //   {
+        //   method: 'GET',
+        //   // headers: {
+        //   //   Authorization: `Bearer ${localStorage.getItem('token')}`,
+        //   // },
+        // }
+      );
         if (!res.ok) throw new Error('Failed to fetch create URL');
         const data = await res.json();
         setUserCreateUrl(data.user_create_url);
@@ -57,20 +59,22 @@ const CreateUserFormBuilderBuilder = ({ organizationId, onClose, onSaveSuccess }
         // First try the primary API.
         let res = await request.get(
           `/fetch?organization_id=${organizationId}&skip=0&limit=100`,
-          {
-            // headers: {
-            //   Authorization: `Bearer ${localStorage.getItem('token')}`,
-            // },
-          }
+          // {
+          //   // headers: {
+          //   //   Authorization: `Bearer ${localStorage.getItem('token')}`,
+          //   // },
+          // }
         );
         let data = await res.json();
         // If empty array, fetch from fallback.
         if (!data?.data || data.data.length === 0) {
-          res = await request.get(`/default/fetch-all/?skip=0&limit=100`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          });
+          res = await request.get(`/default/fetch-all/?skip=0&limit=100`, 
+          //   {
+          //   headers: {
+          //     Authorization: `Bearer ${localStorage.getItem('token')}`,
+          //   },
+          // }
+        );
           data = await res.json();
         }
         // Expecting data.data to be an array of roles.

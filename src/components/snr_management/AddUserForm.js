@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './AddUserForm.css';
 import request from '../request';
+import {toast} from 'react-toastify';
+
 
 const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   const [formDesign, setFormDesign] = useState(null);
@@ -45,7 +47,9 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formDesign || !formDesign.fields || formDesign.fields.length === 0) {
-      alert("No form design available. Please contact your administrator.");
+      toast.info("No form design available. Please contact your administrator.");
+      // console.error("No form design available. Please contact your administrator.");
+      // alert("No form design available. Please contact your administrator.");
       return;
     }
     try {
@@ -61,21 +65,25 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
           }
         });
         formData.append('organization_id', organizationId);
-        response = await request.post(formDesign.submitUrl || '/users/create', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-          body: formData
-        });
+        response = await request.post(formDesign.submitUrl || '/users/create', formData
+        //   {
+        //   method: 'POST',
+        //   headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        //   body: formData
+        // }
+      );
       } else {
         const payload = { ...fieldValues, organization_id: organizationId };
-        response = await request.post(formDesign.submitUrl || '/users/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify(payload)
-        });
+        response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payload)
+        //   {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     Authorization: `Bearer ${localStorage.getItem('token')}`
+        //   },
+        //   body: JSON.stringify(payload)
+        // }
+      );
       }
       if (!response.ok) {
         const errorData = await response.json();
@@ -87,14 +95,16 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
           await submitFunc(fieldValues);
         } catch (error) {
           console.error("Submission error from submitCode:", error);
-          alert(error.message);
+          toast.error(`"Error collecting request form data: "${error.message}`);
+          // alert(error.message);
         }
       }
       onUserAdded();
       onClose();
     } catch (error) {
       console.error("Submit Form Error:", error);
-      alert(error.message);
+      toast.error(`"Error submitting request form data: "${error.message}`);
+      // alert(error.message);
     }
   };
 

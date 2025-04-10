@@ -10,7 +10,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import UnauthorizedPage from './components/UnauthorizedPage';
 import { AuthProvider } from './context/AuthContext';
 // import AlertNotifier from './components/AlertNotifier';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 // A simple hook to set a dark/light theme based on time
@@ -36,6 +37,18 @@ function App() {
   // useTheme();
   return (
     <AuthProvider>
+      {/* Global Toast Container for notifications */}
+      <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/signup" element={<SignupPage />} />

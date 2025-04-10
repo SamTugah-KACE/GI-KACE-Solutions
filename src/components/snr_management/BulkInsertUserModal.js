@@ -6,6 +6,7 @@ import './Modal.css';
 // import Select from 'react-select';
 import request from '../request';
 // import { useOrganization } from '../../context/OrganizationContext';
+import { toast } from 'react-toastify';
 
 
 // Modal for Bulk Insert Users
@@ -20,7 +21,8 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
     const handleSubmit = async e => {
       e.preventDefault();
       if (!selectedFile) {
-        alert("Please select a file to upload.");
+        // alert("Please select a file to upload.");
+        toast.info("Please select the excel file containing your employee records.");
         return;
       }
       const formData = new FormData();
@@ -47,7 +49,8 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
         onClose();
       } catch (error) {
         console.error("Bulk Insert Error:", error);
-        alert(error.message);
+        // alert(error.message);
+        toast.error(`Error processing the uploaded file: ${error.message}`);
       } finally {
         setUploading(false);
       }
@@ -75,7 +78,8 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Download error:", error);
-      alert(error.message);
+      toast.error(`Error downloading sample file: ${error.message}`);
+    //   alert(error.message);
     }
   };
   
