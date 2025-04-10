@@ -1,12 +1,15 @@
-// file: src/components/AddUserForm.jsx
-import React, { useState, useEffect } from 'react';
+// src/components/AddUserForm.jsx
+import React, { useState, useEffect, useCallback } from 'react';
 import './AddUserForm.css';
+import request from '../request';
 
-const AddUserForm = ({ organizationId, userId }) => {
+const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   const [formDesign, setFormDesign] = useState(null);
+  const [fieldValues, setFieldValues] = useState({});
 
+  // Establish websocket connection to prefetch the form design.
   useEffect(() => {
-    const wsUrl = `ws://staff-records-backend.onrender.com/ws/form-design/${organizationId}/${userId}`;
+    const wsUrl = `wss://staff-records-backend.onrender.com/ws/form-design/${organizationId}/${userId}`;
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => console.info("WebSocket connected to form-design endpoint.");
@@ -14,11 +17,18 @@ const AddUserForm = ({ organizationId, userId }) => {
       try {
         const data = JSON.parse(event.data);
         setFormDesign(data.formDesign);
+        // Initialize controlled state for each field.
+        if (data.formDesign?.fields) {
+          const initialValues = {};
+          data.formDesign.fields.forEach(field => {
+            initialValues[field.id] = '';
+          });
+          setFieldValues(initialValues);
+        }
       } catch (error) {
         console.error("Error parsing form design:", error);
       }
     };
-
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
     };
@@ -28,96 +38,159 @@ const AddUserForm = ({ organizationId, userId }) => {
     };
   }, [organizationId, userId]);
 
+  // Handler for changes in the dynamic inputs.
+  const handleInputChange = useCallback((e, fieldId) => {
+    const value = e.target.type === "file" ? e.target.files : e.target.value;
+    setFieldValues(prev => ({
+      ...prev,
+      [fieldId]: value
+    }));
+  }, []);
+
+  // Submit the form by gathering the controlled input values.
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Gather form data using a robust approach – ideally using controlled components or refs.
-    const formData = {};
-    formDesign.fields.forEach((field) => {
-      const el = document.getElementById(field.id);
-      if (el) {
-        // If file input, collect FileList; else, get the value.
+    try {
+      // Prepare data: if any field is a file input, prepare FormData.
+      let hasFileField = false;
+      formDesign.fields.forEach(field => {
         if (field.id === 'file') {
-          formData[field.id] = el.files;
-        } else {
-          formData[field.id] = el.value;
+          hasFileField = true;
+        }
+      });
+      let response;
+      if (hasFileField) {
+        const formData = new FormData();
+        Object.entries(fieldValues).forEach(([key, value]) => {
+          if (value instanceof FileList) {
+            Array.from(value).forEach(file => formData.append(key, file));
+          } else {
+            formData.append(key, value);
+          }
+        });
+        formData.append('organization_id', organizationId);
+        response = await request.post(formDesign.submitUrl || '/user/create', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          body: formData
+        });
+      } else {
+        const payload = { ...fieldValues, organization_id: organizationId };
+        response = await request.post(formDesign.submitUrl || '/user/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(payload)
+        });
+      }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Submission failed');
+      }
+      // Execute the precompiled submission code if provided.
+      if (formDesign && formDesign.submitCode) {
+        try {
+          const submitFunc = new Function(`"use strict"; return (${formDesign.submitCode})`)();
+          await submitFunc(fieldValues);
+        } catch (error) {
+          console.error("Submission error from submitCode:", error);
+          alert(error.message);
         }
       }
-    });
-
-    // In production, avoid eval() if possible.
-    // Here we use the Function constructor in strict mode as a slightly safer alternative.
-    if (formDesign && formDesign.submitCode) {
-      try {
-        // Create a new function from the precompiled code.
-        const submitFunc = new Function(`"use strict"; return (${formDesign.submitCode})`)();
-        await submitFunc(formData);
-      } catch (error) {
-        console.error("Submission error:", error);
-        alert(error.message);
-      }
+      onUserAdded();
+      onClose();
+    } catch (error) {
+      console.error("Submit Form Error:", error);
+      alert(error.message);
     }
   };
 
   if (!formDesign) {
-    return <div>Loading form...</div>;
+    return <div>Loading form…</div>;
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      {formDesign.fields.map((field, index) => {
-        // Render dynamic fields based on type.
-        if (field.id === 'role_select') {
-          return (
-            <div key={index}>
-              <label>{field.label}</label>
-              <select id={field.id}>
-                {/* Assume role options are now embedded in formDesign for simplicity.
-                    In production, you might fetch these separately. */}
-                {field.options && field.options.length > 0 ? (
-                  field.options.map(option => (
-                    <option key={option.id} value={option.id}>
-                      {option.name}
-                    </option>
-                  ))
-                ) : (
-                  <option value="">No roles available</option>
-                )}
-              </select>
-            </div>
-          );
-        }
-        // Basic render for other field types.
-        if (['text', 'email', 'url', 'date', 'phone'].includes(field.id)) {
-          return (
-            <div key={index}>
-              <label>{field.label}</label>
-              <input type={field.id} id={field.id} placeholder={field.label} />
-            </div>
-          );
-        }
-        // For radio/checkbox: render an input to enter options.
-        if (['radio', 'checkbox'].includes(field.id)) {
-          return (
-            <div key={index}>
-              <label>{field.label}</label>
-              <input type="text" id={field.id} placeholder="Comma separated options" />
-            </div>
-          );
-        }
-        // For file upload:
-        if (field.id === 'file') {
-          return (
-            <div key={index}>
-              <label>{field.label}</label>
-              <input type="file" id={field.id} multiple />
-            </div>
-          );
-        }
-        return null;
-      })}
-      <button type="submit">Submit</button>
-    </form>
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <form onSubmit={handleSubmit}>
+          {formDesign.fields.map((field, index) => {
+            if (field.id === 'role_select') {
+              return (
+                <div key={index} className="form-group">
+                  <label>{field.label}</label>
+                  <select 
+                    id={field.id}
+                    value={fieldValues[field.id]}
+                    onChange={(e) => handleInputChange(e, field.id)}
+                  >
+                    <option value="">Select a Role</option>
+                    {field.options && field.options.length > 0 ? (
+                      field.options.map(option => (
+                        <option key={option.id} value={option.id}>
+                          {option.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="">No roles available</option>
+                    )}
+                  </select>
+                </div>
+              );
+            }
+            if (['text', 'email', 'url', 'date', 'phone'].includes(field.id)) {
+              return (
+                <div key={index} className="form-group">
+                  <label>{field.label}</label>
+                  <input 
+                    type={field.id}
+                    id={field.id}
+                    placeholder={field.label}
+                    value={fieldValues[field.id] || ''}
+                    onChange={(e) => handleInputChange(e, field.id)}
+                  />
+                </div>
+              );
+            }
+            if (['radio', 'checkbox'].includes(field.id)) {
+              return (
+                <div key={index} className="form-group">
+                  <label>{field.label}</label>
+                  <input 
+                    type="text"
+                    id={field.id}
+                    placeholder="Comma separated options"
+                    value={fieldValues[field.id] || ''}
+                    onChange={(e) => handleInputChange(e, field.id)}
+                  />
+                </div>
+              );
+            }
+            if (field.id === 'file') {
+              return (
+                <div key={index} className="form-group">
+                  <label>{field.label}</label>
+                  <input 
+                    type="file"
+                    id={field.id}
+                    multiple
+                    onChange={(e) => handleInputChange(e, field.id)}
+                  />
+                </div>
+              );
+            }
+            return null;
+          })}
+          <div className="modal-actions">
+            <button type="submit">Submit</button>
+            <button type="button" onClick={onClose}>Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
 export default AddUserForm;
+

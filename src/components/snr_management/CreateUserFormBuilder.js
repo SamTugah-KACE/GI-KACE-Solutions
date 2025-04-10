@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import './FormBuilderModal.css';
+import request from '../request';
 
 // Available field definitions; note the added "role_select" option.
 const availableFields = [
@@ -18,7 +19,7 @@ const availableFields = [
 
 const initialFormFields = [];
 
-const FormBuilderModal = ({ organizationId, onClose, onSaveSuccess }) => {
+const CreateUserFormBuilderBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
   // State holds the current form fields, fetched create URL, and available role options.
   const [formFields, setFormFields] = useState(initialFormFields);
   const [userCreateUrl, setUserCreateUrl] = useState('');
@@ -28,7 +29,7 @@ const FormBuilderModal = ({ organizationId, onClose, onSaveSuccess }) => {
   useEffect(() => {
     const fetchCreateUrl = async () => {
       try {
-        const res = await fetch('/create-url', {
+        const res = await request.get('/create-url', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -49,7 +50,7 @@ const FormBuilderModal = ({ organizationId, onClose, onSaveSuccess }) => {
     const fetchRoleOptions = async () => {
       try {
         // First try the primary API.
-        let res = await fetch(
+        let res = await request.get(
           `/fetch?organization_id=${organizationId}&skip=0&limit=100`,
           {
             headers: {
@@ -60,7 +61,7 @@ const FormBuilderModal = ({ organizationId, onClose, onSaveSuccess }) => {
         let data = await res.json();
         // If empty array, fetch from fallback.
         if (!data?.data || data.data.length === 0) {
-          res = await fetch(`/default/fetch-all/?skip=0&limit=100`, {
+          res = await request.get(`/default/fetch-all/?skip=0&limit=100`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
@@ -203,7 +204,7 @@ const FormBuilderModal = ({ organizationId, onClose, onSaveSuccess }) => {
           }
         });
         formData.append('organization_id', organizationId);
-        response = await fetch(userCreateUrl, {
+        response = await request.post(userCreateUrl, {
           method: 'POST',
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
           body: formData
@@ -211,7 +212,7 @@ const FormBuilderModal = ({ organizationId, onClose, onSaveSuccess }) => {
       } else {
         // Otherwise send as JSON.
         const payload = buildFormPayload();
-        response = await fetch(userCreateUrl, {
+        response = await request.post(userCreateUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -243,7 +244,7 @@ const FormBuilderModal = ({ organizationId, onClose, onSaveSuccess }) => {
       submitCode: ""
     };
     try {
-      const res = await fetch('/api/form_design', {
+      const res = await request.post('/dashboards', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json', 
@@ -370,4 +371,4 @@ const FormBuilderModal = ({ organizationId, onClose, onSaveSuccess }) => {
   );
 };
 
-export default FormBuilderModal;
+export default CreateUserFormBuilderBuilder;

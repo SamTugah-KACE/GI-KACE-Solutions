@@ -11,7 +11,9 @@ import UpdateDepartmentModal from '../snr_management/UpdateDepartmentModal';
 import AddBranchModal from '../snr_management/AddBranchModal';
 import UserFormBuilderModal from '../snr_management/CreateUserFormBuilder'; // Import the modal
 import AddUserForm from '../snr_management/AddUserForm';
-
+import BulkInsertUsersModal from '../snr_management/BulkInsertUserModal'; // Import the modal
+import ExistingUsersModal from '../snr_management/ExistingUsersModal'; // Import the modal
+import AddRoleModal from '../snr_management/AddRoleModal';
 
 
 
@@ -26,7 +28,13 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
 
   const [showUserFormBuilderModal, setShowUserFormBuilderModal] = useState(false);
   const [showAddUserForm, setShowAddUserForm] = useState(false);
+  const [showBulkInsertModal, setShowBulkInsertModal] = useState(false);
+  const [showExistingUsersModal, setShowExistingUsersModal] = useState(false);
   
+
+  const [showAddRoleModal, setShowAddRoleModal] = useState(false);
+
+
   // const [showAddDeptModal, setShowAddDeptModal] = useState(false);
   const [showAddBranchModal, setShowAddBranchModal] = useState(false);
 
@@ -84,8 +92,9 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
           New User <span className="dropdown-indicator">▼</span>
           {expanded && activeMenu === 'users' && (
             <ul className="submenu">
-              <li onClick={setShowAddUserForm(true)}>Add New User</li>
-              <li onClick={() => alert("Existing Users modal")}>Existing Users</li>
+              <li onClick={() => setShowAddUserForm(true)}>Add New User</li>
+              <li onClick={() => setShowBulkInsertModal(true)}>Bulk Insert Users</li>
+              <li onClick={() => setShowExistingUsersModal(true)}>Existing Users</li>
               <li onClick={() => setShowUserFormBuilderModal(true)}>User Registration Form</li>
             </ul>
           )}
@@ -94,7 +103,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
           System Roles <span className="dropdown-indicator">▼</span>
           {expanded && activeMenu === 'roles' && (
             <ul className="submenu">
-              <li onClick={() => alert("Add New Role modal")}>Add New Role</li>
+              <li onClick={() => setShowAddRoleModal(true)}>Add New Role</li>
               <li onClick={() => alert("Existing Roles modal")}>Existing Roles</li>
             </ul>
           )}
@@ -167,6 +176,30 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
           />
         )
     }
+
+    {showBulkInsertModal && (
+        <BulkInsertUsersModal
+          organizationId={organization.id}
+          onClose={() => setShowBulkInsertModal(false)}
+          onSuccess={() => alert("Users inserted successfully")}
+        />
+      )}
+
+      {showExistingUsersModal && (
+        <ExistingUsersModal
+          organizationId={organization.id}
+          onClose={() => setShowExistingUsersModal(false)}
+        />
+      )}
+
+      {
+        showAddRoleModal && (
+          <AddRoleModal
+            onClose={() => setShowAddRoleModal(false)}
+            onRoleAdded={() => alert("Role added")}
+          />
+        )
+      }
 
      {showUpdateDeptModal && (
         <UpdateDepartmentModal onClose={() => setShowUpdateDeptModal(false)} 
