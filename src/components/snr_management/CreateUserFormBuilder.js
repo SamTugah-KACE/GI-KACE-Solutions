@@ -35,51 +35,51 @@ const initialFormFields = [];
 //     onFieldUpdate(index, { [name]: newVal });
 //   };
 
-  return (
-    <div className="field-config">
-      <div className="config-group">
-        <label>Label</label>
-        <input
-          type="text"
-          name="label"
-          value={field.label}
-          onChange={handleChange}
-          placeholder="Field label"
-        />
-      </div>
-      {['radio', 'checkbox', 'select'].includes(field.id) && (
-        <div className="config-group">
-          <label>Options (comma separated)</label>
-          <input
-            type="text"
-            name="choices"
-            value={field.options?.choices ? field.options.choices.join(',') : ''}
-            onChange={(e) =>
-              onFieldUpdate(index, {
-                options: {
-                  ...field.options,
-                  choices: e.target.value.split(',').map((opt) => opt.trim()),
-                },
-              })
-            }
-            placeholder="e.g., Option1, Option2"
-          />
-        </div>
-      )}
-      <div className="config-group">
-        <label>
-          <input
-            type="checkbox"
-            name="required"
-            checked={field.required || false}
-            onChange={handleChange}
-          />{' '}
-          Required
-        </label>
-      </div>
-    </div>
-  );
-};
+//   return (
+//     <div className="field-config">
+//       <div className="config-group">
+//         <label>Label</label>
+//         <input
+//           type="text"
+//           name="label"
+//           value={field.label}
+//           onChange={handleChange}
+//           placeholder="Field label"
+//         />
+//       </div>
+//       {['radio', 'checkbox', 'select'].includes(field.id) && (
+//         <div className="config-group">
+//           <label>Options (comma separated)</label>
+//           <input
+//             type="text"
+//             name="choices"
+//             value={field.options?.choices ? field.options.choices.join(',') : ''}
+//             onChange={(e) =>
+//               onFieldUpdate(index, {
+//                 options: {
+//                   ...field.options,
+//                   choices: e.target.value.split(',').map((opt) => opt.trim()),
+//                 },
+//               })
+//             }
+//             placeholder="e.g., Option1, Option2"
+//           />
+//         </div>
+//       )}
+//       <div className="config-group">
+//         <label>
+//           <input
+//             type="checkbox"
+//             name="required"
+//             checked={field.required || false}
+//             onChange={handleChange}
+//           />{' '}
+//           Required
+//         </label>
+//       </div>
+//     </div>
+//   );
+// };
 
 /** DraggableField for the available fields palette */
 const DraggableField = ({ field }) => {
