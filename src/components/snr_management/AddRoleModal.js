@@ -14,7 +14,7 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
     const fetchPermissions = async () => {
       try {
         const res = await request.get('/default/fetch-all/?skip=0&limit=100');
-        const data = await res.json() || res.data;
+        const data =  res.data;
         console.log('response.json():', res.json);
         console.log('response.data:', res.data);
         console.log('response data:', data);
@@ -23,6 +23,7 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
         }
         // Assume the response is an array and find the object where data_name === 'permissions'
         const permissionObj = data.find(item => item.data_name && item.data_name.toLowerCase() === 'permissions');
+        console.log('permissionObj:', permissionObj.data);
         if (permissionObj && Array.isArray(permissionObj.data)) {
           setPermissions(permissionObj.data);
         }

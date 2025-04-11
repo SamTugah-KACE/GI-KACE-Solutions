@@ -387,7 +387,9 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     const fetchRoles = async () => {
       try {
         const res = await request.get(`/fetch?organization_id=${organizationId}&skip=0&limit=100`);
-        const data = await res.json() || res.data;
+        const data =  res.data;
+        console.log('response.data:', data);
+        console.log('response data.data:', data.data);
         if (data?.data) {
           setRoleOptions(data.data);
         }
