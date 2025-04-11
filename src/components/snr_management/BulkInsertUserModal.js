@@ -32,7 +32,10 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
       console.log("Organization ID: ", formData.get('organization_id'));
       setUploading(true);
       try {
-        const response = await request.post('/users/bulk_insert_employee_data_api', formData
+        const response = await request.post('/users/bulk_insert_employee_data_api', formData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
+              }
         // {
         //   method: 'POST',
         // //   headers: {
@@ -60,7 +63,7 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
   const handleDownloadSample = async () => {
     try {
       // Send a GET request to the download API.
-      const response = await request.get('/download/download-file', { method: 'GET' });
+      const response = await request.get('/download/download-file');
       if (!response.ok) {
         throw new Error("Failed to download sample file");
       }
@@ -93,7 +96,7 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
               <input 
                 type="file" 
                 id="bulkFile" 
-                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .xls, .xlsx"
                 onChange={handleFileChange} 
               />
             </div>

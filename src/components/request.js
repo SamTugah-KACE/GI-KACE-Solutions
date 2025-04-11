@@ -14,6 +14,8 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
+    console.log('\n\nRequest Token:', token);
+    // Attach the token to the Authorization header if it exists
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }

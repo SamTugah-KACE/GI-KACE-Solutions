@@ -31,7 +31,7 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
     setLoading(true);
     try {
       const response = await request.get(
-        `/users/employees?organizationId=${organizationId}&skip=0&limit=100&sort=asc`
+        `/users/employees?organization_id=${organizationId}&skip=0&limit=100&sort=asc`
       );
       const data = await response.json();
 
