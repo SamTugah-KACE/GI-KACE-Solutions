@@ -75,7 +75,7 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
       const a = document.createElement('a');
       a.href = url;
       // Optionally, set the filename. You can also get this from response headers.
-      a.download = "sample.xlsx";
+    //   a.download = "sample.xlsx";
       document.body.appendChild(a);
       a.click();
       a.remove();
