@@ -163,7 +163,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
         showUserFormBuilderModal && (
           <UserFormBuilderModal
             organizationId={organization.id} // Pass the organization ID from context
-            userId={auth.user_id}
+            userId={auth.user.id}
             onClose={() => setShowUserFormBuilderModal(false)}
             onSaveSuccess={() => alert("Form saved successfully")}
           />
