@@ -387,7 +387,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     const fetchRoles = async () => {
       try {
         const res = await request.get(`/fetch?organization_id=${organizationId}&skip=0&limit=100`);
-        const data = await res.json();
+        const data = await res.json() || res.data;
         if (data?.data) {
           setRoleOptions(data.data);
         }
@@ -435,7 +435,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         const payload = { ...fieldValues, organization_id: organizationId };
         response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payload));
       }
-      if (!response.ok || response.status !== 200) {
+      if (!response.ok || response.status !== 200 || response.status !== 201) {
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Submission failed');
       }

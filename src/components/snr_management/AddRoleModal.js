@@ -14,7 +14,13 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
     const fetchPermissions = async () => {
       try {
         const res = await request.get('/default/fetch-all/?skip=0&limit=100');
-        const data = await res.json();
+        const data = await res.json() || res.data;
+        console.log('response.json():', res.json);
+        console.log('response.data:', res.data);
+        console.log('response data:', data);
+        if (!Array.isArray(data)) {
+            throw new Error('Invalid data format received from API');
+        }
         // Assume the response is an array and find the object where data_name === 'permissions'
         const permissionObj = data.find(item => item.data_name && item.data_name.toLowerCase() === 'permissions');
         if (permissionObj && Array.isArray(permissionObj.data)) {
@@ -51,14 +57,18 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
       organization_id: organizationId,
     };
     try {
-      const res = await request.post('/role', JSON.stringify(payload), {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
+      const res = await request.post('/role', JSON.stringify(payload),
+    //    {
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       Authorization: `Bearer ${localStorage.getItem('token')}`,
+    //     },
+    //   }
+    );
+      if (!res.ok || res.status !== 201) {
+        // Handle error response from the server.
+        const errorData = await res.json() || res.data;
+        console.error('Error response:', errorData);
         throw new Error(errorData.detail || 'Failed to add role');
       }
       const newRole = await res.json();
