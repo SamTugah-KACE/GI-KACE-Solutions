@@ -1,3 +1,315 @@
+// // src/components/snr_management/CreateUserFormBuilder.js
+// import React, { useState, useEffect, useCallback } from 'react';
+// import { DndProvider, useDrag, useDrop } from 'react-dnd';
+// import { HTML5Backend } from 'react-dnd-html5-backend';
+// import { motion } from 'framer-motion';
+// import './FormBuilderModal.css';
+// import request from '../request';
+// import FieldConfiguration from './FieldConfiguration';
+
+
+// // Define the available fields.
+// const availableFields = [
+//   { id: 'text', label: 'Text Input' },
+//   { id: 'email', label: 'Email Input' },
+//   { id: 'url', label: 'URL Input' },
+//   { id: 'date', label: 'Date Picker' },
+//   { id: 'phone', label: 'Phone Number' },
+//   { id: 'radio', label: 'Radio Buttons' },
+//   { id: 'checkbox', label: 'Checkboxes' },
+//   { id: 'file', label: 'File Upload' },
+//   { id: 'role_select', label: 'Role Selection' },
+//   { id: 'submit', label: 'Submit Button' },
+//   { id: 'text_area', label: 'Text Area' },
+//   { id: 'number', label: 'Number Input' },
+//   { id: 'select', label: 'Dropdown Select' },
+// ];
+
+// const initialFormFields = [];
+
+// /** FieldConfiguration renders inline controls for each dropped field */
+// // const FieldConfiguration = ({ field, index, onFieldUpdate }) => {
+// //   const handleChange = (e) => {
+// //     const { name, value, type, checked } = e.target;
+// //     const newVal = type === 'checkbox' ? checked : value;
+// //     onFieldUpdate(index, { [name]: newVal });
+// //   };
+
+// //   return (
+// //     <div className="field-config">
+// //       <div className="config-group">
+// //         <label>Label</label>
+// //         <input
+// //           type="text"
+// //           name="label"
+// //           value={field.label}
+// //           onChange={handleChange}
+// //           placeholder="Field label"
+// //         />
+// //       </div>
+// //       {['radio', 'checkbox', 'select'].includes(field.id) && (
+// //         <div className="config-group">
+// //           <label>Options (comma separated)</label>
+// //           <input
+// //             type="text"
+// //             name="choices"
+// //             value={field.options?.choices ? field.options.choices.join(',') : ''}
+// //             onChange={(e) =>
+// //               onFieldUpdate(index, {
+// //                 options: {
+// //                   ...field.options,
+// //                   choices: e.target.value.split(',').map((opt) => opt.trim()),
+// //                 },
+// //               })
+// //             }
+// //             placeholder="e.g., Option1, Option2"
+// //           />
+// //         </div>
+// //       )}
+// //       <div className="config-group">
+// //         <label>
+// //           <input
+// //             type="checkbox"
+// //             name="required"
+// //             checked={field.required || false}
+// //             onChange={handleChange}
+// //           />{' '}
+// //           Required
+// //         </label>
+// //       </div>
+// //     </div>
+// //   );
+// // };
+
+// /** DraggableField for the available fields palette */
+// const DraggableField = ({ field }) => {
+//   const [{ isDragging }, drag] = useDrag(() => ({
+//     type: 'FIELD',
+//     item: { field },
+//     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
+//   }));
+//   return (
+//     <div ref={drag} className="field-item" style={{ opacity: isDragging ? 0.5 : 1 }}>
+//       {field.label}
+//     </div>
+//   );
+// };
+
+// /** FormFieldItem: a draggable field in the builder area with inline configuration */
+// const FormFieldItem = ({ field, index, moveField, onFieldUpdate }) => {
+//   const ref = React.useRef(null);
+//   const [, drop] = useDrop({
+//     accept: 'BUILDER_FIELD',
+//     hover(item, monitor) {
+//       if (!ref.current) return;
+//       const dragIndex = item.index;
+//       const hoverIndex = index;
+//       if (dragIndex === hoverIndex) return;
+//       const hoverBoundingRect = ref.current.getBoundingClientRect();
+//       const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+//       const clientOffset = monitor.getClientOffset();
+//       const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+//       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
+//       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
+//       moveField(dragIndex, hoverIndex);
+//       item.index = hoverIndex;
+//     },
+//   });
+
+//   const [{ isDragging }, drag] = useDrag({
+//     type: 'BUILDER_FIELD',
+//     item: { type: 'BUILDER_FIELD', id: field.id, index },
+//     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
+//   });
+//   drag(drop(ref));
+
+//   return (
+//     <motion.div
+//       ref={ref}
+//       className="form-field"
+//       style={{ opacity: isDragging ? 0.5 : 1 }}
+//       initial={{ opacity: 0, y: 10 }}
+//       animate={{ opacity: 1, y: 0 }}
+//       transition={{ duration: 0.2 }}
+//     >
+//       <div className="field-display">
+//         <strong>{field.label}</strong>
+//       </div>
+//       <FieldConfiguration field={field} index={index} onFieldUpdate={onFieldUpdate} />
+//     </motion.div>
+//   );
+// };
+
+// /** The main form builder component */
+// const CreateUserFormBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
+//   const [formFields, setFormFields] = useState(initialFormFields);
+//   const [userCreateUrl, setUserCreateUrl] = useState('');
+//   const [roleOptions, setRoleOptions] = useState([]);
+
+//   // Fetch the user create URL.
+//   useEffect(() => {
+//     const fetchCreateUrl = async () => {
+//       try {
+//         const res = await request.get('/organizations/create-url');
+//         if (res.status !== 200) throw new Error('Failed to fetch create URL');
+//         const data = await res.json();
+//         setUserCreateUrl(data.user_create_url);
+//       } catch (error) {
+//         console.error('Error fetching create URL:', error);
+//       }
+//     };
+//     fetchCreateUrl();
+//   }, []);
+
+//   // Fetch role options.
+//   useEffect(() => {
+//     const fetchRoleOptions = async () => {
+//       try {
+//         let res = await request.get(`/fetch?organization_id=${organizationId}&skip=0&limit=100`);
+//         let data = await res.json();
+//         if (!data?.data || data.data.length === 0) {
+//           res = await request.get(`/default/fetch-all/?skip=0&limit=100`);
+//           data = await res.json();
+//         }
+//         if (data?.data) {
+//           const roles = data.data.map((role) => ({ id: role.id, name: role.name }));
+//           setRoleOptions(roles);
+//         }
+//       } catch (error) {
+//         console.error('Error fetching role options:', error);
+//       }
+//     };
+//     fetchRoleOptions();
+//   }, [organizationId]);
+
+//   // Move field for reordering within the builder.
+//   const moveField = useCallback((dragIndex, hoverIndex) => {
+//     setFormFields((prevFields) => {
+//       const updatedFields = Array.from(prevFields);
+//       const [removed] = updatedFields.splice(dragIndex, 1);
+//       updatedFields.splice(hoverIndex, 0, removed);
+//       return updatedFields;
+//     });
+//   }, []);
+
+//   const updateField = (index, updateProps) => {
+//     setFormFields((prev) => {
+//       const newFields = [...prev];
+//       newFields[index] = { ...newFields[index], ...updateProps };
+//       return newFields;
+//     });
+//   };
+
+//   // The drop zone for adding fields from the palette.
+//   const FormBuilderArea = () => {
+//     const [, drop] = useDrop({
+//       accept: 'FIELD',
+//       drop: (item) => {
+//         const field = availableFields.find((f) => f.id === item.field.id);
+//         if (field) {
+//           const newField = {
+//             ...field,
+//             options: ['role_select', 'radio', 'checkbox', 'select'].includes(field.id)
+//               ? { choices: [] }
+//               : {},
+//             required: false,
+//             validation: field.id === 'phone'
+//               ? { countryCodes: ['+1', '+44', '+91'], maxLength: 10 }
+//               : field.id === 'email'
+//               ? { regex: '^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$' }
+//               : {},
+//           };
+//           setFormFields((prev) => [...prev, newField]);
+//         }
+//       },
+//     });
+//     return (
+//       <div ref={drop} className="form-builder">
+//         <h3>Your Form</h3>
+//         {formFields.map((field, index) => (
+//           <FormFieldItem
+//             key={index}
+//             field={field}
+//             index={index}
+//             moveField={moveField}
+//             onFieldUpdate={updateField}
+//           />
+//         ))}
+//       </div>
+//     );
+//   };
+
+//   // Automatically ensure a "submit" field exists before saving.
+//   const ensureSubmitField = (fields) => {
+//     if (!fields.some((field) => field.id === 'submit')) {
+//       return [
+//         ...fields,
+//         {
+//           id: 'submit',
+//           label: 'Submit',
+//           required: false,
+//           options: {},
+//           validation: {},
+//         },
+//       ];
+//     }
+//     return fields;
+//   };
+
+//   // Save the form design.
+//   const handleSaveForm = async () => {
+//     const fieldsWithSubmit = ensureSubmitField(formFields);
+//     const formDesign = {
+//       fields: fieldsWithSubmit,
+//       submitCode: "",
+//     };
+//     try {
+//       const res = await request.post('/dashboards/dashboards', JSON.stringify({ organization_id: organizationId, form_design: formDesign })
+//       //   {
+//       //   method: 'POST',
+//       //   headers: {
+//       //     'Content-Type': 'application/json',
+//       //     Authorization: `Bearer ${localStorage.getItem('token')}`,
+//       //   },
+//       //   body: JSON.stringify({ organization_id: organizationId, form_design: formDesign }),
+//       // }
+//     );
+//       if (!res.ok) throw new Error('Error saving form design');
+//       onSaveSuccess();
+//       onClose();
+//     } catch (error) {
+//       console.error('Error saving form design:', error);
+//       alert(error.message);
+//     }
+//   };
+
+//   return (
+//     <DndProvider backend={HTML5Backend}>
+//       <div className="modal-overlay">
+//         <div className="modal-content">
+//           <h2>Form Builder</h2>
+//           <div className="builder-container">
+//             <div className="field-palette">
+//               <h3>Available Fields</h3>
+//               {availableFields.map((field) => (
+//                 <DraggableField key={field.id} field={field} />
+//               ))}
+//             </div>
+//             <FormBuilderArea />
+//           </div>
+//           <div className="modal-actions">
+//             <button onClick={handleSaveForm}>Save Form Design</button>
+//             <button onClick={onClose}>Cancel</button>
+//           </div>
+//         </div>
+//       </div>
+//     </DndProvider>
+//   );
+// };
+
+// export default CreateUserFormBuilder;
+
+
 // src/components/snr_management/CreateUserFormBuilder.js
 import React, { useState, useEffect, useCallback } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
@@ -6,7 +318,7 @@ import { motion } from 'framer-motion';
 import './FormBuilderModal.css';
 import request from '../request';
 import FieldConfiguration from './FieldConfiguration';
-
+import { FaTrashAlt } from 'react-icons/fa'; // For remove button
 
 // Define the available fields.
 const availableFields = [
@@ -27,61 +339,7 @@ const availableFields = [
 
 const initialFormFields = [];
 
-/** FieldConfiguration renders inline controls for each dropped field */
-// const FieldConfiguration = ({ field, index, onFieldUpdate }) => {
-//   const handleChange = (e) => {
-//     const { name, value, type, checked } = e.target;
-//     const newVal = type === 'checkbox' ? checked : value;
-//     onFieldUpdate(index, { [name]: newVal });
-//   };
-
-//   return (
-//     <div className="field-config">
-//       <div className="config-group">
-//         <label>Label</label>
-//         <input
-//           type="text"
-//           name="label"
-//           value={field.label}
-//           onChange={handleChange}
-//           placeholder="Field label"
-//         />
-//       </div>
-//       {['radio', 'checkbox', 'select'].includes(field.id) && (
-//         <div className="config-group">
-//           <label>Options (comma separated)</label>
-//           <input
-//             type="text"
-//             name="choices"
-//             value={field.options?.choices ? field.options.choices.join(',') : ''}
-//             onChange={(e) =>
-//               onFieldUpdate(index, {
-//                 options: {
-//                   ...field.options,
-//                   choices: e.target.value.split(',').map((opt) => opt.trim()),
-//                 },
-//               })
-//             }
-//             placeholder="e.g., Option1, Option2"
-//           />
-//         </div>
-//       )}
-//       <div className="config-group">
-//         <label>
-//           <input
-//             type="checkbox"
-//             name="required"
-//             checked={field.required || false}
-//             onChange={handleChange}
-//           />{' '}
-//           Required
-//         </label>
-//       </div>
-//     </div>
-//   );
-// };
-
-/** DraggableField for the available fields palette */
+/** DraggableField: Displays each available field in the palette */
 const DraggableField = ({ field }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'FIELD',
@@ -95,9 +353,11 @@ const DraggableField = ({ field }) => {
   );
 };
 
-/** FormFieldItem: a draggable field in the builder area with inline configuration */
-const FormFieldItem = ({ field, index, moveField, onFieldUpdate }) => {
+/** FormFieldItem: Displays a dropped field with inline configuration and a remove button */
+const FormFieldItem = ({ field, index, moveField, onFieldUpdate, onRemove }) => {
   const ref = React.useRef(null);
+  
+  // Enable drop to reorder.
   const [, drop] = useDrop({
     accept: 'BUILDER_FIELD',
     hover(item, monitor) {
@@ -115,7 +375,6 @@ const FormFieldItem = ({ field, index, moveField, onFieldUpdate }) => {
       item.index = hoverIndex;
     },
   });
-
   const [{ isDragging }, drag] = useDrag({
     type: 'BUILDER_FIELD',
     item: { type: 'BUILDER_FIELD', id: field.id, index },
@@ -134,13 +393,60 @@ const FormFieldItem = ({ field, index, moveField, onFieldUpdate }) => {
     >
       <div className="field-display">
         <strong>{field.label}</strong>
+        <button
+          type="button"
+          className="remove-field-btn"
+          onClick={() => onRemove(index)}
+          title="Remove field"
+        >
+          <FaTrashAlt />
+        </button>
       </div>
       <FieldConfiguration field={field} index={index} onFieldUpdate={onFieldUpdate} />
     </motion.div>
   );
 };
 
-/** The main form builder component */
+/** FormBuilderArea: The drop zone where fields are assembled */
+const FormBuilderArea = ({ formFields, setFormFields, moveField, updateField, removeField }) => {
+  const [, drop] = useDrop({
+    accept: 'FIELD',
+    drop: (item) => {
+      const field = availableFields.find((f) => f.id === item.field.id);
+      if (field) {
+        const newField = {
+          ...field,
+          options: ['role_select', 'radio', 'checkbox', 'select'].includes(field.id)
+            ? { choices: [] }
+            : {},
+          required: false,
+          validation: field.id === 'phone'
+            ? { countryCodes: ['+1', '+44', '+91'], maxLength: 10 }
+            : field.id === 'email'
+            ? { regex: '^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$' }
+            : {},
+        };
+        setFormFields((prev) => [...prev, newField]);
+      }
+    },
+  });
+  return (
+    <div ref={drop} className="form-builder">
+      <h3>Your Form</h3>
+      {formFields.map((field, index) => (
+        <FormFieldItem
+          key={index}
+          field={field}
+          index={index}
+          moveField={moveField}
+          onFieldUpdate={updateField}
+          onRemove={removeField}
+        />
+      ))}
+    </div>
+  );
+};
+
 const CreateUserFormBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
   const [formFields, setFormFields] = useState(initialFormFields);
   const [userCreateUrl, setUserCreateUrl] = useState('');
@@ -172,7 +478,7 @@ const CreateUserFormBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
           data = await res.json();
         }
         if (data?.data) {
-          const roles = data.data.map((role) => ({ id: role.id, name: role.name }));
+          const roles = data.data.map(role => ({ id: role.id, name: role.name }));
           setRoleOptions(roles);
         }
       } catch (error) {
@@ -182,7 +488,7 @@ const CreateUserFormBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
     fetchRoleOptions();
   }, [organizationId]);
 
-  // Move field for reordering within the builder.
+  // Reorder fields.
   const moveField = useCallback((dragIndex, hoverIndex) => {
     setFormFields((prevFields) => {
       const updatedFields = Array.from(prevFields);
@@ -192,6 +498,7 @@ const CreateUserFormBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
     });
   }, []);
 
+  // Update a field's properties.
   const updateField = (index, updateProps) => {
     setFormFields((prev) => {
       const newFields = [...prev];
@@ -200,46 +507,12 @@ const CreateUserFormBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
     });
   };
 
-  // The drop zone for adding fields from the palette.
-  const FormBuilderArea = () => {
-    const [, drop] = useDrop({
-      accept: 'FIELD',
-      drop: (item) => {
-        const field = availableFields.find((f) => f.id === item.field.id);
-        if (field) {
-          const newField = {
-            ...field,
-            options: ['role_select', 'radio', 'checkbox', 'select'].includes(field.id)
-              ? { choices: [] }
-              : {},
-            required: false,
-            validation: field.id === 'phone'
-              ? { countryCodes: ['+1', '+44', '+91'], maxLength: 10 }
-              : field.id === 'email'
-              ? { regex: '^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$' }
-              : {},
-          };
-          setFormFields((prev) => [...prev, newField]);
-        }
-      },
-    });
-    return (
-      <div ref={drop} className="form-builder">
-        <h3>Your Form</h3>
-        {formFields.map((field, index) => (
-          <FormFieldItem
-            key={index}
-            field={field}
-            index={index}
-            moveField={moveField}
-            onFieldUpdate={updateField}
-          />
-        ))}
-      </div>
-    );
+  // Remove a field from the form.
+  const removeField = (index) => {
+    setFormFields((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Automatically ensure a "submit" field exists before saving.
+  // Ensure a "submit" field exists.
   const ensureSubmitField = (fields) => {
     if (!fields.some((field) => field.id === 'submit')) {
       return [
@@ -259,21 +532,26 @@ const CreateUserFormBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
   // Save the form design.
   const handleSaveForm = async () => {
     const fieldsWithSubmit = ensureSubmitField(formFields);
-    const formDesign = {
-      fields: fieldsWithSubmit,
-      submitCode: "",
+    const formDesign = { fields: fieldsWithSubmit, submitCode: "" };
+    // Prepare a complete dashboard payload (to prevent missing fields errors)
+    const dashboardPayload = {
+      dashboard_name: "User Registration Form",
+      dashboard_data: formDesign,
+      access_url: userCreateUrl || "", // if available
+      organization_id: organizationId,
+      user_id: localStorage.getItem("user_id") || null,
     };
     try {
-      const res = await request.post('/dashboards/dashboards', JSON.stringify({ organization_id: organizationId, form_design: formDesign })
-      //   {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     Authorization: `Bearer ${localStorage.getItem('token')}`,
-      //   },
-      //   body: JSON.stringify({ organization_id: organizationId, form_design: formDesign }),
-      // }
-    );
+      const res = await request.post(
+        '/dashboards/dashboards',
+        JSON.stringify(dashboardPayload),
+        // {
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     Authorization: `Bearer ${localStorage.getItem('token')}`,
+        //   },
+        // }
+      );
       if (!res.ok) throw new Error('Error saving form design');
       onSaveSuccess();
       onClose();
@@ -295,7 +573,13 @@ const CreateUserFormBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
                 <DraggableField key={field.id} field={field} />
               ))}
             </div>
-            <FormBuilderArea />
+            <FormBuilderArea
+              formFields={formFields}
+              setFormFields={setFormFields}
+              moveField={moveField}
+              updateField={updateField}
+              removeField={removeField}
+            />
           </div>
           <div className="modal-actions">
             <button onClick={handleSaveForm}>Save Form Design</button>
@@ -308,6 +592,40 @@ const CreateUserFormBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
 };
 
 export default CreateUserFormBuilder;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
