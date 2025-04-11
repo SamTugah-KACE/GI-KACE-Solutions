@@ -55,8 +55,8 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
         // Extract a friendly message from the response.
       const resData = typeof response.json === 'function' ? await response.json() : response.data;
       const message = resData.message || resData.detail || JSON.stringify(resData);
-      toast.info(message);
-        onSuccess();
+      toast.info(JSON.stringify(resData));
+        // onSuccess();
         onClose();
       } catch (error) {
         console.error("Bulk Insert Error:", error);

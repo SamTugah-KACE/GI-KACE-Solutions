@@ -5,6 +5,8 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { motion } from 'framer-motion';
 import './FormBuilderModal.css';
 import request from '../request';
+import FieldConfiguration from './FieldConfiguration';
+
 
 // Define the available fields.
 const availableFields = [
@@ -26,12 +28,12 @@ const availableFields = [
 const initialFormFields = [];
 
 /** FieldConfiguration renders inline controls for each dropped field */
-const FieldConfiguration = ({ field, index, onFieldUpdate }) => {
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const newVal = type === 'checkbox' ? checked : value;
-    onFieldUpdate(index, { [name]: newVal });
-  };
+// const FieldConfiguration = ({ field, index, onFieldUpdate }) => {
+//   const handleChange = (e) => {
+//     const { name, value, type, checked } = e.target;
+//     const newVal = type === 'checkbox' ? checked : value;
+//     onFieldUpdate(index, { [name]: newVal });
+//   };
 
   return (
     <div className="field-config">
