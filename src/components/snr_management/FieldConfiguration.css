@@ -1,5 +1,4 @@
-/* FieldConfiguration.css */
-
+/* src/components/snr_management/FieldConfiguration.css */
 .field-config {
     margin-top: 10px;
     padding: 10px;
@@ -42,7 +41,7 @@
     border: none;
     cursor: pointer;
     color: #007bff;
-    font-size: 0.9rem;
+    font-size: 1rem;
     padding: 2px 4px;
   }
   

@@ -6,6 +6,11 @@ const FieldConfiguration = ({ field, index, onFieldUpdate }) => {
   const [isEditingLabel, setIsEditingLabel] = useState(false);
   const [tempLabel, setTempLabel] = useState(field.label);
 
+  const [isEditingOptions, setIsEditingOptions] = useState(false);
+  const [tempOptions, setTempOptions] = useState(
+    field.options && field.options.choices ? field.options.choices.join(', ') : ''
+  );
+
   // Handle label input change
   const handleLabelChange = (e) => {
     setTempLabel(e.target.value);
@@ -22,6 +27,21 @@ const FieldConfiguration = ({ field, index, onFieldUpdate }) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       saveLabel();
+    }
+  };
+
+  
+  // Handle options changes.
+  const handleOptionsChange = (e) => setTempOptions(e.target.value);
+  const saveOptions = () => {
+    const choices = tempOptions.split(',').map((opt) => opt.trim());
+    onFieldUpdate(index, { options: { ...field.options, choices } });
+    setIsEditingOptions(false);
+  };
+  const handleOptionsKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveOptions();
     }
   };
 
@@ -45,28 +65,44 @@ const FieldConfiguration = ({ field, index, onFieldUpdate }) => {
         ) : (
           <>
             <span className="config-static-label">{field.label}</span>
-            <button type="button" className="icon-btn" onClick={() => setIsEditingLabel(true)}>
+            <button type="button" className="icon-btn" onClick={() => setIsEditingLabel(true)}  title="Edit Label">
               <FaPencilAlt />
             </button>
           </>
         )}
       </div>
+      {/* Options Editing for radio, checkbox, select fields */}
       {['radio', 'checkbox', 'select'].includes(field.id) && (
         <div className="config-row">
           <span className="config-label">Options:</span>
-          <input
-            type="text"
-            value={field.options?.choices ? field.options.choices.join(', ') : ''}
-            onChange={(e) =>
-              onFieldUpdate(index, {
-                options: { ...field.options, choices: e.target.value.split(',').map(opt => opt.trim()) },
-              })
-            }
-            placeholder="e.g., Option1, Option2"
-            className="config-input"
-          />
+          {isEditingOptions ? (
+            <input
+              type="text"
+              value={tempOptions}
+              onChange={handleOptionsChange}
+              onBlur={saveOptions}
+              onKeyPress={handleOptionsKeyPress}
+              className="config-input"
+              placeholder="e.g., Option1, Option2"
+            />
+          ) : (
+            <>
+              <span className="config-static-label">
+                {field.options?.choices ? field.options.choices.join(', ') : 'N/A'}
+              </span>
+              <button
+                type="button"
+                className="icon-btn"
+                onClick={() => setIsEditingOptions(true)}
+                title="Edit Options"
+              >
+                <FaPencilAlt />
+              </button>
+            </>
+          )}
         </div>
       )}
+      {/* Required Checkbox */}
       <div className="config-row inline">
         <input
           type="checkbox"
