@@ -44,11 +44,12 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
         //   body: formData
         // }
         );
-        if (!response.ok) {
-          const errData = await response.json();
+        if (response.status !== 200) {
+          // Handle error response from the server.
+          const errData = sponse.data || await response.json();
           throw new Error(errData.detail || "Bulk insert failed");
         }
-        toast.info(`${response.json()}`);
+        toast.info(`${response.data}`);
         onSuccess();
         onClose();
       } catch (error) {
@@ -65,7 +66,8 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
     try {
       // Send a GET request to the download API.
       const response = await request.get('/download/sample-file');
-      if (!response.ok) {
+      if (response.status !== 200) {
+        // Handle error response from the server.
         throw new Error("Failed to download sample file");
       }
       // Convert the response to a Blob.
@@ -75,7 +77,7 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
       const a = document.createElement('a');
       a.href = url;
       // Optionally, set the filename. You can also get this from response headers.
-    //   a.download = "sample.xlsx";
+      a.download = "sample.xlsx";
       document.body.appendChild(a);
       a.click();
       a.remove();

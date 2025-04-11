@@ -1,3 +1,4 @@
+
 /* CSS Variables */
 :root {
     --primary-color: #007bff;
@@ -25,7 +26,7 @@
   }
   
   /* Modal Content */
-  .modal-content {
+  /* .modal-content {
     background: var(--background-color);
     width: 100%;
     max-width: 600px;
@@ -35,8 +36,25 @@
     display: flex;
     flex-direction: column;
     animation: fadeInScale var(--transition-speed) ease-out forwards;
-  }
-  
+  } */
+
+  /* Modal Content */
+.modal-content {
+  background: var(--background-color);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;                /* Prevent modal from exceeding the viewport height */
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;                /* Hide overflow to let body control scrolling */
+  display: flex;
+  flex-direction: column;
+  animation: fadeInScale var(--transition-speed) ease-out forwards;
+}
+
+
+
+
   /* Modal Header */
   .modal-header {
     display: flex;
