@@ -7,6 +7,7 @@ import './Modal.css';
 import request from '../request';
 // import { useOrganization } from '../../context/OrganizationContext';
 import { toast } from 'react-toastify';
+import './BulkInsertUsersModal.css'; // Additional custom CSS for spinner, if needed.
 
 
 // Modal for Bulk Insert Users
@@ -46,10 +47,15 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
         );
         if (response.status !== 200) {
           // Handle error response from the server.
-          const errData = response.data || await response.json();
-          throw new Error(errData.detail || "Bulk insert failed");
+          // Using either .json() or response.data if Axios.
+          const errData = typeof response.json === 'function' ? await response.json() : response.data;
+          throw new Error(errData.message || errData.detail || "Bulk insert failed");
         }
-        toast.info(`${response.data}`);
+        
+        // Extract a friendly message from the response.
+      const resData = typeof response.json === 'function' ? await response.json() : response.data;
+      const message = resData.message || resData.detail || JSON.stringify(resData);
+      toast.info(message);
         onSuccess();
         onClose();
       } catch (error) {
@@ -108,7 +114,9 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
                 Download Sample File
               </button>
               <button type="submit" disabled={uploading}>
-                {uploading ? 'Uploading…' : 'Submit'}
+              {uploading ? (<span className="spinner"></span>) : 'Submit'}
+              {uploading && <span className="uploading-text"> Processing...</span>}
+                {/* {uploading ? 'Uploading…' : 'Submit'} */}
               </button>
               <button type="button" onClick={onClose}>Cancel</button>
             </div>
