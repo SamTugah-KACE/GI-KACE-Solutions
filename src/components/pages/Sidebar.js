@@ -199,6 +199,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
       {
         showAddRoleModal && (
           <AddRoleModal
+            organizationId={organization.id}
             onClose={() => setShowAddRoleModal(false)}
             onRoleAdded={() => alert("Role added")}
           />

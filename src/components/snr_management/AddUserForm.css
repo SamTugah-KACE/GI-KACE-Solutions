@@ -1,57 +1,142 @@
-/* AddUserForm.css */
+/* src/components/AddUserForm.css */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  width: 600px;
+  max-width: 95%;
+  padding: 20px;
+  border-radius: 8px;
+  overflow-y: auto;
+  max-height: 90vh;
+}
 
 form {
-    max-width: 600px;
-    margin: 20px auto;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Options grouping: arrange horizontally if options ≤ 3; otherwise wrap. */
+.options-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.options-horizontal {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+.option-label {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* Step indicator styles */
+.step-indicator {
+  text-align: center;
+  margin: 20px 0;
+  font-weight: bold;
+}
+
+/* Modal action buttons */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-actions button[type="submit"] {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.modal-actions button:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  form {
+    width: 95%;
+  }
+}
+/* Responsive adjustments for smaller screens */  
+@media (max-width: 600px) {
+  .modal-content {
+    width: 90%;
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fff;
   }
-  
-  form > div {
-    margin-bottom: 15px;
+  .form-group {
+    margin-bottom: 10px;
   }
-  
-  label {
-    display: block;
-    font-weight: bold;
+  .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .modal-actions button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .modal-actions button:last-child {
+    margin-bottom: 0;
+  }
+  .options-group {
+    flex-direction: column;
+  }
+  .options-horizontal {
+    flex-direction: column;
+  }
+  .option-label {
     margin-bottom: 5px;
   }
-  
-  input[type="text"],
-  input[type="email"],
-  input[type="url"],
-  input[type="date"],
-  input[type="tel"],
-  select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  .step-indicator {
+    font-size: 1.2rem;
   }
-  
-  input[type="file"] {
-    padding: 5px 0;
+  .modal-overlay {
+    padding: 0.5rem;
   }
-  
-  button[type="submit"] {
-    padding: 10px 20px;
-    background-color: #007bff;
-    border: none;
-    color: #fff;
-    font-size: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
+  .modal-content {
+    padding: 10px;
   }
-  
-  button[type="submit"]:hover {
-    background-color: #0056b3;
+  .modal-actions button {
+    padding: 6px 12px;
   }
-  
-  @media (max-width: 768px) {
-    form {
-      width: 95%;
-    }
+  .modal-actions button[type="submit"] {
+    padding: 8px 16px;
   }
-  
+  .modal-actions button:hover {
+    padding: 8px 16px;
+  }
+}
