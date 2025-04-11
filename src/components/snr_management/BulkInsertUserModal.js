@@ -7,7 +7,7 @@ import './Modal.css';
 import request from '../request';
 // import { useOrganization } from '../../context/OrganizationContext';
 import { toast } from 'react-toastify';
-import './BulkInsertUsersModal.css'; // Additional custom CSS for spinner, if needed.
+import './BulkInsertUserModal.css'; // Additional custom CSS for spinner, if needed.
 
 
 // Modal for Bulk Insert Users
