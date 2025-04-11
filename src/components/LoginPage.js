@@ -232,7 +232,10 @@ const LoginPage = () => {
           )}
 
           <button type="submit" className="login-btn" disabled={loading}>
+          {/* The wrapper ensures that the button size remains fixed */}
+          <span className="btn-content">
           {loading ? <div className="spinner"></div> : "Login"}
+          </span>
           </button>
         </form>
       </div>

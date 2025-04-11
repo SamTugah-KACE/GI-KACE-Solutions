@@ -31,9 +31,9 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
     setLoading(true);
     try {
       const response = await request.get(
-        `/users/employees?organization_id=${organizationId}&skip=0&limit=1&sort=asc`
+        `/users/employees?organization_id=${organizationId}&skip=0&limit=1000&sort=asc`
       );
-      const data = await response.json();
+      const data = response.data || await response.json(); // Fallback for other clients
 
       // Extract summary details
       const { summary = {}, employees = [] } = data;
@@ -89,6 +89,7 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
     }
   };
 
+  // Initial fetch on component mount or when organizationId changes.
   useEffect(() => {
     fetchUsers();
   }, [organizationId]);
@@ -120,21 +121,30 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
     const updates = updatedRows[user.id];
     if (!updates) return;
     try {
-      const response = await request.patch(`/users/${user.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        // In this example, the update payload includes the new department name,
-        // branch name, and role id (looked up from the static options).
-        body: JSON.stringify({
-          department: updates.department || user.department?.name,
-          branch: updates.branch || user.branch?.name,
-          role_id: ROLE_OPTIONS_STATIC.find((r) => r.name === (updates.role || user.role?.name))?.id || user.role.id,
-        })
-      });
-      if (!response.ok) {
+      const response = await request.patch(`/users/${user.id}`, JSON.stringify({
+        department: updates.department || user.department?.name,
+        branch: updates.branch || user.branch?.name,
+        role_id: ROLE_OPTIONS_STATIC.find((r) => r.name === (updates.role || user.role?.name))?.id || user.role.id,
+      })
+        
+    //     {
+    //     method: 'PATCH',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       Authorization: `Bearer ${localStorage.getItem('token')}`
+    //     },
+    //     // In this example, the update payload includes the new department name,
+    //     // branch name, and role id (looked up from the static options).
+    //     body: JSON.stringify({
+    //       department: updates.department || user.department?.name,
+    //       branch: updates.branch || user.branch?.name,
+    //       role_id: ROLE_OPTIONS_STATIC.find((r) => r.name === (updates.role || user.role?.name))?.id || user.role.id,
+    //     })
+    //   }
+    
+    );
+      if (response.status !== 200) {
+        // Handle error response
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Update failed');
       }
@@ -157,13 +167,17 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
   const handleArchive = async (user) => {
     if (window.confirm(`Archive (soft delete) user ${user.name}?`)) {
       try {
-        const response = await request.delete(`/users/${user.id}?deleteType=soft`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        if (!response.ok) {
+        const response = await request.delete(`/users/${user.id}?deleteType=soft`, 
+            
+        //     {
+        //   method: 'DELETE',
+        //   headers: {
+        //     Authorization: `Bearer ${localStorage.getItem('token')}`
+        //   }
+        // }
+    );
+        if (response.status !== 200) {
+          // Handle error response
           const errorData = await response.json();
           throw new Error(errorData.detail || 'Archive failed');
         }
@@ -179,13 +193,16 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
   const handleDelete = async (user) => {
     if (window.confirm(`Delete user ${user.name}? This is permanent.`)) {
       try {
-        const response = await request.delete(`/users/${user.id}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        if (!response.ok) {
+        const response = await request.delete(`/users/${user.id}`, 
+        //     {
+        //   method: 'DELETE',
+        //   headers: {
+        //     Authorization: `Bearer ${localStorage.getItem('token')}`
+        //   }
+        // }
+    );
+        if (response.status !== 200) {
+          // Handle error response
           const errorData = await response.json();
           throw new Error(errorData.detail || 'Deletion failed');
         }
@@ -212,92 +229,120 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
       <div className="modal-content large-modal">
         <h2>Existing Users</h2>
         {loading ? (
-          <p>Loading users…</p>
+          <div className="loading-state">Loading users...</div>
         ) : (
-          <div className="table-container">
-            <table className="users-table">
-              <thead>
-                <tr>
-                  <th>Staff ID</th>
-                  <th>Name</th>
-                  <th>Department</th>
-                  {usersData.branchOptions.length > 0 && <th>Branch</th>}
-                  <th>Role</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedEmployees.map(user => (
-                  <tr key={user.id}>
-                    <td>{user.staffId}</td>
-                    <td>{user.name}</td>
-                    <td>
-                      <select
-                        value={updatedRows[user.id]?.department || user.department?.name || ''}
-                        onChange={(e) => handleSelectChange(user.id, 'department', e.target.value)}
-                      >
-                        <option value={user.department?.name || ''}>
-                          {user.department?.name || 'Select Department'}
-                        </option>
-                        {usersData.departmentOptions
-                          .filter(opt => opt.name !== user.department?.name)
-                          .map(opt => (
-                            <option key={opt.id} value={opt.name}>{opt.name}</option>
-                          ))}
-                      </select>
-                    </td>
-                    {usersData.branchOptions.length > 0 && (
-                      <td>
-                        <select
-                          value={updatedRows[user.id]?.branch || user.branch?.name || ''}
-                          onChange={(e) => handleSelectChange(user.id, 'branch', e.target.value)}
-                        >
-                          {user.branch ? (
-                            <option value={user.branch.name}>{user.branch.name}</option>
-                          ) : (
-                            <option value="">Select Branch</option>
-                          )}
-                          {usersData.branchOptions
-                            .filter(opt => opt.name !== user.branch?.name)
-                            .map(opt => (
-                              <option key={opt.id} value={opt.name}>{opt.name}</option>
-                            ))}
-                        </select>
-                      </td>
-                    )}
-                    <td>
-                      <select
-                        value={updatedRows[user.id]?.role || user.role?.name || ''}
-                        onChange={(e) => handleSelectChange(user.id, 'role', e.target.value)}
-                      >
-                        <option value={user.role?.name}>{user.role?.name}</option>
-                        {ROLE_OPTIONS_STATIC
-                          .filter(opt => opt.name !== user.role?.name)
-                          .map(opt => (
-                            <option key={opt.id} value={opt.name}>{opt.name}</option>
-                          ))}
-                      </select>
-                    </td>
-                    <td>
-                      <button onClick={() => handleUpdateRow(user)} disabled={!isRowDirty(user)}>
-                        Update
-                      </button>
-                      <button onClick={() => handleArchive(user)}>Archive</button>
-                      <button onClick={() => handleDelete(user)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="pagination-controls">
-              <button onClick={handlePrevPage} disabled={currentPage === 1}>Prev</button>
-              <span>Page {currentPage} of {totalPages}</span>
-              <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
-            </div>
-          </div>
+          <>
+            {usersData.employees.length === 0 ? (
+              <div className="empty-state">No users found.</div>
+            ) : (
+              <div className="table-container">
+                <table className="users-table">
+                  <thead>
+                    <tr>
+                      <th>Staff ID</th>
+                      <th>Name</th>
+                      <th>Department</th>
+                      {usersData.branchOptions.length > 0 && <th>Branch</th>}
+                      <th>Role</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedEmployees.map(user => (
+                      <tr key={user.id}>
+                        <td>{user.staffId}</td>
+                        <td>{user.name}</td>
+                        <td>
+                          <select
+                            value={updatedRows[user.id]?.department || user.department?.name || ''}
+                            onChange={(e) => handleSelectChange(user.id, 'department', e.target.value)}
+                          >
+                            <option value={user.department?.name || ''}>
+                              {user.department?.name || 'Select Department'}
+                            </option>
+                            {usersData.departmentOptions
+                              .filter(opt => opt.name !== user.department?.name)
+                              .map(opt => (
+                                <option key={opt.id} value={opt.name}>{opt.name}</option>
+                              ))}
+                          </select>
+                        </td>
+                        {usersData.branchOptions.length > 0 && (
+                          <td>
+                            <select
+                              value={updatedRows[user.id]?.branch || user.branch?.name || ''}
+                              onChange={(e) => handleSelectChange(user.id, 'branch', e.target.value)}
+                            >
+                              {user.branch ? (
+                                <option value={user.branch.name}>{user.branch.name}</option>
+                              ) : (
+                                <option value="">Select Branch</option>
+                              )}
+                              {usersData.branchOptions
+                                .filter(opt => opt.name !== user.branch?.name)
+                                .map(opt => (
+                                  <option key={opt.id} value={opt.name}>{opt.name}</option>
+                                ))}
+                            </select>
+                          </td>
+                        )}
+                        <td>
+                          <select
+                            value={updatedRows[user.id]?.role || user.role?.name || ''}
+                            onChange={(e) => handleSelectChange(user.id, 'role', e.target.value)}
+                          >
+                            <option value={user.role?.name}>{user.role?.name}</option>
+                            {ROLE_OPTIONS_STATIC
+                              .filter(opt => opt.name !== user.role?.name)
+                              .map(opt => (
+                                <option key={opt.id} value={opt.name}>{opt.name}</option>
+                              ))}
+                          </select>
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => handleUpdateRow(user)}
+                            disabled={!isRowDirty(user)}
+                            className="action-btn update-btn"
+                          >
+                            Update
+                          </button>
+                          <button
+                            onClick={() => handleArchive(user)}
+                            className="action-btn archive-btn"
+                          >
+                            Archive
+                          </button>
+                          <button
+                            onClick={() => handleDelete(user)}
+                            className="action-btn delete-btn"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div className="pagination-controls">
+                  <button onClick={handlePrevPage} disabled={currentPage === 1}>
+                    Prev
+                  </button>
+                  <span>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
         <div className="modal-actions">
-          <button onClick={onClose}>Close</button>
+          <button onClick={onClose} className="close-btn">
+            Close
+          </button>
         </div>
       </div>
     </div>

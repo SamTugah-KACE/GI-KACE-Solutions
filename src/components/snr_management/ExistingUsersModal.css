@@ -1,6 +1,7 @@
 /* src/components/snr_management/ExistingUsersModal.css */
+
 .table-container {
-    max-width: 100%;
+    width: 100%;
     overflow-x: auto;
     margin-top: 10px;
   }
@@ -8,6 +9,7 @@
   .users-table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 0.95rem;
   }
   
   .users-table th,
@@ -17,15 +19,76 @@
     border: 1px solid #ddd;
   }
   
+  .users-table select {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+  }
+  
   .pagination-controls {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 10px;
+    gap: 10px;
   }
   
   .pagination-controls button {
     padding: 5px 10px;
-    margin: 0 10px;
+    border: none;
+    background-color: var(--primary-color);
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background var(--transition-speed);
+  }
+  
+  .pagination-controls button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  
+  .loading-state,
+  .empty-state {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1.1rem;
+  }
+  
+  /* Action buttons styles */
+  .action-btn {
+    padding: 4px 8px;
+    margin: 2px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background var(--transition-speed);
+  }
+  
+  .update-btn {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .archive-btn {
+    background-color: #ffc107;
+    color: #fff;
+  }
+  
+  .delete-btn {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .users-table {
+      font-size: 0.85rem;
+    }
+    .pagination-controls button {
+      padding: 5px;
+    }
   }
   
