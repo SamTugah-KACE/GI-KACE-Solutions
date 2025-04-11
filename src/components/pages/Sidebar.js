@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useOrganization } from '../../context/OrganizationContext';
 import request from '../request';
+import { toast } from 'react-toastify';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
 import ViewDepartmentsModal from '../snr_management/ViewDepartmentsModal'; // Import the modal
 import UpdateDepartmentModal from '../snr_management/UpdateDepartmentModal';
@@ -71,7 +72,8 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
 
     } catch (error) {
       console.error('Logout API error:', error);
-      alert(error);
+      // alert(error);
+      toast.error('Logout failed. Please try again.');
       // Optionally, show an error message to the user
     }
     // Clear auth state and redirect to the organization's signin page
@@ -181,7 +183,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
         <BulkInsertUsersModal
           organizationId={organization.id}
           onClose={() => setShowBulkInsertModal(false)}
-          onSuccess={() => alert("Users inserted successfully")}
+          onSuccess={() => toast.success("Users inserted successfully")}
         />
       )}
 

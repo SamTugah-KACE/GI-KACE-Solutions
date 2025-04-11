@@ -48,6 +48,7 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
           const errData = await response.json();
           throw new Error(errData.detail || "Bulk insert failed");
         }
+        toast.info(`${response.json()}`);
         onSuccess();
         onClose();
       } catch (error) {
