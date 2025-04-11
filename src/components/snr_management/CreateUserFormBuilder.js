@@ -447,7 +447,7 @@ const FormBuilderArea = ({ formFields, setFormFields, moveField, updateField, re
   );
 };
 
-const CreateUserFormBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
+const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess }) => {
   const [formFields, setFormFields] = useState(initialFormFields);
   const [userCreateUrl, setUserCreateUrl] = useState('');
   const [roleOptions, setRoleOptions] = useState([]);
@@ -539,7 +539,7 @@ const CreateUserFormBuilder = ({ organizationId, onClose, onSaveSuccess }) => {
       dashboard_data: formDesign,
       access_url: userCreateUrl || "", // if available
       organization_id: organizationId,
-      user_id: localStorage.getItem("user_id") || null,
+      user_id: userId || null,
     };
     try {
       const res = await request.post(
