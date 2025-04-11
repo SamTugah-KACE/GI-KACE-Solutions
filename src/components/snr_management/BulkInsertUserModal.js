@@ -64,7 +64,7 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
   const handleDownloadSample = async () => {
     try {
       // Send a GET request to the download API.
-      const response = await request.get('/download/download-file');
+      const response = await request.get('/download/sample-file');
       if (!response.ok) {
         throw new Error("Failed to download sample file");
       }
