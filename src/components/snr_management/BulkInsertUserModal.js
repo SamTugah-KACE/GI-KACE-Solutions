@@ -71,13 +71,14 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
   const handleDownloadSample = async () => {
     try {
       // Send a GET request to the download API.
-      const response = await request.get('/download/sample-file');
+      // Send a GET request to the download API with responseType: 'blob'
+      const response = await request.get('/download/sample-file', { responseType: 'blob' });
       if (response.status !== 200) {
         // Handle error response from the server.
         throw new Error("Failed to download sample file");
       }
-      // Convert the response to a Blob.
-      const blob = await response.blob();
+      // For Axios, the Blob is in response.data
+    const blob = response.data;
       // Create a temporary object URL and trigger download.
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

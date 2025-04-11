@@ -319,6 +319,7 @@ import './FormBuilderModal.css';
 import request from '../request';
 import FieldConfiguration from './FieldConfiguration';
 import { FaTrashAlt } from 'react-icons/fa'; // For remove button
+import { toast } from 'react-toastify';
 
 // Define the available fields.
 const availableFields = [
@@ -554,12 +555,13 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
         //   },
         // }
       );
-      if (!res.ok) throw new Error('Error saving form design');
+      if (res.status !== 200) throw new Error('Error saving form design');
       onSaveSuccess();
       onClose();
     } catch (error) {
       console.error('Error saving form design:', error);
-      alert(error.message);
+      toast.error(`Error saving form design: ${error.message}`);
+      // alert(error.message);
     }
   };
 
