@@ -46,7 +46,7 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
         );
         if (response.status !== 200) {
           // Handle error response from the server.
-          const errData = sponse.data || await response.json();
+          const errData = response.data || await response.json();
           throw new Error(errData.detail || "Bulk insert failed");
         }
         toast.info(`${response.data}`);
