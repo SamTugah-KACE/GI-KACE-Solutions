@@ -8,7 +8,7 @@ import useValidateSlug from '../hooks/useValidateSlug';
 import { useAuth } from '../context/AuthContext';
 import { useOrganization } from '../context/OrganizationContext';
 import stockPhoto from '../assets/images/stock-photo.jpg'; // Import the default background image
-
+import { toast } from 'react-toastify';
 
 
 const LoginPage = () => {
@@ -72,7 +72,8 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!username) {
-      alert("Username is required.");
+      // alert("Username is required.");
+      toast.error("Username is required.");
       return;
     }
 
@@ -85,7 +86,8 @@ const LoginPage = () => {
 
     if (loginMode === "password") {
       if (!password) {
-        alert("Password is required for traditional login.");
+        // alert("Password is required for traditional login.");
+        toast.error("Password is required for traditional login.");
         setLoading(false);
         return;
       }
@@ -95,7 +97,8 @@ const LoginPage = () => {
        // Do NOT append password to formData in this case.
     } else {
       if (!facialImage) {
-        alert("Please capture your facial image for authentication.");
+        // alert("Please capture your facial image for authentication.");
+        toast.error("Please capture your facial image for authentication.");
         setLoading(false);
         return;
       }
@@ -108,10 +111,13 @@ const LoginPage = () => {
     try {
       // const response = await request.post("/auth/login", formData, {
       //   headers: { "Content-Type": "multipart/form-data" }
-      // });.
+      // });
       // const response = await request.post("/auth/login", formData);
 
-      const response = await request.post(url, formData);
+      const response = await request.post(url, formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       // Assume the API returns a token and user info
       
       console.log("\nlogin response: ", response);
@@ -161,7 +167,8 @@ const LoginPage = () => {
 
     } catch (error) {
       console.log("\n\nlogin failed with error: ", error.message);
-      alert("Login failed: " + error.message);
+      toast.error("Login failed: " + error.message);
+      // alert("Login failed: " + error.message);
     }finally {
       setLoading(false);
     }
