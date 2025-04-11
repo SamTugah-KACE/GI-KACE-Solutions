@@ -174,7 +174,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
         showAddUserForm && (
           <AddUserForm
             organizationId={organization.id} // Pass the organization ID from context
-            userId={auth.user_id}  // Pass the user ID from auth context
+            userId={auth.user.id}  // Pass the user ID from auth context
             onClose={() => setShowAddUserForm(false)}
             onUserAdded={() => alert("User added")}
           />

@@ -531,6 +531,8 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
 
   // Save the form design.
   const handleSaveForm = async () => {
+    console.log("userId: ", userId);
+    console.log("organizationId: ", organizationId);
     const fieldsWithSubmit = ensureSubmitField(formFields);
     const formDesign = { fields: fieldsWithSubmit, submitCode: "" };
     // Prepare a complete dashboard payload (to prevent missing fields errors)
