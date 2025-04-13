@@ -138,21 +138,19 @@ const LoginPage = () => {
       console.log("is_admin: ", perms.admin);
       if (
         perms.includes("hr:dashboard") 
-        // ||
-        // perms.admin     ||
-        // perms.add_new_staff ||
-        // perms['Add New Role'] ||
-        // perms['Approve|Decline Requests']
+       
       ) {
         targetRoute = "/dashboard";
       } else if (
+        perms.includes("staff:dashboard")
+      ) {
+        targetRoute = "/staff";
+      }else if (
         perms.view_security_logs ||
         perms.systems_administration
       ) {
         targetRoute = "/systems";
-      } else if (perms.includes("staff:dashboard")) {
-        targetRoute = "/staff";
-      }
+      } 
       // Navigate to the appropriate route using the orgSlug and replace the history entry.
       navigate(`/${orgSlug}${targetRoute}`, { replace: true });
 

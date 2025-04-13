@@ -555,7 +555,7 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
         //   },
         // }
       );
-      if (res.status !== 200 || res.status !== 201) throw new Error('Error saving form design');
+      if (res.status !== 200 || res.status !== 201 || !res.ok) throw new Error('Error saving form design');
       onSaveSuccess();
       onClose();
     } catch (error) {
