@@ -24,42 +24,63 @@ const Staff = () => {
     <div className="dashboard-container">
       <Header />
       <div className="dashboard-content">
-        <ProfileCard />
-        <SearchBar />
-        <ExpandableSection title="Bio-Data" icon="user">
-          <BioDataSection staffId={staffId}/>
-        </ExpandableSection>
+      <div className="section-block">
+          <ProfileCard />
+        </div>
+        <div className="section-block">
+          <SearchBar />
+        </div>
+        <div className="section-block">
+          <ExpandableSection title="Bio-Data" icon="user">
+            <BioDataSection staffId={staffId} />
+          </ExpandableSection>
+        </div>
 
-        <ExpandableSection title="Qualifications" icon="graduation-cap">
-          <div className="qualifications-container">
-            <ExpandableSection title="Academic" icon="book">
-              <QualificationsSection type="academic" />
-            </ExpandableSection>
-            <ExpandableSection title="Professional" icon="briefcase">
-              <QualificationsSection type="professional" />
-            </ExpandableSection>
-          </div>
-        </ExpandableSection>
+        <div className="section-block">
+          <ExpandableSection title="Qualifications" icon="graduation-cap">
+            <div className="qualifications-container">
+              <div className="section-block">
+                <ExpandableSection title="Academic" icon="book">
+                  <QualificationsSection type="academic" />
+                </ExpandableSection>
+              </div>
+              <div className="section-block">
+                <ExpandableSection title="Professional" icon="briefcase">
+                  <QualificationsSection type="professional" />
+                </ExpandableSection>
+              </div>
+            </div>
+          </ExpandableSection>
+        </div>
 
-        <ExpandableSection title="Employment Details" icon="building">
-          <EmploymentDetailsSection />
-        </ExpandableSection>
-
-        {/* <ExpandableSection title="Payment Details" icon="money">
-          <PaymentDetailsSection />
-        </ExpandableSection> */}
-{/* 
-        <ExpandableSection title="Next of Kin" icon="users">
-          <NextOfKinSection />
-        </ExpandableSection> */}
-
-        {/* <ExpandableSection title="Emergency Contact" icon="phone">
-          <EmergencyContactSection />
-        </ExpandableSection> */}
-
-        {/* <ExpandableSection title="Employment History" icon="history">
-          <EmploymentHistorySection />
-        </ExpandableSection> */}
+        <div className="section-block">
+          <ExpandableSection title="Employment Details" icon="building">
+            <EmploymentDetailsSection />
+          </ExpandableSection>
+        </div>
+        {/*
+        Uncomment and add additional sections as required:
+        <div className="section-block">
+          <ExpandableSection title="Payment Details" icon="money">
+            <PaymentDetailsSection />
+          </ExpandableSection>
+        </div>
+        <div className="section-block">
+          <ExpandableSection title="Next of Kin" icon="users">
+            <NextOfKinSection />
+          </ExpandableSection>
+        </div>
+        <div className="section-block">
+          <ExpandableSection title="Emergency Contact" icon="phone">
+            <EmergencyContactSection />
+          </ExpandableSection>
+        </div>
+        <div className="section-block">
+          <ExpandableSection title="Employment History" icon="history">
+            <EmploymentHistorySection />
+          </ExpandableSection>
+        </div>
+        */}
       </div>
       <Footer />
     </div>
