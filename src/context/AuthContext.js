@@ -8,7 +8,7 @@ const AuthContext = createContext();
 // Provider component
 export const AuthProvider = ({ children }) => {
   // The auth state might include a token and user information.
-  const [auth, setAuth] = useState({ token: null, user: null, user_name: null, role: null });
+  const [auth, setAuth] = useState({ token: null, user: null, user_name: null, role: null, emp:null });
 
   // Load auth state from localStorage on mount
   useEffect(() => {
@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
     const storedUserStr = localStorage.getItem('authUser');
     const storedUserName = localStorage.getItem('authUserName');
     const storedUserRole = localStorage.getItem('authUserRole');
+    const storedEmpStr = localStorage.getItem('authEmp');
 
     let storedUser = null;
     if (storedUserStr) {
@@ -25,20 +26,29 @@ export const AuthProvider = ({ children }) => {
           console.error('Error parsing stored user:', error);
         }
       }
+    let storedEmp = null;
+      if (storedEmpStr) {
+        try {
+          storedEmp = JSON.parse(storedEmpStr);
+        } catch (error) {
+          console.error('Error parsing stored emp:', error);
+        }
+      }
 
-    if (storedToken && storedUser && storedUserName && storedUserRole) {
-      setAuth({ token: storedToken, user: storedUser, user_name: storedUserName, role: storedUserRole });
+    if (storedToken && storedUser && storedUserName && storedUserRole && storedEmp) {
+      setAuth({ token: storedToken, user: storedUser, user_name: storedUserName, role: storedUserRole, emp:storedEmp });
     }
   }, []);
 
   // Function to log in a user
-  const login = (token, user, user_name, role) => {
+  const login = (token, user, user_name, role, emp) => {
     localStorage.setItem('authToken', token);
     localStorage.setItem('authUser', JSON.stringify(user));
     localStorage.setItem('authUserName', user_name);
     localStorage.setItem('authUserRole', role);
+    localStorage.setItem('authEmp', JSON.stringify(emp));
 
-    setAuth({ token, user, user_name, role });
+    setAuth({ token, user, user_name, role, emp });
     toast.success('Login successful.');
   };
 
@@ -49,9 +59,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('authUser');
     localStorage.removeItem('authUserName')
     localStorage.removeItem('authUserRole');
+    localStorage.removeItem('authEmp');
 
-    setAuth({ token: null, user: null, user_name: null, role: null });
-    toast.info('Logged out successfully.');
+    setAuth({ token: null, user: null, user_name: null, role: null, emp:null });
+    toast.success('Logged out successfully.');
     }catch (error) {
       console.error('Logout error:', error);
       toast.error('Logout failed. Please try again.');

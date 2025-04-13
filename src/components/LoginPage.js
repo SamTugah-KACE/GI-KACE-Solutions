@@ -122,8 +122,8 @@ const LoginPage = () => {
       
       console.log("\nlogin response: ", response);
       console.log("\nlogin response.data: ", response.data);
-      const { token, user, name, role } = response.data;
-      login(token, user, name, role);
+      const { token, user, name, role, staff } = response.data;
+      login(token, user, name, role, staff);
       // In LoginPage.js, after successful login:
        localStorage.setItem('orgData', JSON.stringify(org));
 
@@ -150,7 +150,7 @@ const LoginPage = () => {
         perms.systems_administration
       ) {
         targetRoute = "/systems";
-      } else {
+      } else if (perms.includes("staff:dashboard")) {
         targetRoute = "/staff";
       }
       // Navigate to the appropriate route using the orgSlug and replace the history entry.

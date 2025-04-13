@@ -6,6 +6,7 @@ import LandingPage from './components/LandingPage';
 import SignupPage from './components/SignupPage';
 import SigninPage from './components/LoginPage'
 import Dashboard from './components/snr_management/Dashboard';
+import Staff from './components/staff/Staff';
 import ProtectedRoute from './components/ProtectedRoute';
 import UnauthorizedPage from './components/UnauthorizedPage';
 import { AuthProvider } from './context/AuthContext';
@@ -57,7 +58,10 @@ function App() {
        {/* Wrap protected routes */}
        <Route element={<ProtectedRoute />}>
           <Route path="/:orgSlug/dashboard" element={<Dashboard />} />
+          <Route path="/:orgSlug/staff" element={<Staff />} />
+          {/* Add more protected routes here */}
         </Route>
+
     </Routes>
      </AuthProvider>
   );
