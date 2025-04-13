@@ -546,7 +546,7 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
     };
     try {
       const res = await request.post(
-        '/dashboards/dashboards',
+        '/dashboards/upsert',
         JSON.stringify(dashboardPayload),
         // {
         //   headers: {
