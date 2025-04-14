@@ -673,8 +673,8 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       try {
         const res = await request.get(`/fetch?organization_id=${organizationId}&skip=0&limit=100`);
         const data = res.data;
-        if (data && data.data) {
-          setRoleOptions(data.data);
+        if (data) {
+          setRoleOptions(data);
         }
       } catch (error) {
         console.error("Error fetching roles:", error);
@@ -815,6 +815,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
               <button type="submit">Submit</button>
             )}
+            <button type="submit">Submit</button>
             <button type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>
