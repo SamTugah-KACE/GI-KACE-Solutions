@@ -39,7 +39,7 @@ label {
   margin-bottom: 5px;
 }
 
-/* Options: if ≤ 3 options display horizontally; else wrap */
+/* Options: if ≤3 options display horizontally; else wrap */
 .options-group {
   display: flex;
   flex-wrap: wrap;

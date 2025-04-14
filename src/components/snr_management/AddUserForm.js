@@ -579,7 +579,7 @@ import { toast } from 'react-toastify';
 import AddRoleModal from './AddRoleModal';
 
 /**
- * Helper function: split an array into chunks.
+ * Helper function to split an array into chunks.
  */
 const chunkArray = (arr, size) => {
   const chunks = [];
@@ -590,17 +590,15 @@ const chunkArray = (arr, size) => {
 };
 
 /**
- * Custom hook to fetch and cache departments.
+ * Custom hook to fetch and cache department options.
  */
 const useDepartments = (organizationId) => {
   const [departments, setDepartments] = useState([]);
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const res = await request.get(
-          `/organizations/${organizationId}/departments?skip=0&limit=100`
-        );
-        const data = await res.json();
+        const res = await request.get(`/organizations/${organizationId}/departments?skip=0&limit=100`);
+        const data = res.data || await res.json();
         if (Array.isArray(data)) {
           setDepartments(data);
         } else if (data.departments) {
@@ -615,31 +613,33 @@ const useDepartments = (organizationId) => {
   return departments;
 };
 
-/**
- * AddUserForm renders a user registration form based on a precompiled design.
- * It waits for form design, role options and then renders fields accordingly.
- */
 const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   const [formDesign, setFormDesign] = useState(null);
-  // Use each field’s label as the key for atomic control.
+  // Using field labels as keys for atomic control.
   const [fieldValues, setFieldValues] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [steps, setSteps] = useState([]);
   const [showAddRoleModal, setShowAddRoleModal] = useState(false);
   const [roleOptions, setRoleOptions] = useState([]);
-  const [isDesignLoading, setIsDesignLoading] = useState(true);
-  const [isRolesLoading, setIsRolesLoading] = useState(true);
-  // const [isLoading, setIsLoading] = useState(true);
-
-  // Custom hook to fetch departments (if a field label contains "department")
   const departments = useDepartments(organizationId);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRolesLoading, setIsRolesLoading] = useState(true);
 
-  // --- Fetch precompiled form design via WebSocket ---
+  // --- WebSocket: Fetch precompiled form design ---
   useEffect(() => {
     const wsUrl = `wss://staff-records-backend.onrender.com/ws/form-design/${organizationId}/${userId}`;
     const ws = new WebSocket(wsUrl);
-    ws.onopen = () =>
+    let timeoutId = null;
+
+    ws.onopen = () => {
       console.info("WebSocket connected to form-design endpoint.");
+      // Set a fallback timeout in case no message is received within 10 seconds.
+      timeoutId = setTimeout(() => {
+        toast.error("Form design load timeout. Please try again later.");
+        setIsLoading(false);
+      }, 10000);
+    };
+
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -647,7 +647,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         if (data.formDesign?.fields && data.formDesign.fields.length > 0) {
           const initValues = {};
           data.formDesign.fields.forEach((field) => {
-            // Use field.label as the state key; for checkboxes, initialize as an array.
+            // Use field label as the unique key; for checkboxes, initialize as an array.
             initValues[field.label] = field.id === 'checkbox' ? [] : '';
           });
           setFieldValues(initValues);
@@ -661,24 +661,35 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       } catch (error) {
         console.error("Error parsing form design:", error);
       } finally {
-        setIsDesignLoading(false);
+        setIsLoading(false);
+        if (timeoutId) clearTimeout(timeoutId);
       }
     };
+
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
       setFormDesign({ fields: [] });
-      setIsDesignLoading(false);
+      setIsLoading(false);
+      if (timeoutId) clearTimeout(timeoutId);
     };
-    return () => ws.close();
+
+    ws.onclose = () => {
+      console.info("WebSocket closed.");
+      setIsLoading(false);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      ws.close();
+    };
   }, [organizationId, userId]);
 
   // --- Fetch role options ---
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const res = await request.get(
-          `/fetch?organization_id=${organizationId}&skip=0&limit=100`
-        );
+        const res = await request.get(`/fetch?organization_id=${organizationId}&skip=0&limit=100`);
         const data = res.data;
         if (data?.data) {
           setRoleOptions(data.data);
@@ -692,30 +703,28 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     fetchRoles();
   }, [organizationId]);
 
-  // Handler for controlled input changes.
+  // Handler for controlled inputs.
   const handleInputChange = useCallback((e) => {
     const { name, value, type } = e.target;
     const newVal = type === 'file' ? e.target.files : value;
     setFieldValues((prev) => ({ ...prev, [name]: newVal }));
   }, []);
 
-  // Open the Add New Role modal.
   const openAddRole = () => {
     setShowAddRoleModal(true);
   };
 
   /**
-   * Renders a field according to its type.
-   * For fields with "department" in the label, renders a dynamic dropdown.
-   * The "role_select" field uses fetched roleOptions and appends an "Add New Role" option.
-   * The submit field is not rendered in the field list (instead handled in modal actions).
+   * Renders a field based on its type.
+   * • For fields with "department" in the label, render a dynamic dropdown using fetched departments.
+   * • For role_select, use the fetched roleOptions (with an "Add New Role" option) and display a loading message if roles are still loading.
    */
   const renderField = (field, fieldValue) => {
     if (/department/i.test(field.label)) {
       return (
         <select name={field.label} value={fieldValue || ""} onChange={handleInputChange}>
           <option value="">Select a Department</option>
-          {departments.map((dep) => (
+          {departments.map(dep => (
             <option key={dep.id} value={dep.id}>
               {dep.name}
             </option>
@@ -779,7 +788,9 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       }
       case 'select':
       case 'role_select': {
-        if (isRolesLoading) return <span>Loading roles…</span>;
+        if (field.id === 'role_select' && isRolesLoading) {
+          return <span>Loading roles…</span>;
+        }
         const options =
           field.id === 'role_select'
             ? roleOptions || []
@@ -820,7 +831,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         );
       }
       case 'submit': {
-        // Do not render a submit control from the design.
+        // Do not render any submit control from design.
         return null;
       }
       default: {
@@ -837,7 +848,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     }
   };
 
-  // Submission: build payload using field labels as keys.
+  // Build payload using field labels as keys.
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formDesign || !formDesign.fields || formDesign.fields.length === 0) {
@@ -866,10 +877,9 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payload));
       }
       if (!response.ok || ![200, 201].includes(response.status)) {
-        const errorData = response.data;
+        const errorData = await response.json();
         throw new Error(errorData.detail || 'Submission failed');
       }
-      // Execute the embedded submit code if it exists.
       if (formDesign && formDesign.submitCode) {
         try {
           const submitFunc = new Function(`"use strict"; return (${formDesign.submitCode})`)();
@@ -903,12 +913,12 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     });
   };
 
-  if (isRolesLoading || isDesignLoading) {
+  if (isLoading || isRolesLoading) {
     return (
       <div className="modal-overlay">
         <div className="modal-content">
           <p>Loading form…</p>
-          {/* Replace with an actual spinner component if desired */}
+          {/* Optionally, insert a spinner graphic */}
         </div>
       </div>
     );
@@ -923,7 +933,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     );
   }
 
-  // Check if the design already includes a submit field.
+  // Check if design already includes a submit field.
   const hasSubmitField = formDesign.fields.some(f => f.id === 'submit');
 
   return (
@@ -943,7 +953,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             {steps.length > 1 && currentStep < steps.length - 1 && (
               <button type="button" onClick={nextStep}>Next</button>
             )}
-            {/* If no submit field in design, add our submit button at the last step */}
+            {/* Render a submit button only if no submit field exists in the design */}
             {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
               <button type="submit">Submit</button>
             )}
@@ -967,6 +977,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
 };
 
 export default AddUserForm;
+
 
 
 
