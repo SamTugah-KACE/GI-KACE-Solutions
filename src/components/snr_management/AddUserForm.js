@@ -834,6 +834,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       }
       case 'submit': {
         // Do not render any submit control from design.
+        // return <button type="submit">{field.label}</button>;
         return null;
       }
       default: {
@@ -959,6 +960,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
               <button type="submit">Submit</button>
             )}
+            <button type="submit">Submit 2</button>
             <button type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>

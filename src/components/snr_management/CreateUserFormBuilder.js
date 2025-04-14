@@ -557,7 +557,7 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
         //   },
         // }
       );
-      if (![200, 201].includes(res.status) || !res.ok) {
+      if (res.status !== 201) {
         throw new Error('Error saving form design');
       }
       onSaveSuccess();
