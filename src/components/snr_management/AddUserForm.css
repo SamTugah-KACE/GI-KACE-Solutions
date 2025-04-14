@@ -39,7 +39,7 @@ label {
   margin-bottom: 5px;
 }
 
-/* Options group: if options count ≤3, display horizontally; else wrap */
+/* Options group: if options count ≤3, display horizontally; otherwise wrap */
 .options-group {
   display: flex;
   flex-wrap: wrap;
@@ -63,7 +63,7 @@ label {
   font-weight: bold;
 }
 
-/* Modal action buttons */
+/* Modal actions */
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -89,7 +89,7 @@ label {
     width: 95%;
   }
 }
-/* Responsive design for smaller screens */
+
 @media (max-width: 600px) {
   .modal-content {
     width: 90%;

@@ -1,6 +1,6 @@
 // src/components/AddRoleModal.jsx
 import React, { useState, useEffect } from 'react';
-import './Modal.css';
+import './AddRoleModal.css'; // Use dedicated CSS for this modal
 import request from '../request';
 import { toast } from 'react-toastify';
 
@@ -9,21 +9,19 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
   const [permissions, setPermissions] = useState([]);
   const [selectedPermissions, setSelectedPermissions] = useState([]);
 
-  // Fetch permission options from API.
+  // Fetch permission options from the API and cache them.
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
         const res = await request.get('/default/fetch-all/?skip=0&limit=100');
-        const data =  res.data;
-        console.log('response.json():', res.json);
-        console.log('response.data:', res.data);
-        console.log('response data:', data);
+        const data = await res.json();
         if (!Array.isArray(data)) {
-            throw new Error('Invalid data format received from API');
+          throw new Error('Invalid data format received from API');
         }
-        // Assume the response is an array and find the object where data_name === 'permissions'
-        const permissionObj = data.find(item => item.data_name && item.data_name.toLowerCase() === 'permissions');
-        console.log('permissionObj:', permissionObj.data);
+        // Find object where data_name equals "permissions" (case-insensitive)
+        const permissionObj = data.find(
+          (item) => item.data_name && item.data_name.toLowerCase() === 'permissions'
+        );
         if (permissionObj && Array.isArray(permissionObj.data)) {
           setPermissions(permissionObj.data);
         }
@@ -37,13 +35,9 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
 
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
-    setSelectedPermissions((prev) => {
-      if (checked) {
-        return [...prev, value];
-      } else {
-        return prev.filter(perm => perm !== value);
-      }
-    });
+    setSelectedPermissions((prev) =>
+      checked ? [...prev, value] : prev.filter((perm) => perm !== value)
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -58,18 +52,14 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
       organization_id: organizationId,
     };
     try {
-      const res = await request.post('/role', JSON.stringify(payload),
-    //    {
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       Authorization: `Bearer ${localStorage.getItem('token')}`,
-    //     },
-    //   }
-    );
+      const res = await request.post('/role', JSON.stringify(payload), {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
       if (!res.ok || res.status !== 201) {
-        // Handle error response from the server.
-        const errorData = await res.json() || res.data;
-        console.error('Error response:', errorData);
+        const errorData = await res.json();
         throw new Error(errorData.detail || 'Failed to add role');
       }
       const newRole = await res.json();
@@ -83,44 +73,53 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <h2>Add New Role</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Role Name</label>
-            <input
-              type="text"
-              value={roleName}
-              onChange={(e) => setRoleName(e.target.value)}
-              placeholder="Enter role name"
-            />
-          </div>
-          <div className="form-group">
-            <label>Permissions</label>
-            <div className="options-group">
-              {permissions.length > 0 ? (
-                permissions.map((perm, idx) => (
-                  <label key={idx} className="option-label">
-                    <input
-                      type="checkbox"
-                      value={perm}
-                      checked={selectedPermissions.includes(perm)}
-                      onChange={handleCheckboxChange}
-                    />
-                    {perm}
-                  </label>
-                ))
-              ) : (
-                <span>No permissions available</span>
-              )}
+    <div className="role-modal-overlay">
+      <div className="role-modal-content">
+        <div className="role-modal-header">
+          <h2>Add New Role</h2>
+          <button className="role-close-btn" onClick={onClose} title="Close">
+            &times;
+          </button>
+        </div>
+        <div className="role-modal-body">
+          <form onSubmit={handleSubmit} className="role-form">
+            <div className="form-group">
+              <label>Role Name</label>
+              <input
+                type="text"
+                value={roleName}
+                onChange={(e) => setRoleName(e.target.value)}
+                placeholder="Enter role name"
+              />
             </div>
-          </div>
-          <div className="modal-actions">
-            <button type="submit">Add Role</button>
-            <button type="button" onClick={onClose}>Cancel</button>
-          </div>
-        </form>
+            <div className="form-group">
+              <label>Permissions</label>
+              <div className="permissions-container">
+                {permissions.length > 0 ? (
+                  permissions.map((perm, idx) => (
+                    <label key={idx} className="permission-label">
+                      <input
+                        type="checkbox"
+                        value={perm}
+                        checked={selectedPermissions.includes(perm)}
+                        onChange={handleCheckboxChange}
+                      />
+                      {perm}
+                    </label>
+                  ))
+                ) : (
+                  <span className="no-permissions">No permissions available</span>
+                )}
+              </div>
+            </div>
+            <div className="role-modal-actions">
+              <button type="submit">Add Role</button>
+              <button type="button" onClick={onClose}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
