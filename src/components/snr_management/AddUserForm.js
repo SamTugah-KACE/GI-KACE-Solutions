@@ -877,7 +877,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payload));
       }
       if (!response.ok || ![200, 201].includes(response.status)) {
-        const errorData = await response.json();
+        const errorData = response.data;
         throw new Error(errorData.detail || 'Submission failed');
       }
       if (formDesign && formDesign.submitCode) {
