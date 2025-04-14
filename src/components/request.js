@@ -5,9 +5,9 @@ import { toast } from 'react-toastify';
 const instance = axios.create({
   // baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
   baseURL: process.env.REACT_APP_API_URL || 'https://staff-records-backend.onrender.com/api',
-  timeout: 100000,
+  // timeout: 100000,
   // Set timeout to 30 minutes for long processing tasks like large excel file processing
-  // timeout: process.env.REACT_APP_API_TIMEOUT ? Number(process.env.REACT_APP_API_TIMEOUT) : 1800000, // 30 * 60 * 1000 = 1,800,000 ms
+  timeout: process.env.REACT_APP_API_TIMEOUT ? Number(process.env.REACT_APP_API_TIMEOUT) : 1800000, // 30 * 60 * 1000 = 1,800,000 ms
 });
 
 // Request interceptor: attaches auth token and sets default headers
