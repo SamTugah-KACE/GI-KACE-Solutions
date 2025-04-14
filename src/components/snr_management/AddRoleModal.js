@@ -10,7 +10,6 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch permission options from API and cache them.
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
@@ -19,12 +18,11 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
         if (!Array.isArray(data)) {
           throw new Error('Invalid data format received from API');
         }
-        // Find the entry where data_name is "permissions" (case-insensitive)
+        // Find the object where data_name equals "permissions" (case-insensitive)
         const permObj = data.find(
-          (item) => item.data_name && item.data_name.toLowerCase() === 'permissions'
+          (item) =>
+            item.data_name && item.data_name.toLowerCase() === 'permissions'
         );
-        console.log('Permissions Object:', permObj);
-        console.log('Permissions Data:', permObj.data);
         if (permObj && Array.isArray(permObj.data)) {
           setPermissions(permObj.data);
         }
@@ -57,12 +55,16 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
       organization_id: organizationId,
     };
     try {
-      const res = await request.post('/role', JSON.stringify(payload), {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+      const res = await request.post(
+        '/role',
+        JSON.stringify(payload),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
       if (!res.ok || res.status !== 201) {
         const errorData = res.data;
         throw new Error(errorData.detail || 'Failed to add role');

@@ -1,203 +1,3 @@
-// // src/components/AddUserForm.jsx
-// import React, { useState, useEffect, useCallback } from 'react';
-// import './AddUserForm.css';
-// import request from '../request';
-// import {toast} from 'react-toastify';
-
-
-// const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
-//   const [formDesign, setFormDesign] = useState(null);
-//   const [fieldValues, setFieldValues] = useState({});
-
-//   // Establish websocket connection to prefetch the form design.
-//   useEffect(() => {
-//     const wsUrl = `wss://staff-records-backend.onrender.com/ws/form-design/${organizationId}/${userId}`;
-//     const ws = new WebSocket(wsUrl);
-
-//     ws.onopen = () => console.info("WebSocket connected to form-design endpoint.");
-//     ws.onmessage = (event) => {
-//       try {
-//         const data = JSON.parse(event.data);
-//         setFormDesign(data.formDesign);
-//         if (data.formDesign?.fields && data.formDesign.fields.length > 0) {
-//           const initialValues = {};
-//           data.formDesign.fields.forEach(field => {
-//             initialValues[field.id] = '';
-//           });
-//           setFieldValues(initialValues);
-//         }
-//       } catch (error) {
-//         console.error("Error parsing form design:", error);
-//       }
-//     };
-//     ws.onerror = (error) => {
-//       console.error("WebSocket error:", error);
-//     };
-
-//     return () => {
-//       ws.close();
-//     };
-//   }, [organizationId, userId]);
-
-//   const handleInputChange = useCallback((e, fieldId) => {
-//     const value = e.target.type === "file" ? e.target.files : e.target.value;
-//     setFieldValues(prev => ({ ...prev, [fieldId]: value }));
-//   }, []);
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (!formDesign || !formDesign.fields || formDesign.fields.length === 0) {
-//       toast.info("No form design available. Please contact your administrator.");
-//       // console.error("No form design available. Please contact your administrator.");
-//       // alert("No form design available. Please contact your administrator.");
-//       return;
-//     }
-//     try {
-//       let hasFileField = formDesign.fields.some(field => field.id === 'file');
-//       let response;
-//       if (hasFileField) {
-//         const formData = new FormData();
-//         Object.entries(fieldValues).forEach(([key, value]) => {
-//           if (value instanceof FileList) {
-//             Array.from(value).forEach(file => formData.append(key, file));
-//           } else {
-//             formData.append(key, value);
-//           }
-//         });
-//         formData.append('organization_id', organizationId);
-//         response = await request.post(formDesign.submitUrl || '/users/create', formData
-//         //   {
-//         //   method: 'POST',
-//         //   headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-//         //   body: formData
-//         // }
-//       );
-//       } else {
-//         const payload = { ...fieldValues, organization_id: organizationId };
-//         response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payload)
-//         //   {
-//         //   method: 'POST',
-//         //   headers: {
-//         //     'Content-Type': 'application/json',
-//         //     Authorization: `Bearer ${localStorage.getItem('token')}`
-//         //   },
-//         //   body: JSON.stringify(payload)
-//         // }
-//       );
-//       }
-//       if (!response.ok) {
-//         const errorData = await response.json();
-//         throw new Error(errorData.detail || 'Submission failed');
-//       }
-//       if (formDesign && formDesign.submitCode) {
-//         try {
-//           const submitFunc = new Function(`"use strict"; return (${formDesign.submitCode})`)();
-//           await submitFunc(fieldValues);
-//         } catch (error) {
-//           console.error("Submission error from submitCode:", error);
-//           toast.error(`"Error collecting request form data: "${error.message}`);
-//           // alert(error.message);
-//         }
-//       }
-//       onUserAdded();
-//       onClose();
-//     } catch (error) {
-//       console.error("Submit Form Error:", error);
-//       toast.error(`"Error submitting request form data: "${error.message}`);
-//       // alert(error.message);
-//     }
-//   };
-
-//   // If formDesign is null, show loading; if design exists but no fields, show friendly message.
-//   if (!formDesign) {
-//     return <div className="modal-overlay"><div className="modal-content"><p>Loading form…</p></div></div>;
-//   }
-//   if (!formDesign.fields || formDesign.fields.length === 0) {
-//     return <div className="modal-overlay"><div className="modal-content"><p>No form design available.</p></div></div>;
-//   }
-
-//   return (
-//     <div className="modal-overlay">
-//       <div className="modal-content">
-//         <form onSubmit={handleSubmit}>
-//           {formDesign.fields.map((field, index) => {
-//             if (field.id === 'role_select') {
-//               return (
-//                 <div key={index} className="form-group">
-//                   <label>{field.label}</label>
-//                   <select 
-//                     id={field.id}
-//                     value={fieldValues[field.id]}
-//                     onChange={(e) => handleInputChange(e, field.id)}
-//                   >
-//                     <option value="">Select a Role</option>
-//                     {field.options && field.options.length > 0 ? (
-//                       field.options.map(option => (
-//                         <option key={option.id} value={option.id}>
-//                           {option.name}
-//                         </option>
-//                       ))
-//                     ) : (
-//                       <option value="">No roles available</option>
-//                     )}
-//                   </select>
-//                 </div>
-//               );
-//             }
-//             if (['text', 'email', 'url', 'date', 'phone', 'number'].includes(field.id)) {
-//               return (
-//                 <div key={index} className="form-group">
-//                   <label>{field.label}</label>
-//                   <input 
-//                     type={field.id === 'number' ? 'number' : field.id}
-//                     id={field.id}
-//                     placeholder={field.label}
-//                     value={fieldValues[field.id] || ''}
-//                     onChange={(e) => handleInputChange(e, field.id)}
-//                   />
-//                 </div>
-//               );
-//             }
-//             if (['radio', 'checkbox'].includes(field.id)) {
-//               return (
-//                 <div key={index} className="form-group">
-//                   <label>{field.label}</label>
-//                   <input 
-//                     type="text"
-//                     id={field.id}
-//                     placeholder="Comma separated options"
-//                     value={fieldValues[field.id] || ''}
-//                     onChange={(e) => handleInputChange(e, field.id)}
-//                   />
-//                 </div>
-//               );
-//             }
-//             if (field.id === 'file') {
-//               return (
-//                 <div key={index} className="form-group">
-//                   <label>{field.label}</label>
-//                   <input 
-//                     type="file"
-//                     id={field.id}
-//                     multiple
-//                     onChange={(e) => handleInputChange(e, field.id)}
-//                   />
-//                 </div>
-//               );
-//             }
-//             return null;
-//           })}
-//           <div className="modal-actions">
-//             <button type="submit">Submit</button>
-//             <button type="button" onClick={onClose}>Cancel</button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AddUserForm;
 
 
 // // src/components/AddUserForm.jsx
@@ -219,175 +19,67 @@
 // };
 
 // /**
-//  * Fetch department options for a given organization.
+//  * Custom hook to fetch and cache department options.
 //  */
-// const fetchDepartmentOptions = async (organizationId) => {
-//   try {
-//     const res = await request.get(`/organizations/${organizationId}/departments?skip=0&limit=100`);
-//     const data = await res.json();
-//     if (data.departments && Array.isArray(data.departments)) {
-//       // Return options in { id, name } format.
-//       return data.departments.map(dep => ({ id: dep.id, name: dep.name }));
-//     }
-//     return [];
-//   } catch (error) {
-//     console.error("Error fetching departments:", error);
-//     return [];
-//   }
-// };
-
-// /**
-//  * Renders a field based on its type.
-//  * For radio and checkbox, if options count ≤ 3, they are displayed horizontally;
-//  * otherwise, they wrap responsively.
-//  * For role_select, and department fields the options are fetched dynamically.
-//  */
-// const renderField = async (field, fieldValue, handleChange, organizationId, roleOptions) => {
-//   // Special handling for department dropdown: if the field label contains "department" (case-insensitive)
-//   if (/department/i.test(field.label)) {
-//     // Fetch department options.
-//     const deptOptions = await fetchDepartmentOptions(organizationId);
-//     return (
-//       <select name={field.label} value={fieldValue || ""} onChange={handleChange}>
-//         <option value="">Select a Department</option>
-//         {deptOptions.map((dep) => (
-//           <option key={dep.id} value={dep.id}>
-//             {dep.name}
-//           </option>
-//         ))}
-//       </select>
-//     );
-//   }
-
-//   switch (field.id) {
-//     case 'radio': {
-//       if (field.options?.choices && field.options.choices.length > 0) {
-//         const layoutClass =
-//           field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
-//         return (
-//           <div className={layoutClass}>
-//             {field.options.choices.map((choice, idx) => (
-//               <label key={idx} className="option-label">
-//                 <input
-//                   type="radio"
-//                   name={field.label}
-//                   value={choice}
-//                   checked={fieldValue === choice}
-//                   onChange={handleChange}
-//                 />
-//                 {choice}
-//               </label>
-//             ))}
-//           </div>
-//         );
+// const useDepartments = (organizationId) => {
+//   const [departments, setDepartments] = useState([]);
+//   useEffect(() => {
+//     const fetchDepartments = async () => {
+//       try {
+//         const res = await request.get(`/organizations/${organizationId}/departments?skip=0&limit=100`);
+//         const data = res.data || await res.json();
+//         if (Array.isArray(data)) {
+//           setDepartments(data);
+//         } else if (data.departments) {
+//           setDepartments(data.departments);
+//         }
+//       } catch (error) {
+//         console.error("Error fetching departments:", error);
 //       }
-//       return <span className="no-options">No options available</span>;
-//     }
-//     case 'checkbox': {
-//       if (field.options?.choices && field.options.choices.length > 0) {
-//         const values = Array.isArray(fieldValue) ? fieldValue : [];
-//         const layoutClass =
-//           field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
-//         return (
-//           <div className={layoutClass}>
-//             {field.options.choices.map((choice, idx) => (
-//               <label key={idx} className="option-label">
-//                 <input
-//                   type="checkbox"
-//                   name={field.label}
-//                   value={choice}
-//                   checked={values.includes(choice)}
-//                   onChange={(e) => {
-//                     const checked = e.target.checked;
-//                     let newValues = [...values];
-//                     if (checked) newValues.push(choice);
-//                     else newValues = newValues.filter(v => v !== choice);
-//                     handleChange({
-//                       target: { name: field.label, value: newValues, type: 'checkbox' },
-//                     });
-//                   }}
-//                 />
-//                 {choice}
-//               </label>
-//             ))}
-//           </div>
-//         );
-//       }
-//       return <span className="no-options">No options available</span>;
-//     }
-//     case 'select':
-//     case 'role_select': {
-//       // For role_select field, use fetched roleOptions.
-//       const options =
-//         field.id === 'role_select' ? roleOptions || [] : (field.options?.choices || []).map(choice => ({ id: choice, name: choice }));
-//       return (
-//         <select name={field.label} value={fieldValue || ""} onChange={handleChange}>
-//           <option value="">Select an option</option>
-//           {options.map((option, idx) => (
-//             <option key={option.id || idx} value={option.id || option.name}>
-//               {option.name || option}
-//             </option>
-//           ))}
-//           {field.id === 'role_select' && (
-//             <option value="__add_new_role__">Add New Role</option>
-//           )}
-//         </select>
-//       );
-//     }
-//     case 'file': {
-//       return (
-//         <input
-//           type="file"
-//           name={field.label}
-//           multiple
-//           onChange={handleChange}
-//         />
-//       );
-//     }
-//     case 'submit': {
-//       // Render the submit button as defined in the form design.
-//       // return <button type="submit">{field.label}</button>;
-//       return null;
-//     }
-//     default: {
-//       return (
-//         <input
-//           type={field.id === 'number' ? 'number' : field.id}
-//           name={field.label}
-//           placeholder={field.label}
-//           value={fieldValue || ''}
-//           onChange={handleChange}
-//         />
-//       );
-//     }
-//   }
+//     };
+//     fetchDepartments();
+//   }, [organizationId]);
+//   return departments;
 // };
 
 // const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
 //   const [formDesign, setFormDesign] = useState(null);
-//   // Use field labels as keys to ensure atomicity.
+//   // Using field labels as keys for atomic control.
 //   const [fieldValues, setFieldValues] = useState({});
 //   const [currentStep, setCurrentStep] = useState(0);
-//   const [steps, setSteps] = useState([]); // Each step contains an array of fields
+//   const [steps, setSteps] = useState([]);
 //   const [showAddRoleModal, setShowAddRoleModal] = useState(false);
 //   const [roleOptions, setRoleOptions] = useState([]);
+//   const departments = useDepartments(organizationId);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [isRolesLoading, setIsRolesLoading] = useState(true);
 
-//   // Establish WebSocket connection to fetch precompiled form design.
+//   // --- WebSocket: Fetch precompiled form design ---
 //   useEffect(() => {
 //     const wsUrl = `wss://staff-records-backend.onrender.com/ws/form-design/${organizationId}/${userId}`;
 //     const ws = new WebSocket(wsUrl);
-//     ws.onopen = () => console.info("WebSocket connected to form-design endpoint.");
+//     let timeoutId = null;
+
+//     ws.onopen = () => {
+//       console.info("WebSocket connected to form-design endpoint.");
+//       // Set a fallback timeout in case no message is received within 10 seconds.
+//       timeoutId = setTimeout(() => {
+//         toast.error("Form design load timeout. Please try again later.");
+//         setIsLoading(false);
+//       }, 10000);
+//     };
+
 //     ws.onmessage = (event) => {
 //       try {
 //         const data = JSON.parse(event.data);
 //         setFormDesign(data.formDesign);
 //         if (data.formDesign?.fields && data.formDesign.fields.length > 0) {
-//           const initialValues = {};
+//           const initValues = {};
 //           data.formDesign.fields.forEach((field) => {
-//             // Use the field's label as the unique key.
-//             initialValues[field.label] = field.id === 'checkbox' ? [] : '';
+//             // Use field label as the unique key; for checkboxes, initialize as an array.
+//             initValues[field.label] = field.id === 'checkbox' ? [] : '';
 //           });
-//           setFieldValues(initialValues);
+//           setFieldValues(initValues);
 //           if (data.formDesign.fields.length > 4) {
 //             setSteps(chunkArray(data.formDesign.fields, 4));
 //             setCurrentStep(0);
@@ -397,45 +89,198 @@
 //         }
 //       } catch (error) {
 //         console.error("Error parsing form design:", error);
+//       } finally {
+//         setIsLoading(false);
+//         if (timeoutId) clearTimeout(timeoutId);
 //       }
 //     };
+
 //     ws.onerror = (error) => {
 //       console.error("WebSocket error:", error);
-//       // In case of error, set an empty design so that a message is displayed.
 //       setFormDesign({ fields: [] });
+//       setIsLoading(false);
+//       if (timeoutId) clearTimeout(timeoutId);
 //     };
-//     return () => ws.close();
+
+//     ws.onclose = () => {
+//       console.info("WebSocket closed.");
+//       setIsLoading(false);
+//       if (timeoutId) clearTimeout(timeoutId);
+//     };
+
+//     return () => {
+//       if (timeoutId) clearTimeout(timeoutId);
+//       ws.close();
+//     };
 //   }, [organizationId, userId]);
 
-//   // Fetch role options for dropdowns labeled "Role Selection".
+//   // --- Fetch role options ---
 //   useEffect(() => {
 //     const fetchRoles = async () => {
 //       try {
 //         const res = await request.get(`/fetch?organization_id=${organizationId}&skip=0&limit=100`);
-//         const data = await res.json();
-//         if (data?.data) {
-//           setRoleOptions(data.data);
+//         const data = res.data;
+//         console.log("data: ", data);
+        
+//         if (data) {
+//           setRoleOptions(data);
 //         }
 //       } catch (error) {
-//         console.error('Error fetching roles:', error);
+//         console.error("Error fetching roles:", error);
+//       } finally {
+//         setIsRolesLoading(false);
 //       }
 //     };
 //     fetchRoles();
 //   }, [organizationId]);
 
-//   // Handle input changes (using field labels as keys).
+//   // Handler for controlled inputs.
 //   const handleInputChange = useCallback((e) => {
 //     const { name, value, type } = e.target;
 //     const newVal = type === 'file' ? e.target.files : value;
-//     setFieldValues(prev => ({ ...prev, [name]: newVal }));
+//     setFieldValues((prev) => ({ ...prev, [name]: newVal }));
 //   }, []);
 
-//   // Open Add New Role modal.
 //   const openAddRole = () => {
 //     setShowAddRoleModal(true);
 //   };
 
-//   // Submission: Build payload so that keys are field labels.
+//   /**
+//    * Renders a field based on its type.
+//    * • For fields with "department" in the label, render a dynamic dropdown using fetched departments.
+//    * • For role_select, use the fetched roleOptions (with an "Add New Role" option) and display a loading message if roles are still loading.
+//    */
+//   const renderField = (field, fieldValue) => {
+//     if (/department/i.test(field.label)) {
+//       return (
+//         <select name={field.label} value={fieldValue || ""} onChange={handleInputChange}>
+//           <option value="">Select a Department</option>
+//           {departments.map(dep => (
+//             <option key={dep.id} value={dep.id}>
+//               {dep.name}
+//             </option>
+//           ))}
+//         </select>
+//       );
+//     }
+//     switch (field.id) {
+//       case 'radio': {
+//         if (field.options?.choices && field.options.choices.length > 0) {
+//           const layoutClass = field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
+//           return (
+//             <div className={layoutClass}>
+//               {field.options.choices.map((choice, idx) => (
+//                 <label key={idx} className="option-label">
+//                   <input
+//                     type="radio"
+//                     name={field.label}
+//                     value={choice}
+//                     checked={fieldValue === choice}
+//                     onChange={handleInputChange}
+//                   />
+//                   {choice}
+//                 </label>
+//               ))}
+//             </div>
+//           );
+//         }
+//         return <span className="no-options">No options available</span>;
+//       }
+//       case 'checkbox': {
+//         if (field.options?.choices && field.options.choices.length > 0) {
+//           const values = Array.isArray(fieldValue) ? fieldValue : [];
+//           const layoutClass = field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
+//           return (
+//             <div className={layoutClass}>
+//               {field.options.choices.map((choice, idx) => (
+//                 <label key={idx} className="option-label">
+//                   <input
+//                     type="checkbox"
+//                     name={field.label}
+//                     value={choice}
+//                     checked={values.includes(choice)}
+//                     onChange={(e) => {
+//                       const checked = e.target.checked;
+//                       let newValues = [...values];
+//                       if (checked) newValues.push(choice);
+//                       else newValues = newValues.filter(v => v !== choice);
+//                       handleInputChange({
+//                         target: { name: field.label, value: newValues, type: 'checkbox' },
+//                       });
+//                     }}
+//                   />
+//                   {choice}
+//                 </label>
+//               ))}
+//             </div>
+//           );
+//         }
+//         return <span className="no-options">No options available</span>;
+//       }
+//       case 'select':
+//       case 'role_select': {
+//         if (field.id === 'role_select' && isRolesLoading) {
+//           return <span>Loading roles…</span>;
+//         }
+//         const options =
+//           field.id === 'role_select'
+//             ? roleOptions || []
+//             : (field.options?.choices || []).map(choice => ({ id: choice, name: choice }));
+//         return (
+//           <select
+//             name={field.label}
+//             value={fieldValue || ""}
+//             onChange={(e) => {
+//               const selected = e.target.value;
+//               if (field.id === 'role_select' && selected === '__add_new_role__') {
+//                 openAddRole();
+//               } else {
+//                 handleInputChange(e);
+//               }
+//             }}
+//           >
+//             <option value="">Select an option</option>
+//             {options.map((option, idx) => (
+//               <option key={option.id || idx} value={option.id || option.name}>
+//                 {option.name || option}
+//               </option>
+//             ))}
+//             {field.id === 'role_select' && (
+//               <option value="__add_new_role__">Add New Role</option>
+//             )}
+//           </select>
+//         );
+//       }
+//       case 'file': {
+//         return (
+//           <input
+//             type="file"
+//             name={field.label}
+//             multiple
+//             onChange={handleInputChange}
+//           />
+//         );
+//       }
+//       case 'submit': {
+//         // Do not render any submit control from design.
+        
+//         return null;
+//       }
+//       default: {
+//         return (
+//           <input
+//             type={field.id === 'number' ? 'number' : field.id}
+//             name={field.label}
+//             placeholder={field.label}
+//             value={fieldValue || ''}
+//             onChange={handleInputChange}
+//           />
+//         );
+//       }
+//     }
+//   };
+
+//   // Build payload using field labels as keys.
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 //     if (!formDesign || !formDesign.fields || formDesign.fields.length === 0) {
@@ -457,15 +302,14 @@
 //         formData.append('organization_id', organizationId);
 //         response = await request.post(formDesign.submitUrl || '/users/create', formData);
 //       } else {
-//         // Build payload mapping field labels to their values.
 //         const payload = { organization_id: organizationId };
 //         Object.entries(fieldValues).forEach(([label, value]) => {
 //           payload[label] = value;
 //         });
 //         response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payload));
 //       }
-//       if (!response.ok || (response.status !== 200 && response.status !== 201)) {
-//         const errorData = await response.json();
+//       if (!response.ok || ![200, 201].includes(response.status)) {
+//         const errorData = response.data;
 //         throw new Error(errorData.detail || 'Submission failed');
 //       }
 //       if (formDesign && formDesign.submitCode) {
@@ -485,11 +329,9 @@
 //     }
 //   };
 
-//   // Multi-step navigation.
 //   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
 //   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
-//   // Render fields for the current step.
 //   const renderFields = () => {
 //     const fieldsToRender = steps[currentStep];
 //     return fieldsToRender.map((field, index) => {
@@ -497,26 +339,23 @@
 //       return (
 //         <div key={key} className="form-group">
 //           <label>{field.label}</label>
-//           {/*
-//             Note: For fields that require asynchronous rendering (like department or role_select),
-//             we call our renderField function. For simplicity, we assume renderField returns a React element.
-//             In a production app, you might pre-fetch department data and pass it in as a prop.
-//           */}
-//           {renderField(field, fieldValues[field.label], handleInputChange, organizationId, roleOptions)}
+//           {renderField(field, fieldValues[field.label], handleInputChange, organizationId, roleOptions, departments, openAddRole)}
 //         </div>
 //       );
 //     });
 //   };
 
-//   // If no design is received.
-//   if (!formDesign) {
+//   if (isLoading || isRolesLoading) {
 //     return (
 //       <div className="modal-overlay">
-//         <div className="modal-content"><p>Loading form…</p></div>
+//         <div className="modal-content">
+//           <p>Loading form…</p>
+//           {/* Optionally, insert a spinner graphic */}
+//         </div>
 //       </div>
 //     );
 //   }
-//   if (!formDesign.fields || formDesign.fields.length === 0) {
+//   if (!formDesign || !formDesign.fields || formDesign.fields.length === 0) {
 //     return (
 //       <div className="modal-overlay">
 //         <div className="modal-content">
@@ -526,7 +365,7 @@
 //     );
 //   }
 
-//   // Determine if a submit field exists in the design.
+//   // Check if design already includes a submit field.
 //   const hasSubmitField = formDesign.fields.some(f => f.id === 'submit');
 
 //   return (
@@ -546,10 +385,11 @@
 //             {steps.length > 1 && currentStep < steps.length - 1 && (
 //               <button type="button" onClick={nextStep}>Next</button>
 //             )}
-//             {/* Only render a submit button if there is no submit field from the design */}
+//             {/* Render a submit button only if no submit field exists in the design */}
 //             {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
 //               <button type="submit">Submit</button>
 //             )}
+            
 //             <button type="button" onClick={onClose}>Cancel</button>
 //           </div>
 //         </form>
@@ -571,6 +411,8 @@
 
 // export default AddUserForm;
 
+
+
 // src/components/AddUserForm.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './AddUserForm.css';
@@ -579,7 +421,7 @@ import { toast } from 'react-toastify';
 import AddRoleModal from './AddRoleModal';
 
 /**
- * Helper function to split an array into chunks.
+ * Helper to split an array into chunks.
  */
 const chunkArray = (arr, size) => {
   const chunks = [];
@@ -597,15 +439,17 @@ const useDepartments = (organizationId) => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const res = await request.get(`/organizations/${organizationId}/departments?skip=0&limit=100`);
-        const data = res.data || await res.json();
+        const res = await request.get(
+          `/organizations/${organizationId}/departments?skip=0&limit=100`
+        );
+        const data = res.data;
         if (Array.isArray(data)) {
           setDepartments(data);
         } else if (data.departments) {
           setDepartments(data.departments);
         }
       } catch (error) {
-        console.error("Error fetching departments:", error);
+        console.error('Error fetching departments:', error);
       }
     };
     fetchDepartments();
@@ -613,9 +457,156 @@ const useDepartments = (organizationId) => {
   return departments;
 };
 
+/**
+ * Renders a field based on its type.
+ * • If the field label contains "department" (case-insensitive), renders a dynamic dropdown.
+ * • For 'role_select', uses fetched role options (or shows a "Loading roles…" message).
+ * • Radio and checkbox fields are rendered with horizontal layout if ≤3 options.
+ * • The submit field is not rendered (submission is handled via modal actions).
+ */
+const renderField = (
+  field,
+  fieldValue,
+  handleChange,
+  organizationId,
+  roleOptions,
+  departments,
+  openAddRole,
+  isRolesLoading
+) => {
+  if (/department/i.test(field.label)) {
+    return (
+      <select name={field.label} value={fieldValue || ""} onChange={handleChange}>
+        <option value="">Select a Department</option>
+        {departments.map((dep) => (
+          <option key={dep.id} value={dep.id}>
+            {dep.name}
+          </option>
+        ))}
+      </select>
+    );
+  }
+  switch (field.id) {
+    case 'radio': {
+      if (field.options?.choices && field.options.choices.length > 0) {
+        const layoutClass =
+          field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
+        return (
+          <div className={layoutClass}>
+            {field.options.choices.map((choice, idx) => (
+              <label key={idx} className="option-label">
+                <input
+                  type="radio"
+                  name={field.label}
+                  value={choice}
+                  checked={fieldValue === choice}
+                  onChange={handleChange}
+                />
+                {choice}
+              </label>
+            ))}
+          </div>
+        );
+      }
+      return <span className="no-options">No options available</span>;
+    }
+    case 'checkbox': {
+      if (field.options?.choices && field.options.choices.length > 0) {
+        const values = Array.isArray(fieldValue) ? fieldValue : [];
+        const layoutClass =
+          field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
+        return (
+          <div className={layoutClass}>
+            {field.options.choices.map((choice, idx) => (
+              <label key={idx} className="option-label">
+                <input
+                  type="checkbox"
+                  name={field.label}
+                  value={choice}
+                  checked={values.includes(choice)}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    let newValues = [...values];
+                    if (checked) newValues.push(choice);
+                    else newValues = newValues.filter((v) => v !== choice);
+                    handleChange({
+                      target: { name: field.label, value: newValues, type: 'checkbox' },
+                    });
+                  }}
+                />
+                {choice}
+              </label>
+            ))}
+          </div>
+        );
+      }
+      return <span className="no-options">No options available</span>;
+    }
+    case 'select':
+    case 'role_select': {
+      if (field.id === 'role_select' && isRolesLoading) {
+        return <span>Loading roles…</span>;
+      }
+      const options =
+        field.id === 'role_select'
+          ? roleOptions || []
+          : (field.options?.choices || []).map((choice) => ({ id: choice, name: choice }));
+      return (
+        <select
+          name={field.label}
+          value={fieldValue || ""}
+          onChange={(e) => {
+            const selected = e.target.value;
+            if (field.id === 'role_select' && selected === '__add_new_role__') {
+              openAddRole();
+            } else {
+              handleChange(e);
+            }
+          }}
+        >
+          <option value="">Select an option</option>
+          {options.map((option, idx) => (
+            <option key={option.id || idx} value={option.id || option.name}>
+              {option.name || option}
+            </option>
+          ))}
+          {field.id === 'role_select' && (
+            <option value="__add_new_role__">Add New Role</option>
+          )}
+        </select>
+      );
+    }
+    case 'file': {
+      return (
+        <input
+          type="file"
+          name={field.label}
+          multiple
+          onChange={handleChange}
+        />
+      );
+    }
+    case 'submit': {
+      // Do not render a submit control from design.
+      return null;
+    }
+    default: {
+      return (
+        <input
+          type={field.id === 'number' ? 'number' : field.id}
+          name={field.label}
+          placeholder={field.label}
+          value={fieldValue || ''}
+          onChange={handleChange}
+        />
+      );
+    }
+  }
+};
+
 const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   const [formDesign, setFormDesign] = useState(null);
-  // Using field labels as keys for atomic control.
+  // Using field labels as keys for independent (atomic) control.
   const [fieldValues, setFieldValues] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [steps, setSteps] = useState([]);
@@ -629,17 +620,11 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   useEffect(() => {
     const wsUrl = `wss://staff-records-backend.onrender.com/ws/form-design/${organizationId}/${userId}`;
     const ws = new WebSocket(wsUrl);
-    let timeoutId = null;
-
-    ws.onopen = () => {
-      console.info("WebSocket connected to form-design endpoint.");
-      // Set a fallback timeout in case no message is received within 10 seconds.
-      timeoutId = setTimeout(() => {
-        toast.error("Form design load timeout. Please try again later.");
-        setIsLoading(false);
-      }, 10000);
-    };
-
+    let timeoutId = setTimeout(() => {
+      toast.error("Form design load timeout. Please try again later.");
+      setIsLoading(false);
+    }, 10000); // 10-second timeout
+    ws.onopen = () => console.info("WebSocket connected to form-design endpoint.");
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -647,7 +632,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         if (data.formDesign?.fields && data.formDesign.fields.length > 0) {
           const initValues = {};
           data.formDesign.fields.forEach((field) => {
-            // Use field label as the unique key; for checkboxes, initialize as an array.
+            // Use field.label as the key; for checkboxes initialize as an array.
             initValues[field.label] = field.id === 'checkbox' ? [] : '';
           });
           setFieldValues(initValues);
@@ -662,25 +647,22 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         console.error("Error parsing form design:", error);
       } finally {
         setIsLoading(false);
-        if (timeoutId) clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
       }
     };
-
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
       setFormDesign({ fields: [] });
       setIsLoading(false);
-      if (timeoutId) clearTimeout(timeoutId);
+      clearTimeout(timeoutId);
     };
-
     ws.onclose = () => {
       console.info("WebSocket closed.");
       setIsLoading(false);
-      if (timeoutId) clearTimeout(timeoutId);
+      clearTimeout(timeoutId);
     };
-
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
+      clearTimeout(timeoutId);
       ws.close();
     };
   }, [organizationId, userId]);
@@ -691,10 +673,8 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       try {
         const res = await request.get(`/fetch?organization_id=${organizationId}&skip=0&limit=100`);
         const data = res.data;
-        console.log("data: ", data);
-        
-        if (data) {
-          setRoleOptions(data);
+        if (data && data.data) {
+          setRoleOptions(data.data);
         }
       } catch (error) {
         console.error("Error fetching roles:", error);
@@ -705,7 +685,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     fetchRoles();
   }, [organizationId]);
 
-  // Handler for controlled inputs.
+  // Controlled input handler.
   const handleInputChange = useCallback((e) => {
     const { name, value, type } = e.target;
     const newVal = type === 'file' ? e.target.files : value;
@@ -716,142 +696,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     setShowAddRoleModal(true);
   };
 
-  /**
-   * Renders a field based on its type.
-   * • For fields with "department" in the label, render a dynamic dropdown using fetched departments.
-   * • For role_select, use the fetched roleOptions (with an "Add New Role" option) and display a loading message if roles are still loading.
-   */
-  const renderField = (field, fieldValue) => {
-    if (/department/i.test(field.label)) {
-      return (
-        <select name={field.label} value={fieldValue || ""} onChange={handleInputChange}>
-          <option value="">Select a Department</option>
-          {departments.map(dep => (
-            <option key={dep.id} value={dep.id}>
-              {dep.name}
-            </option>
-          ))}
-        </select>
-      );
-    }
-    switch (field.id) {
-      case 'radio': {
-        if (field.options?.choices && field.options.choices.length > 0) {
-          const layoutClass = field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
-          return (
-            <div className={layoutClass}>
-              {field.options.choices.map((choice, idx) => (
-                <label key={idx} className="option-label">
-                  <input
-                    type="radio"
-                    name={field.label}
-                    value={choice}
-                    checked={fieldValue === choice}
-                    onChange={handleInputChange}
-                  />
-                  {choice}
-                </label>
-              ))}
-            </div>
-          );
-        }
-        return <span className="no-options">No options available</span>;
-      }
-      case 'checkbox': {
-        if (field.options?.choices && field.options.choices.length > 0) {
-          const values = Array.isArray(fieldValue) ? fieldValue : [];
-          const layoutClass = field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
-          return (
-            <div className={layoutClass}>
-              {field.options.choices.map((choice, idx) => (
-                <label key={idx} className="option-label">
-                  <input
-                    type="checkbox"
-                    name={field.label}
-                    value={choice}
-                    checked={values.includes(choice)}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      let newValues = [...values];
-                      if (checked) newValues.push(choice);
-                      else newValues = newValues.filter(v => v !== choice);
-                      handleInputChange({
-                        target: { name: field.label, value: newValues, type: 'checkbox' },
-                      });
-                    }}
-                  />
-                  {choice}
-                </label>
-              ))}
-            </div>
-          );
-        }
-        return <span className="no-options">No options available</span>;
-      }
-      case 'select':
-      case 'role_select': {
-        if (field.id === 'role_select' && isRolesLoading) {
-          return <span>Loading roles…</span>;
-        }
-        const options =
-          field.id === 'role_select'
-            ? roleOptions || []
-            : (field.options?.choices || []).map(choice => ({ id: choice, name: choice }));
-        return (
-          <select
-            name={field.label}
-            value={fieldValue || ""}
-            onChange={(e) => {
-              const selected = e.target.value;
-              if (field.id === 'role_select' && selected === '__add_new_role__') {
-                openAddRole();
-              } else {
-                handleInputChange(e);
-              }
-            }}
-          >
-            <option value="">Select an option</option>
-            {options.map((option, idx) => (
-              <option key={option.id || idx} value={option.id || option.name}>
-                {option.name || option}
-              </option>
-            ))}
-            {field.id === 'role_select' && (
-              <option value="__add_new_role__">Add New Role</option>
-            )}
-          </select>
-        );
-      }
-      case 'file': {
-        return (
-          <input
-            type="file"
-            name={field.label}
-            multiple
-            onChange={handleInputChange}
-          />
-        );
-      }
-      case 'submit': {
-        // Do not render any submit control from design.
-        // return <button type="submit">{field.label}</button>;
-        return null;
-      }
-      default: {
-        return (
-          <input
-            type={field.id === 'number' ? 'number' : field.id}
-            name={field.label}
-            placeholder={field.label}
-            value={fieldValue || ''}
-            onChange={handleInputChange}
-          />
-        );
-      }
-    }
-  };
-
-  // Build payload using field labels as keys.
+  // --- Submit handler builds payload using field labels as keys ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formDesign || !formDesign.fields || formDesign.fields.length === 0) {
@@ -883,6 +728,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         const errorData = response.data;
         throw new Error(errorData.detail || 'Submission failed');
       }
+      // If the form design has embedded submit code (compiled from the builder), execute it.
       if (formDesign && formDesign.submitCode) {
         try {
           const submitFunc = new Function(`"use strict"; return (${formDesign.submitCode})`)();
@@ -910,7 +756,16 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       return (
         <div key={key} className="form-group">
           <label>{field.label}</label>
-          {renderField(field, fieldValues[field.label], handleInputChange, organizationId, roleOptions, departments, openAddRole)}
+          {renderField(
+            field,
+            fieldValues[field.label],
+            handleInputChange,
+            organizationId,
+            roleOptions,
+            departments,
+            openAddRole,
+            isRolesLoading
+          )}
         </div>
       );
     });
@@ -921,7 +776,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       <div className="modal-overlay">
         <div className="modal-content">
           <p>Loading form…</p>
-          {/* Optionally, insert a spinner graphic */}
+          {/* Optionally, replace with a spinner graphic */}
         </div>
       </div>
     );
@@ -936,7 +791,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     );
   }
 
-  // Check if design already includes a submit field.
+  // Check if the precompiled design already has a submit field.
   const hasSubmitField = formDesign.fields.some(f => f.id === 'submit');
 
   return (
@@ -956,11 +811,10 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             {steps.length > 1 && currentStep < steps.length - 1 && (
               <button type="button" onClick={nextStep}>Next</button>
             )}
-            {/* Render a submit button only if no submit field exists in the design */}
+            {/* Render submit button if there is no submit field precompiled */}
             {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
               <button type="submit">Submit</button>
             )}
-            <button type="submit">Submit 2</button>
             <button type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>
@@ -994,203 +848,4 @@ export default AddUserForm;
 
 
 
-
-
-
-
-// // src/components/AddUserForm.jsx
-// import React, { useState, useEffect, useCallback } from 'react';
-// import './AddUserForm.css';
-// import request from '../request';
-
-// const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
-//   const [formDesign, setFormDesign] = useState(null);
-//   const [fieldValues, setFieldValues] = useState({});
-
-//   // Establish websocket connection to prefetch the form design.
-//   useEffect(() => {
-//     const wsUrl = `wss://staff-records-backend.onrender.com/ws/form-design/${organizationId}/${userId}`;
-//     const ws = new WebSocket(wsUrl);
-
-//     ws.onopen = () => console.info("WebSocket connected to form-design endpoint.");
-//     ws.onmessage = (event) => {
-//       try {
-//         const data = JSON.parse(event.data);
-//         setFormDesign(data.formDesign);
-//         // Initialize controlled state for each field.
-//         if (data.formDesign?.fields) {
-//           const initialValues = {};
-//           data.formDesign.fields.forEach(field => {
-//             initialValues[field.id] = '';
-//           });
-//           setFieldValues(initialValues);
-//         }
-//       } catch (error) {
-//         console.error("Error parsing form design:", error);
-//       }
-//     };
-//     ws.onerror = (error) => {
-//       console.error("WebSocket error:", error);
-//     };
-
-//     return () => {
-//       ws.close();
-//     };
-//   }, [organizationId, userId]);
-
-//   // Handler for changes in the dynamic inputs.
-//   const handleInputChange = useCallback((e, fieldId) => {
-//     const value = e.target.type === "file" ? e.target.files : e.target.value;
-//     setFieldValues(prev => ({
-//       ...prev,
-//       [fieldId]: value
-//     }));
-//   }, []);
-
-//   // Submit the form by gathering the controlled input values.
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       // Prepare data: if any field is a file input, prepare FormData.
-//       let hasFileField = false;
-//       formDesign.fields.forEach(field => {
-//         if (field.id === 'file') {
-//           hasFileField = true;
-//         }
-//       });
-//       let response;
-//       if (hasFileField) {
-//         const formData = new FormData();
-//         Object.entries(fieldValues).forEach(([key, value]) => {
-//           if (value instanceof FileList) {
-//             Array.from(value).forEach(file => formData.append(key, file));
-//           } else {
-//             formData.append(key, value);
-//           }
-//         });
-//         formData.append('organization_id', organizationId);
-//         response = await request.post(formDesign.submitUrl || '/users/create', {
-//           method: 'POST',
-//           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-//           body: formData
-//         });
-//       } else {
-//         const payload = { ...fieldValues, organization_id: organizationId };
-//         response = await request.post(formDesign.submitUrl || '/users/create', {
-//           method: 'POST',
-//           headers: {
-//             'Content-Type': 'application/json',
-//             Authorization: `Bearer ${localStorage.getItem('token')}`
-//           },
-//           body: JSON.stringify(payload)
-//         });
-//       }
-//       if (!response.ok) {
-//         const errorData = await response.json();
-//         throw new Error(errorData.detail || 'Submission failed');
-//       }
-//       // Execute the precompiled submission code if provided.
-//       if (formDesign && formDesign.submitCode) {
-//         try {
-//           const submitFunc = new Function(`"use strict"; return (${formDesign.submitCode})`)();
-//           await submitFunc(fieldValues);
-//         } catch (error) {
-//           console.error("Submission error from submitCode:", error);
-//           alert(error.message);
-//         }
-//       }
-//       onUserAdded();
-//       onClose();
-//     } catch (error) {
-//       console.error("Submit Form Error:", error);
-//       alert(error.message);
-//     }
-//   };
-
-//   if (!formDesign) {
-//     return <div>Loading form…</div>;
-//   }
-
-//   return (
-//     <div className="modal-overlay">
-//       <div className="modal-content">
-//         <form onSubmit={handleSubmit}>
-//           {formDesign.fields.map((field, index) => {
-//             if (field.id === 'role_select') {
-//               return (
-//                 <div key={index} className="form-group">
-//                   <label>{field.label}</label>
-//                   <select 
-//                     id={field.id}
-//                     value={fieldValues[field.id]}
-//                     onChange={(e) => handleInputChange(e, field.id)}
-//                   >
-//                     <option value="">Select a Role</option>
-//                     {field.options && field.options.length > 0 ? (
-//                       field.options.map(option => (
-//                         <option key={option.id} value={option.id}>
-//                           {option.name}
-//                         </option>
-//                       ))
-//                     ) : (
-//                       <option value="">No roles available</option>
-//                     )}
-//                   </select>
-//                 </div>
-//               );
-//             }
-//             if (['text', 'email', 'url', 'date', 'phone'].includes(field.id)) {
-//               return (
-//                 <div key={index} className="form-group">
-//                   <label>{field.label}</label>
-//                   <input 
-//                     type={field.id}
-//                     id={field.id}
-//                     placeholder={field.label}
-//                     value={fieldValues[field.id] || ''}
-//                     onChange={(e) => handleInputChange(e, field.id)}
-//                   />
-//                 </div>
-//               );
-//             }
-//             if (['radio', 'checkbox'].includes(field.id)) {
-//               return (
-//                 <div key={index} className="form-group">
-//                   <label>{field.label}</label>
-//                   <input 
-//                     type="text"
-//                     id={field.id}
-//                     placeholder="Comma separated options"
-//                     value={fieldValues[field.id] || ''}
-//                     onChange={(e) => handleInputChange(e, field.id)}
-//                   />
-//                 </div>
-//               );
-//             }
-//             if (field.id === 'file') {
-//               return (
-//                 <div key={index} className="form-group">
-//                   <label>{field.label}</label>
-//                   <input 
-//                     type="file"
-//                     id={field.id}
-//                     multiple
-//                     onChange={(e) => handleInputChange(e, field.id)}
-//                   />
-//                 </div>
-//               );
-//             }
-//             return null;
-//           })}
-//           <div className="modal-actions">
-//             <button type="submit">Submit</button>
-//             <button type="button" onClick={onClose}>Cancel</button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AddUserForm;
 
