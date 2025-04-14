@@ -793,7 +793,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
 
   // Check if the precompiled design already has a submit field.
   const hasSubmitField = formDesign.fields.some(f => f.id === 'submit');
-
+ console.log("hasSubmitField: ", hasSubmitField);
   return (
     <div className="modal-overlay">
       <div className="modal-content">
