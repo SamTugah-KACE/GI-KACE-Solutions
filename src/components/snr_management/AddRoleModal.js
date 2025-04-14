@@ -15,7 +15,7 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
     const fetchPermissions = async () => {
       try {
         const res = await request.get('/default/fetch-all/?skip=0&limit=100');
-        const data = await res.json();
+        const data = res.data;
         if (!Array.isArray(data)) {
           throw new Error('Invalid data format received from API');
         }
@@ -23,6 +23,8 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
         const permObj = data.find(
           (item) => item.data_name && item.data_name.toLowerCase() === 'permissions'
         );
+        console.log('Permissions Object:', permObj);
+        console.log('Permissions Data:', permObj.data);
         if (permObj && Array.isArray(permObj.data)) {
           setPermissions(permObj.data);
         }
@@ -62,10 +64,10 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
         },
       });
       if (!res.ok || res.status !== 201) {
-        const errorData = await res.json();
+        const errorData = res.data;
         throw new Error(errorData.detail || 'Failed to add role');
       }
-      const newRole = await res.json();
+      const newRole = res.data;
       toast.success('Role added successfully!');
       onRoleAdded(newRole);
       onClose();

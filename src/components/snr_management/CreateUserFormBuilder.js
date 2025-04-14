@@ -459,7 +459,9 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
       try {
         const res = await request.get('/organizations/create-url');
         if (res.status !== 200) throw new Error('Failed to fetch create URL');
-        const data = await res.json();
+        const data = await res.data;
+        console.log("user_create_url data: ", data);
+        console.log("user_create_url: ", data.user_create_url);
         setUserCreateUrl(data.user_create_url);
       } catch (error) {
         console.error('Error fetching create URL:', error);
@@ -473,10 +475,10 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
     const fetchRoleOptions = async () => {
       try {
         let res = await request.get(`/fetch?organization_id=${organizationId}&skip=0&limit=100`);
-        let data = await res.json();
+        let data = res.data;
         if (!data?.data || data.data.length === 0) {
           res = await request.get(`/default/fetch-all/?skip=0&limit=100`);
-          data = await res.json();
+          data = res.data;
         }
         if (data?.data) {
           const roles = data.data.map(role => ({ id: role.id, name: role.name }));
