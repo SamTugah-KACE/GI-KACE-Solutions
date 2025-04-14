@@ -200,16 +200,15 @@
 // export default AddUserForm;
 
 
-
 // src/components/AddUserForm.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './AddUserForm.css';
 import request from '../request';
 import { toast } from 'react-toastify';
-import AddRoleModal from './AddRoleModal'; // Modal to add a new role
+import AddRoleModal from './AddRoleModal';
 
 /**
- * Helper: split an array into chunks.
+ * Helper function to split an array into chunks.
  */
 const chunkArray = (arr, size) => {
   const chunks = [];
@@ -220,12 +219,46 @@ const chunkArray = (arr, size) => {
 };
 
 /**
- * Renders a field based on its type.
- * For radio buttons and checkboxes, if there are three or fewer options,
- * they are laid out horizontally; otherwise, they wrap responsively.
- * For role_select fields, role options are taken from `roleOptions` prop.
+ * Fetch department options for a given organization.
  */
-const renderField = (field, fieldValue, handleChange, roleOptions, openAddRole) => {
+const fetchDepartmentOptions = async (organizationId) => {
+  try {
+    const res = await request.get(`/organizations/${organizationId}/departments?skip=0&limit=100`);
+    const data = await res.json();
+    if (data.departments && Array.isArray(data.departments)) {
+      // Return options in { id, name } format.
+      return data.departments.map(dep => ({ id: dep.id, name: dep.name }));
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching departments:", error);
+    return [];
+  }
+};
+
+/**
+ * Renders a field based on its type.
+ * For radio and checkbox, if options count ≤ 3, they are displayed horizontally;
+ * otherwise, they wrap responsively.
+ * For role_select, and department fields the options are fetched dynamically.
+ */
+const renderField = async (field, fieldValue, handleChange, organizationId, roleOptions) => {
+  // Special handling for department dropdown: if the field label contains "department" (case-insensitive)
+  if (/department/i.test(field.label)) {
+    // Fetch department options.
+    const deptOptions = await fetchDepartmentOptions(organizationId);
+    return (
+      <select name={field.label} value={fieldValue || ""} onChange={handleChange}>
+        <option value="">Select a Department</option>
+        {deptOptions.map((dep) => (
+          <option key={dep.id} value={dep.id}>
+            {dep.name}
+          </option>
+        ))}
+      </select>
+    );
+  }
+
   switch (field.id) {
     case 'radio': {
       if (field.options?.choices && field.options.choices.length > 0) {
@@ -237,7 +270,7 @@ const renderField = (field, fieldValue, handleChange, roleOptions, openAddRole) 
               <label key={idx} className="option-label">
                 <input
                   type="radio"
-                  name={field.id}
+                  name={field.label}
                   value={choice}
                   checked={fieldValue === choice}
                   onChange={handleChange}
@@ -261,7 +294,7 @@ const renderField = (field, fieldValue, handleChange, roleOptions, openAddRole) 
               <label key={idx} className="option-label">
                 <input
                   type="checkbox"
-                  name={field.id}
+                  name={field.label}
                   value={choice}
                   checked={values.includes(choice)}
                   onChange={(e) => {
@@ -270,7 +303,7 @@ const renderField = (field, fieldValue, handleChange, roleOptions, openAddRole) 
                     if (checked) newValues.push(choice);
                     else newValues = newValues.filter(v => v !== choice);
                     handleChange({
-                      target: { name: field.id, value: newValues, type: 'checkbox' },
+                      target: { name: field.label, value: newValues, type: 'checkbox' },
                     });
                   }}
                 />
@@ -284,32 +317,20 @@ const renderField = (field, fieldValue, handleChange, roleOptions, openAddRole) 
     }
     case 'select':
     case 'role_select': {
-      // For role_select, use fetched roleOptions and append an "Add New Role" option.
+      // For role_select field, use fetched roleOptions.
       const options =
-        field.id === 'role_select'
-          ? (roleOptions || []).map((role) => ({
-              id: role.id,
-              name: role.name,
-            }))
-          : field.options?.choices?.map(choice => ({ id: choice, name: choice }));
+        field.id === 'role_select' ? roleOptions || [] : (field.options?.choices || []).map(choice => ({ id: choice, name: choice }));
       return (
-        <select name={field.id} value={fieldValue || ""} onChange={(e) => {
-          const selectedValue = e.target.value;
-          // If the "Add New Role" option is chosen, trigger modal.
-          if (selectedValue === '__add_new_role__') {
-            openAddRole();
-          } else {
-            handleChange(e);
-          }
-        }}>
+        <select name={field.label} value={fieldValue || ""} onChange={handleChange}>
           <option value="">Select an option</option>
-          {options &&
-            options.map((option, idx) => (
-              <option key={option.id} value={option.id}>
-                {option.name}
-              </option>
-            ))}
-          {field.id === 'role_select' && <option value="__add_new_role__">Add New Role</option>}
+          {options.map((option, idx) => (
+            <option key={option.id || idx} value={option.id || option.name}>
+              {option.name || option}
+            </option>
+          ))}
+          {field.id === 'role_select' && (
+            <option value="__add_new_role__">Add New Role</option>
+          )}
         </select>
       );
     }
@@ -317,17 +338,22 @@ const renderField = (field, fieldValue, handleChange, roleOptions, openAddRole) 
       return (
         <input
           type="file"
-          name={field.id}
+          name={field.label}
           multiple
           onChange={handleChange}
         />
       );
     }
+    case 'submit': {
+      // Render the submit button as defined in the form design.
+      // return <button type="submit">{field.label}</button>;
+      return null;
+    }
     default: {
       return (
         <input
           type={field.id === 'number' ? 'number' : field.id}
-          name={field.id}
+          name={field.label}
           placeholder={field.label}
           value={fieldValue || ''}
           onChange={handleChange}
@@ -339,19 +365,18 @@ const renderField = (field, fieldValue, handleChange, roleOptions, openAddRole) 
 
 const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   const [formDesign, setFormDesign] = useState(null);
+  // Use field labels as keys to ensure atomicity.
   const [fieldValues, setFieldValues] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
-  const [steps, setSteps] = useState([]);
+  const [steps, setSteps] = useState([]); // Each step contains an array of fields
   const [showAddRoleModal, setShowAddRoleModal] = useState(false);
   const [roleOptions, setRoleOptions] = useState([]);
 
-  // Fetch the precompiled form design via WebSocket.
+  // Establish WebSocket connection to fetch precompiled form design.
   useEffect(() => {
     const wsUrl = `wss://staff-records-backend.onrender.com/ws/form-design/${organizationId}/${userId}`;
     const ws = new WebSocket(wsUrl);
-
-    ws.onopen = () =>
-      console.info("WebSocket connected to form-design endpoint.");
+    ws.onopen = () => console.info("WebSocket connected to form-design endpoint.");
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -359,7 +384,8 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         if (data.formDesign?.fields && data.formDesign.fields.length > 0) {
           const initialValues = {};
           data.formDesign.fields.forEach((field) => {
-            initialValues[field.id] = field.id === 'checkbox' ? [] : '';
+            // Use the field's label as the unique key.
+            initialValues[field.label] = field.id === 'checkbox' ? [] : '';
           });
           setFieldValues(initialValues);
           if (data.formDesign.fields.length > 4) {
@@ -375,23 +401,20 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     };
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
-      // In case of error, allow the modal to display with a friendly message.
+      // In case of error, set an empty design so that a message is displayed.
       setFormDesign({ fields: [] });
     };
-
     return () => ws.close();
   }, [organizationId, userId]);
 
-  // Fetch role options if the form has a role_select field.
+  // Fetch role options for dropdowns labeled "Role Selection".
   useEffect(() => {
     const fetchRoles = async () => {
       try {
         const res = await request.get(`/fetch?organization_id=${organizationId}&skip=0&limit=100`);
-        const data =  res.data;
-        console.log('response.data:', data);
-        console.log('response data.data:', data);
-        if (data) {
-          setRoleOptions(data);
+        const data = await res.json();
+        if (data?.data) {
+          setRoleOptions(data.data);
         }
       } catch (error) {
         console.error('Error fetching roles:', error);
@@ -400,19 +423,19 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     fetchRoles();
   }, [organizationId]);
 
-  // Handler for input changes.
+  // Handle input changes (using field labels as keys).
   const handleInputChange = useCallback((e) => {
     const { name, value, type } = e.target;
     const newVal = type === 'file' ? e.target.files : value;
     setFieldValues(prev => ({ ...prev, [name]: newVal }));
   }, []);
 
-  // Open the Add New Role modal.
+  // Open Add New Role modal.
   const openAddRole = () => {
     setShowAddRoleModal(true);
   };
 
-  // Handler for modal form submission.
+  // Submission: Build payload so that keys are field labels.
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formDesign || !formDesign.fields || formDesign.fields.length === 0) {
@@ -434,10 +457,14 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         formData.append('organization_id', organizationId);
         response = await request.post(formDesign.submitUrl || '/users/create', formData);
       } else {
-        const payload = { ...fieldValues, organization_id: organizationId };
+        // Build payload mapping field labels to their values.
+        const payload = { organization_id: organizationId };
+        Object.entries(fieldValues).forEach(([label, value]) => {
+          payload[label] = value;
+        });
         response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payload));
       }
-      if (!response.ok || response.status !== 200 || response.status !== 201) {
+      if (!response.ok || (response.status !== 200 && response.status !== 201)) {
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Submission failed');
       }
@@ -470,13 +497,18 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       return (
         <div key={key} className="form-group">
           <label>{field.label}</label>
-          {renderField(field, fieldValues[field.id], handleInputChange, roleOptions, openAddRole)}
+          {/*
+            Note: For fields that require asynchronous rendering (like department or role_select),
+            we call our renderField function. For simplicity, we assume renderField returns a React element.
+            In a production app, you might pre-fetch department data and pass it in as a prop.
+          */}
+          {renderField(field, fieldValues[field.label], handleInputChange, organizationId, roleOptions)}
         </div>
       );
     });
   };
 
-  // Friendly messages if no design is retrieved.
+  // If no design is received.
   if (!formDesign) {
     return (
       <div className="modal-overlay">
@@ -487,10 +519,15 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   if (!formDesign.fields || formDesign.fields.length === 0) {
     return (
       <div className="modal-overlay">
-        <div className="modal-content"><p>No form design available. Please contact your administrator.</p></div>
+        <div className="modal-content">
+          <p>No form design available. Please contact your administrator.</p>
+        </div>
       </div>
     );
   }
+
+  // Determine if a submit field exists in the design.
+  const hasSubmitField = formDesign.fields.some(f => f.id === 'submit');
 
   return (
     <div className="modal-overlay">
@@ -509,7 +546,8 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             {steps.length > 1 && currentStep < steps.length - 1 && (
               <button type="button" onClick={nextStep}>Next</button>
             )}
-            {(steps.length <= 1 || currentStep === steps.length - 1) && (
+            {/* Only render a submit button if there is no submit field from the design */}
+            {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
               <button type="submit">Submit</button>
             )}
             <button type="button" onClick={onClose}>Cancel</button>
@@ -520,9 +558,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             organizationId={organizationId}
             onClose={() => setShowAddRoleModal(false)}
             onRoleAdded={(newRole) => {
-              // Update roleOptions state by appending the new role.
               setRoleOptions(prev => [...prev, newRole]);
-              // Also update fieldValues for the role_select field if needed.
               setFieldValues(prev => ({ ...prev, role_select: newRole.id }));
               setShowAddRoleModal(false);
             }}
@@ -534,6 +570,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
 };
 
 export default AddUserForm;
+
 
 
 

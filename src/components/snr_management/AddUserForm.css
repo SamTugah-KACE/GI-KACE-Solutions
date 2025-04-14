@@ -39,15 +39,15 @@ label {
   margin-bottom: 5px;
 }
 
-/* Options grouping: arrange horizontally if options ≤ 3; otherwise wrap. */
+/* Options group: if options count ≤3, display horizontally; else wrap */
 .options-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 10px;
 }
 .options-horizontal {
   display: flex;
-  gap: 5px;
+  gap: 10px;
   flex-wrap: nowrap;
 }
 .option-label {
@@ -70,19 +70,16 @@ label {
   gap: 10px;
   margin-top: 20px;
 }
-
 .modal-actions button {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
-
 .modal-actions button[type="submit"] {
   background-color: #007bff;
   color: #fff;
 }
-
 .modal-actions button:hover {
   opacity: 0.9;
 }
@@ -92,7 +89,7 @@ label {
     width: 95%;
   }
 }
-/* Responsive adjustments for smaller screens */  
+/* Responsive design for smaller screens */
 @media (max-width: 600px) {
   .modal-content {
     width: 90%;
@@ -104,39 +101,5 @@ label {
   .modal-actions {
     flex-direction: column;
     align-items: stretch;
-  }
-  .modal-actions button {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-  .modal-actions button:last-child {
-    margin-bottom: 0;
-  }
-  .options-group {
-    flex-direction: column;
-  }
-  .options-horizontal {
-    flex-direction: column;
-  }
-  .option-label {
-    margin-bottom: 5px;
-  }
-  .step-indicator {
-    font-size: 1.2rem;
-  }
-  .modal-overlay {
-    padding: 0.5rem;
-  }
-  .modal-content {
-    padding: 10px;
-  }
-  .modal-actions button {
-    padding: 6px 12px;
-  }
-  .modal-actions button[type="submit"] {
-    padding: 8px 16px;
-  }
-  .modal-actions button:hover {
-    padding: 8px 16px;
   }
 }

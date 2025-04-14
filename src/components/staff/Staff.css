@@ -1,5 +1,95 @@
 /* src/components/Staff.css */
 .dashboard-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  position: relative;
+}
+
+/* Header and Footer remain fixed inside the container if needed */
+/* Optionally, you could also make them sticky depending on your design */
+
+/* The main content area will automatically scroll if needed */
+.dashboard-content {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Each block-section takes full width on small screens,
+   and on wider viewports, two items per row */
+.block-section {
+  flex: 1 1 100%;
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .block-section {
+    flex: 1 1 calc(50% - 20px);
+  }
+}
+
+/* Nested blocks (for Qualifications) adjust layout */
+.nested-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .nested-blocks {
+    flex-direction: row;
+  }
+  .nested-section {
+    flex: 1 1 calc(50% - 8px);
+  }
+}
+
+/* Logout button styling and positioning */
+.logout-btn-container {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #c0392b;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* src/components/Staff.css */
+/* .dashboard-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -12,9 +102,9 @@
     margin: 20px auto;
     padding: 0 20px;
   }
-  
+   */
   /* Ensure each section is displayed as a block with spacing */
-.section-block {
+/* .section-block {
   margin-bottom: 20px;
   width: 100%;
-}
+} */

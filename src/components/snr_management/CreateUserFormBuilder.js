@@ -422,7 +422,7 @@ const FormBuilderArea = ({ formFields, setFormFields, moveField, updateField, re
             : {},
           required: false,
           validation: field.id === 'phone'
-            ? { countryCodes: ['+1', '+44', '+91'], maxLength: 10 }
+            ? { countryCodes: ['+1', '+44', '+91', '+233'], maxLength: 10 }
             : field.id === 'email'
             ? { regex: '^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$' }
             : {},
@@ -555,7 +555,9 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
         //   },
         // }
       );
-      if (res.status !== 200 || res.status !== 201 || !res.ok) throw new Error('Error saving form design');
+      if (![200, 201].includes(res.status) || !res.ok) {
+        throw new Error('Error saving form design');
+      }
       onSaveSuccess();
       onClose();
     } catch (error) {
