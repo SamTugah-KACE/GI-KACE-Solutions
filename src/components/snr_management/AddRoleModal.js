@@ -1,6 +1,6 @@
 // src/components/AddRoleModal.jsx
 import React, { useState, useEffect } from 'react';
-import './AddRoleModal.css'; // Use dedicated CSS for this modal
+import './AddRoleModal.css';
 import request from '../request';
 import { toast } from 'react-toastify';
 
@@ -8,8 +8,9 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
   const [roleName, setRoleName] = useState('');
   const [permissions, setPermissions] = useState([]);
   const [selectedPermissions, setSelectedPermissions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch permission options from the API and cache them.
+  // Fetch permission options from API and cache them.
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
@@ -18,16 +19,18 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
         if (!Array.isArray(data)) {
           throw new Error('Invalid data format received from API');
         }
-        // Find object where data_name equals "permissions" (case-insensitive)
-        const permissionObj = data.find(
+        // Find the entry where data_name is "permissions" (case-insensitive)
+        const permObj = data.find(
           (item) => item.data_name && item.data_name.toLowerCase() === 'permissions'
         );
-        if (permissionObj && Array.isArray(permissionObj.data)) {
-          setPermissions(permissionObj.data);
+        if (permObj && Array.isArray(permObj.data)) {
+          setPermissions(permObj.data);
         }
       } catch (error) {
         console.error('Error fetching permissions:', error);
         toast.error('Error fetching permissions.');
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchPermissions();
@@ -71,6 +74,16 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
       toast.error(`Error adding role: ${error.message}`);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="role-modal-overlay">
+        <div className="role-modal-content">
+          <p>Loading permissions…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="role-modal-overlay">

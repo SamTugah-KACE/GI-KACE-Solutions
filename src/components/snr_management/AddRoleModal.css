@@ -1,6 +1,4 @@
 /* src/components/AddRoleModal.css */
-
-/* Use the shared CSS variables if desired */
 :root {
     --primary-color: #007bff;
     --secondary-color: #6c757d;
@@ -11,7 +9,7 @@
     --transition-speed: 0.3s;
   }
   
-  /* Modal Overlay for Role Modal */
+  /* Role Modal Overlay */
   .role-modal-overlay {
     position: fixed;
     z-index: 2000;
@@ -26,7 +24,7 @@
     padding: 1rem;
   }
   
-  /* Modal Content */
+  /* Role Modal Content */
   .role-modal-content {
     background: var(--background-color);
     width: 100%;
@@ -49,7 +47,6 @@
     color: #fff;
     padding: 1rem;
   }
-  
   .role-close-btn {
     background: transparent;
     border: none;
@@ -77,13 +74,12 @@
     display: flex;
     flex-direction: column;
   }
-  
   .form-group label {
     margin-bottom: 0.5rem;
     font-weight: bold;
   }
   
-  /* Input and Select Styling */
+  /* Input Styling */
   .form-group input,
   .form-group select,
   .form-group textarea {
@@ -93,7 +89,7 @@
     font-size: 1rem;
   }
   
-  /* Permissions Container: Use grid layout for responsiveness */
+  /* Permissions Container: Responsive grid */
   .permissions-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -121,7 +117,6 @@
     padding: 1rem;
     background: #f7f7f7;
   }
-  
   .role-modal-actions button {
     padding: 0.5rem 1rem;
     border: none;
@@ -129,22 +124,19 @@
     cursor: pointer;
     transition: background var(--transition-speed);
   }
-  
   .role-modal-actions button:hover {
     opacity: 0.9;
   }
-  
   .role-modal-actions button:first-child {
     background: var(--primary-color);
     color: #fff;
   }
-  
   .role-modal-actions button:last-child {
     background: var(--secondary-color);
     color: #fff;
   }
   
-  /* Animations */
+  /* Animation */
   @keyframes fadeInScale {
     from {
       opacity: 0;
@@ -162,4 +154,13 @@
       max-width: 95%;
     }
   }
-  
+    @media (max-width: 480px) {
+        .role-modal-header {
+        flex-direction: column;
+        align-items: flex-start;
+        }
+        .role-modal-actions {
+        flex-direction: column;
+        align-items: stretch;
+        }
+    }  

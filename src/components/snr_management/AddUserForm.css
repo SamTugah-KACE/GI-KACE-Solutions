@@ -39,7 +39,7 @@ label {
   margin-bottom: 5px;
 }
 
-/* Options group: if options count ≤3, display horizontally; otherwise wrap */
+/* Options: if ≤ 3 options display horizontally; else wrap */
 .options-group {
   display: flex;
   flex-wrap: wrap;
@@ -56,7 +56,7 @@ label {
   white-space: nowrap;
 }
 
-/* Step indicator styles */
+/* Step indicator */
 .step-indicator {
   text-align: center;
   margin: 20px 0;
