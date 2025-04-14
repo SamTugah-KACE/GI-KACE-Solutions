@@ -480,8 +480,9 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
           res = await request.get(`/default/fetch-all/?skip=0&limit=100`);
           data = res.data;
         }
-        if (data?.data) {
-          const roles = data.data.map(role => ({ id: role.id, name: role.name }));
+        if (data) {
+          const roles = data.map(role => ({ id: role.id, name: role.name }));
+          console.log("roles in create user form builder: ", roles);
           setRoleOptions(roles);
         }
       } catch (error) {
