@@ -629,7 +629,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   const [roleOptions, setRoleOptions] = useState([]);
   const [isDesignLoading, setIsDesignLoading] = useState(true);
   const [isRolesLoading, setIsRolesLoading] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
 
   // Custom hook to fetch departments (if a field label contains "department")
   const departments = useDepartments(organizationId);
@@ -903,7 +903,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     });
   };
 
-  if (isLoading || isRolesLoading) {
+  if (isRolesLoading || isDesignLoading) {
     return (
       <div className="modal-overlay">
         <div className="modal-content">
