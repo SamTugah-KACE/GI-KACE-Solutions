@@ -793,18 +793,27 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       toast.info("No form design available. Please contact your administrator.");
       return;
     }
+    console.log("Field Values: ", fieldValues);
+    console.log("Form Design: ", formDesign);
+    console.log("Organization ID: ", organizationId);
+    console.log("User ID: ", userId);
+    console.log("\n\n\nsubmitUrl: ", formDesign.submitUrl);
     try {
       let response;
       // First, map the dynamic keys (field labels) to canonical keys.
       const mappedData = mapEmployeeFields(fieldValues);
       const payloadData = mergeContactInfoFields(mappedData);
-      payloadData.organization_id = organizationId;
+      // payloadData.organization_id = organizationId;
+
+      // Merge any contact-related fields into a unified object.
+    payloadData = { organization_id: organizationId, ...mappedData };
       console.log("Mapped Payload Data: ", payloadData);
       // Remove any unwanted fields from the payload.
       // For example, if the form design has a submit field, remove it from the payload.
       //if payloadData has Submit Button as part of the payload to be sent to the server, remove it.
-      if (payloadData.submit) {
+      if (payloadData.submit || payloadData["Submit Button"]) {
         delete payloadData.submit;
+        delete payloadData['Submit Button'];
       }
       console.log("Payload Data: ", payloadData);
 
