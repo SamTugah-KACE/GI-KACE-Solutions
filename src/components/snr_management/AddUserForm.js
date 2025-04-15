@@ -814,14 +814,14 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         formData.append('organization_id', organizationId);
         response = await request.post(formDesign.submitUrl || '/users/create', formData);
       } else {
-        const payload = { organization_id: organizationId };
-        Object.entries(payloadData).forEach(([label, value]) => {
-          payload[label] = value;
-        });
+        // const payload = { organization_id: organizationId };
+        // Object.entries(payloadData).forEach(([label, value]) => {
+        //   payload[label] = value;
+        // });
         response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payloadData));
       }
       if ( ![200, 201].includes(response.status)) {
-        const errorData = response.data || await response.json();
+        const errorData = response.data;
         throw new Error(errorData.detail || 'Submission failed');
       }
       // If the form design has embedded submit code, execute it.
@@ -912,7 +912,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
               <button type="submit">Submit</button>
             )}
-            <button type="submit">Add User</button>
+            {/* <button type="submit">Add User</button> */}
             <button type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>
