@@ -908,7 +908,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
               <button type="submit">Submit</button>
             )}
-            
+            <button type="submit">Add User</button>
             <button type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>

@@ -69,7 +69,7 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
       console.log('Response data:', res.data);
       console.log('Response status:', res.status);
       console.log('Response ok:', res.ok);
-      console.log('Response json:', res.json());
+      // console.log('Response json:', res.json());
       // Check if the response is not empty and has a data property
       if (!res.data || typeof res.data !== 'object') {
         throw new Error('Invalid response data format');
