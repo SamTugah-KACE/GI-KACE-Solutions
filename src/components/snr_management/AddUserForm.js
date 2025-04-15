@@ -836,7 +836,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         //   payload[label] = value;
         // });
         // response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payloadData));
-        response = await request.post('/users/create', payloadData);
+        response = await request.post('/users/create', JSON.stringify(payloadData));
       }
       if ( ![200, 201].includes(response.status)) {
         const errorData = response.data;
