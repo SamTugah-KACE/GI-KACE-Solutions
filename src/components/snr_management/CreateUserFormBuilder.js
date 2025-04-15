@@ -517,6 +517,7 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
   };
 
   // Ensure a "submit" field exists.
+  // Optionally check if a submit field is already included; if not, we do not add one automatically.
   const ensureSubmitField = (fields) => {
     if (!fields.some((field) => field.id === 'submit')) {
       return [

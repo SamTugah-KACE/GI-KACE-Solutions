@@ -65,9 +65,19 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
         //   },
         // }
       );
+      console.log('Response:', res);
+      console.log('Response data:', res.data);
+      console.log('Response status:', res.status);
+      console.log('Response ok:', res.ok);
+      console.log('Response json:', res.json());
+      // Check if the response is not empty and has a data property
+      if (!res.data || typeof res.data !== 'object') {
+        throw new Error('Invalid response data format');
+      }
+      // Check if the response status is 200 and if the response is ok
       if (res.status !== 200 || !res.ok ) {
         const errorData = res.data;
-        throw new Error(errorData.detail || 'Failed to add role');
+        throw new Error(errorData || errorData.detail || 'Failed to add role');
       }
       const newRole = res.data;
       onRoleAdded(newRole);

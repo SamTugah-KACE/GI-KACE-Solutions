@@ -419,6 +419,8 @@ import './AddUserForm.css';
 import request from '../request';
 import { toast } from 'react-toastify';
 import AddRoleModal from './AddRoleModal';
+import { mapEmployeeFields } from '../utils/mappingUtil';
+
 
 /**
  * Helper function to split an array into chunks.
@@ -442,7 +444,7 @@ const useDepartments = (organizationId) => {
         const res = await request.get(
           `/organizations/${organizationId}/departments?skip=0&limit=100`
         );
-        const data = res.data || await res.json();
+        const data = res.data;
         if (Array.isArray(data)) {
           setDepartments(data);
         } else if (data.departments) {
@@ -462,52 +464,52 @@ const useDepartments = (organizationId) => {
  */
 
 // Mapping dictionary: UI keys (normalized) -> canonical backend keys.
-const FIELD_SYNONYMS = {
-  "title": "title",
-  "prefix": "title",
-  "given name": "first_name",
-  "firstname": "first_name",
-  "first": "first_name",
-  "surname": "last_name",
-  "lastname": "last_name",
-  "last name": "last_name",
-  "middle name": "middle_name",
-  "middle": "middle_name",
-  "middle initial": "middle_name",
-  "middle_name": "middle_name",
-  "family name": "last_name",
-  "family": "last_name",
-  "family_name": "last_name",
-  "sex": "gender",
-  "gender": "gender",
-  "dob": "date_of_birth",
-  "date of birth": "date_of_birth",
-  "birth date": "date_of_birth",
-  "birthdate": "date_of_birth",
-  "date_of_birth": "date_of_birth",
-  "birthday": "date_of_birth",
-  "email": "email",
-  "e-mail": "email",
-  "email address": "email",
-  "email input": "email",
-  "email_input": "email",
-  "mail": "email",
-  "mail address": "email",
-  "phone number": "contact_info",
-  "contact": "contact_info",
-  "employee type": "employee_type",
-  "employee_type": "employee_type", // Synonym for employee_type
-  "employment type": "employee_type",
-  "employment_type": "employee_type",
-  "role selection": "role_id",
-  "role": "role_id",
-  "role_select": "role_id",
-  "system_role": "role_id",
-  "role_select_input": "role_id",
-  "system role": "role_id",
-  // "submit button": "submit", // Normally empty
-  // ... add as many synonyms as required.
-};
+// const FIELD_SYNONYMS = {
+//   "title": "title",
+//   "prefix": "title",
+//   "given name": "first_name",
+//   "firstname": "first_name",
+//   "first": "first_name",
+//   "surname": "last_name",
+//   "lastname": "last_name",
+//   "last name": "last_name",
+//   "middle name": "middle_name",
+//   "middle": "middle_name",
+//   "middle initial": "middle_name",
+//   "middle_name": "middle_name",
+//   "family name": "last_name",
+//   "family": "last_name",
+//   "family_name": "last_name",
+//   "sex": "gender",
+//   "gender": "gender",
+//   "dob": "date_of_birth",
+//   "date of birth": "date_of_birth",
+//   "birth date": "date_of_birth",
+//   "birthdate": "date_of_birth",
+//   "date_of_birth": "date_of_birth",
+//   "birthday": "date_of_birth",
+//   "email": "email",
+//   "e-mail": "email",
+//   "email address": "email",
+//   "email input": "email",
+//   "email_input": "email",
+//   "mail": "email",
+//   "mail address": "email",
+//   "phone number": "contact_info",
+//   "contact": "contact_info",
+//   "employee type": "employee_type",
+//   "employee_type": "employee_type", // Synonym for employee_type
+//   "employment type": "employee_type",
+//   "employment_type": "employee_type",
+//   "role selection": "role_id",
+//   "role": "role_id",
+//   "role_select": "role_id",
+//   "system_role": "role_id",
+//   "role_select_input": "role_id",
+//   "system role": "role_id",
+//   // "submit button": "submit", // Normally empty
+//   // ... add as many synonyms as required.
+// };
 
 /**
  * Normalizes a key: lowercases it, trims spaces, and removes punctuation.
@@ -519,15 +521,15 @@ const normalizeKey = (key) => {
 /**
  * Maps dynamic UI keys into canonical backend keys.
  */
-const mapEmployeeFields = (data) => {
-  const mapped = {};
-  Object.entries(data).forEach(([key, value]) => {
-    const normalized = normalizeKey(key);
-    const canonical = FIELD_SYNONYMS[normalized] || key;
-    mapped[canonical] = value;
-  });
-  return mapped;
-};
+// const mapEmployeeFields = (data) => {
+//   const mapped = {};
+//   Object.entries(data).forEach(([key, value]) => {
+//     const normalized = normalizeKey(key);
+//     const canonical = FIELD_SYNONYMS[normalized] || key;
+//     mapped[canonical] = value;
+//   });
+//   return mapped;
+// };
 
 /**
  * Merges contact-related fields into the "contact_info" key.
@@ -670,9 +672,9 @@ const renderField = (
       );
     }
     case 'submit': {
-      return (<button type="submit">Submit 3</button>);
+     
       // Do not render any submit control from design. The modal actions handle submission.
-      // return null;
+      return null;
     }
     default: {
       return (
@@ -805,8 +807,13 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             formData.append(key, val);
           }
         });
+        formData.append('organization_id', organizationId);
         response = await request.post(formDesign.submitUrl || '/users/create', formData);
       } else {
+        const payload = { organization_id: organizationId };
+        Object.entries(payloadData).forEach(([label, value]) => {
+          payload[label] = value;
+        });
         response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payloadData));
       }
       if (!response.ok || ![200, 201].includes(response.status)) {
@@ -901,7 +908,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
               <button type="submit">Submit</button>
             )}
-            <button type="submit">Submit 2</button>
+            
             <button type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>
