@@ -58,20 +58,20 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
       const res = await request.post(
         '/role',
         JSON.stringify(payload),
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
+        // {
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     Authorization: `Bearer ${localStorage.getItem('token')}`,
+        //   },
+        // }
       );
       if (res.status !== 200 || !res.ok || res.status !== 201) {
         const errorData = res.data;
         throw new Error(errorData.detail || 'Failed to add role');
       }
       const newRole = res.data;
-      toast.success('Role added successfully!');
       onRoleAdded(newRole);
+      toast.success('Role added successfully!');
       onClose();
     } catch (error) {
       console.error('Error adding role:', error);

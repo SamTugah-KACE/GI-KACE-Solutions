@@ -43,11 +43,11 @@ label {
 .options-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 5px;
 }
 .options-horizontal {
   display: flex;
-  gap: 4px;
+  gap: 5px;
   flex-wrap: nowrap;
 }
 .option-label {
