@@ -803,10 +803,10 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       // First, map the dynamic keys (field labels) to canonical keys.
       const mappedData = mapEmployeeFields(fieldValues);
       const payloadData = mergeContactInfoFields(mappedData);
-      // payloadData.organization_id = organizationId;
+      payloadData.organization_id = organizationId;
 
       // Merge any contact-related fields into a unified object.
-    payloadData = { organization_id: organizationId, ...mappedData };
+    // payloadData = { organization_id: organizationId, ...mappedData };
       console.log("Mapped Payload Data: ", payloadData);
       // Remove any unwanted fields from the payload.
       // For example, if the form design has a submit field, remove it from the payload.
@@ -829,14 +829,14 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
           }
         });
         formData.append('organization_id', organizationId);
-        response = await request.post(formDesign.submitUrl || '/users/create', formData);
+        response = await request.post('/users/create', formData);
       } else {
         // const payload = { organization_id: organizationId };
         // Object.entries(payloadData).forEach(([label, value]) => {
         //   payload[label] = value;
         // });
         // response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payloadData));
-        response = await request.post(formDesign.submitUrl || '/users/create', payloadData);
+        response = await request.post('/users/create', payloadData);
       }
       if ( ![200, 201].includes(response.status)) {
         const errorData = response.data;
