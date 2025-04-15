@@ -39,7 +39,7 @@ label {
   margin-bottom: 5px;
 }
 
-/* Options group: horizontal if ≤ 3, else wrap */
+/* Options group: if options count ≤3, display horizontally; else wrap */
 .options-group {
   display: flex;
   flex-wrap: wrap;
@@ -47,7 +47,7 @@ label {
 }
 .options-horizontal {
   display: flex;
-  gap: 10px;
+  gap: 4px;
   flex-wrap: nowrap;
 }
 .option-label {

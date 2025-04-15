@@ -421,7 +421,7 @@ import { toast } from 'react-toastify';
 import AddRoleModal from './AddRoleModal';
 
 /**
- * Helper to split an array into chunks.
+ * Helper function to split an array into chunks.
  */
 const chunkArray = (arr, size) => {
   const chunks = [];
@@ -442,14 +442,14 @@ const useDepartments = (organizationId) => {
         const res = await request.get(
           `/organizations/${organizationId}/departments?skip=0&limit=100`
         );
-        const data = res.data;
+        const data = res.data || await res.json();
         if (Array.isArray(data)) {
           setDepartments(data);
         } else if (data.departments) {
           setDepartments(data.departments);
         }
       } catch (error) {
-        console.error('Error fetching departments:', error);
+        console.error("Error fetching departments:", error);
       }
     };
     fetchDepartments();
@@ -458,11 +458,101 @@ const useDepartments = (organizationId) => {
 };
 
 /**
+ * MAPPING HELPERS
+ */
+
+// Mapping dictionary: UI keys (normalized) -> canonical backend keys.
+const FIELD_SYNONYMS = {
+  "title": "title",
+  "prefix": "title",
+  "given name": "first_name",
+  "firstname": "first_name",
+  "first": "first_name",
+  "surname": "last_name",
+  "lastname": "last_name",
+  "last name": "last_name",
+  "middle name": "middle_name",
+  "middle": "middle_name",
+  "middle initial": "middle_name",
+  "middle_name": "middle_name",
+  "family name": "last_name",
+  "family": "last_name",
+  "family_name": "last_name",
+  "sex": "gender",
+  "gender": "gender",
+  "dob": "date_of_birth",
+  "date of birth": "date_of_birth",
+  "birth date": "date_of_birth",
+  "birthdate": "date_of_birth",
+  "date_of_birth": "date_of_birth",
+  "birthday": "date_of_birth",
+  "email": "email",
+  "e-mail": "email",
+  "email address": "email",
+  "email input": "email",
+  "email_input": "email",
+  "mail": "email",
+  "mail address": "email",
+  "phone number": "contact_info",
+  "contact": "contact_info",
+  "employee type": "employee_type",
+  "employee_type": "employee_type", // Synonym for employee_type
+  "employment type": "employee_type",
+  "employment_type": "employee_type",
+  "role selection": "role_id",
+  "role": "role_id",
+  "role_select": "role_id",
+  "system_role": "role_id",
+  "role_select_input": "role_id",
+  "system role": "role_id",
+  // "submit button": "submit", // Normally empty
+  // ... add as many synonyms as required.
+};
+
+/**
+ * Normalizes a key: lowercases it, trims spaces, and removes punctuation.
+ */
+const normalizeKey = (key) => {
+  return key.trim().toLowerCase().replace(/[^\w\s]/g, "");
+};
+
+/**
+ * Maps dynamic UI keys into canonical backend keys.
+ */
+const mapEmployeeFields = (data) => {
+  const mapped = {};
+  Object.entries(data).forEach(([key, value]) => {
+    const normalized = normalizeKey(key);
+    const canonical = FIELD_SYNONYMS[normalized] || key;
+    mapped[canonical] = value;
+  });
+  return mapped;
+};
+
+/**
+ * Merges contact-related fields into the "contact_info" key.
+ */
+const mergeContactInfoFields = (data) => {
+  const contactInfo = data.contact_info && typeof data.contact_info === "object" 
+        ? { ...data.contact_info } : {};
+  const keysToMerge = Object.keys(data).filter(k => {
+    const norm = normalizeKey(k);
+    return (norm.includes("phone") || norm.includes("address")) && !norm.includes("next of kin");
+  });
+  keysToMerge.forEach(k => {
+    contactInfo[k] = data[k];
+    delete data[k];
+  });
+  data.contact_info = contactInfo;
+  return data;
+};
+
+/**
  * Renders a field based on its type.
- * • If the field label contains "department" (case-insensitive), renders a dynamic dropdown.
- * • For 'role_select', uses fetched role options (or shows a "Loading roles…" message).
- * • Radio and checkbox fields are rendered with horizontal layout if ≤3 options.
- * • The submit field is not rendered (submission is handled via modal actions).
+ * – For fields whose label contains "department" (case-insensitive), renders a dynamic dropdown.
+ * – For radio and checkbox fields, renders horizontal layout if ≤3 options; otherwise wraps.
+ * – For role_select fields, if roles are loading, shows a loading message.
+ * – The submit field is not rendered.
  */
 const renderField = (
   field,
@@ -478,7 +568,7 @@ const renderField = (
     return (
       <select name={field.label} value={fieldValue || ""} onChange={handleChange}>
         <option value="">Select a Department</option>
-        {departments.map((dep) => (
+        {departments.map(dep => (
           <option key={dep.id} value={dep.id}>
             {dep.name}
           </option>
@@ -489,8 +579,7 @@ const renderField = (
   switch (field.id) {
     case 'radio': {
       if (field.options?.choices && field.options.choices.length > 0) {
-        const layoutClass =
-          field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
+        const layoutClass = field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
         return (
           <div className={layoutClass}>
             {field.options.choices.map((choice, idx) => (
@@ -513,8 +602,7 @@ const renderField = (
     case 'checkbox': {
       if (field.options?.choices && field.options.choices.length > 0) {
         const values = Array.isArray(fieldValue) ? fieldValue : [];
-        const layoutClass =
-          field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
+        const layoutClass = field.options.choices.length <= 3 ? 'options-horizontal' : 'options-group';
         return (
           <div className={layoutClass}>
             {field.options.choices.map((choice, idx) => (
@@ -528,7 +616,7 @@ const renderField = (
                     const checked = e.target.checked;
                     let newValues = [...values];
                     if (checked) newValues.push(choice);
-                    else newValues = newValues.filter((v) => v !== choice);
+                    else newValues = newValues.filter(v => v !== choice);
                     handleChange({
                       target: { name: field.label, value: newValues, type: 'checkbox' },
                     });
@@ -550,7 +638,7 @@ const renderField = (
       const options =
         field.id === 'role_select'
           ? roleOptions || []
-          : (field.options?.choices || []).map((choice) => ({ id: choice, name: choice }));
+          : (field.options?.choices || []).map(choice => ({ id: choice, name: choice }));
       return (
         <select
           name={field.label}
@@ -578,16 +666,11 @@ const renderField = (
     }
     case 'file': {
       return (
-        <input
-          type="file"
-          name={field.label}
-          multiple
-          onChange={handleChange}
-        />
+        <input type="file" name={field.label} multiple onChange={handleChange} />
       );
     }
     case 'submit': {
-      // Do not render a submit control from design.
+      // Do not render any submit control from design. The modal actions handle submission.
       return null;
     }
     default: {
@@ -606,7 +689,7 @@ const renderField = (
 
 const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   const [formDesign, setFormDesign] = useState(null);
-  // Using field labels as keys for independent (atomic) control.
+  // Use field labels as keys for independent control.
   const [fieldValues, setFieldValues] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [steps, setSteps] = useState([]);
@@ -632,7 +715,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         if (data.formDesign?.fields && data.formDesign.fields.length > 0) {
           const initValues = {};
           data.formDesign.fields.forEach((field) => {
-            // Use field.label as the key; for checkboxes initialize as an array.
+            // Use field.label as the unique key; for checkboxes initialize as an array.
             initValues[field.label] = field.id === 'checkbox' ? [] : '';
           });
           setFieldValues(initValues);
@@ -696,7 +779,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     setShowAddRoleModal(true);
   };
 
-  // --- Submit handler builds payload using field labels as keys ---
+  // --- Submission: Map field keys using helper functions and build payload. ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formDesign || !formDesign.fields || formDesign.fields.length === 0) {
@@ -705,30 +788,31 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     }
     try {
       let response;
+      // First, map the dynamic keys (field labels) to canonical keys.
+      const mappedData = mapEmployeeFields(fieldValues);
+      const payloadData = mergeContactInfoFields(mappedData);
+      payloadData.organization_id = organizationId;
+
+      // Use FormData if there is a file field.
       const hasFileField = formDesign.fields.some(field => field.id === 'file');
       if (hasFileField) {
         const formData = new FormData();
-        Object.entries(fieldValues).forEach(([key, val]) => {
+        Object.entries(payloadData).forEach(([key, val]) => {
           if (val instanceof FileList) {
             Array.from(val).forEach(file => formData.append(key, file));
           } else {
             formData.append(key, val);
           }
         });
-        formData.append('organization_id', organizationId);
         response = await request.post(formDesign.submitUrl || '/users/create', formData);
       } else {
-        const payload = { organization_id: organizationId };
-        Object.entries(fieldValues).forEach(([label, value]) => {
-          payload[label] = value;
-        });
-        response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payload));
+        response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payloadData));
       }
       if (!response.ok || ![200, 201].includes(response.status)) {
-        const errorData = response.data;
+        const errorData = response.data || await response.json();
         throw new Error(errorData.detail || 'Submission failed');
       }
-      // If the form design has embedded submit code (compiled from the builder), execute it.
+      // If the form design has embedded submit code, execute it.
       if (formDesign && formDesign.submitCode) {
         try {
           const submitFunc = new Function(`"use strict"; return (${formDesign.submitCode})`)();
@@ -776,7 +860,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       <div className="modal-overlay">
         <div className="modal-content">
           <p>Loading form…</p>
-          {/* Optionally, replace with a spinner graphic */}
+          {/* Replace with a spinner graphic if desired */}
         </div>
       </div>
     );
@@ -791,9 +875,9 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     );
   }
 
-  // Check if the precompiled design already has a submit field.
+  // Check if the precompiled design already contains a submit field.
   const hasSubmitField = formDesign.fields.some(f => f.id === 'submit');
- console.log("hasSubmitField: ", hasSubmitField);
+
   return (
     <div className="modal-overlay">
       <div className="modal-content">
@@ -811,11 +895,10 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             {steps.length > 1 && currentStep < steps.length - 1 && (
               <button type="button" onClick={nextStep}>Next</button>
             )}
-            {/* Render submit button if there is no submit field precompiled */}
+            {/* Render a submit button only if no submit field exists in the design */}
             {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
               <button type="submit">Submit</button>
             )}
-            <button type="submit">Submit</button>
             <button type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>
@@ -836,6 +919,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
 };
 
 export default AddUserForm;
+
 
 
 

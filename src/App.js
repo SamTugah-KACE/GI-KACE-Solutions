@@ -61,7 +61,7 @@ function App() {
           <Route path="/:orgSlug/staff" element={<Staff />} />
           {/* Add more protected routes here */}
         </Route>
-    <Route path="/staff" element={<Staff />} />
+    {/* <Route path="/staff" element={<Staff />} /> */}
     </Routes>
      </AuthProvider>
   );

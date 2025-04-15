@@ -65,7 +65,7 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
           },
         }
       );
-      if (!res.ok || res.status !== 201) {
+      if (res.status !== 200 || !res.ok || res.status !== 201) {
         const errorData = res.data;
         throw new Error(errorData.detail || 'Failed to add role');
       }

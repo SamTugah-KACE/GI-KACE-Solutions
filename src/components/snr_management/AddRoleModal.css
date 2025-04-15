@@ -87,6 +87,7 @@
     border: 1px solid #ccc;
     border-radius: var(--border-radius);
     font-size: 1rem;
+
   }
   
   /* Permissions Container: Responsive grid */
@@ -107,6 +108,7 @@
     align-items: center;
     gap: 0.3rem;
     font-size: 0.9rem;
+    color:black;
   }
   
   /* Modal Actions */
