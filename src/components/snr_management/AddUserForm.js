@@ -799,6 +799,14 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       const mappedData = mapEmployeeFields(fieldValues);
       const payloadData = mergeContactInfoFields(mappedData);
       payloadData.organization_id = organizationId;
+      console.log("Mapped Payload Data: ", payloadData);
+      // Remove any unwanted fields from the payload.
+      // For example, if the form design has a submit field, remove it from the payload.
+      //if payloadData has Submit Button as part of the payload to be sent to the server, remove it.
+      if (payloadData.submit) {
+        delete payloadData.submit;
+      }
+      console.log("Payload Data: ", payloadData);
 
       // Use FormData if there is a file field.
       const hasFileField = formDesign.fields.some(field => field.id === 'file');
@@ -818,7 +826,8 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         // Object.entries(payloadData).forEach(([label, value]) => {
         //   payload[label] = value;
         // });
-        response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payloadData));
+        // response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payloadData));
+        response = await request.post(formDesign.submitUrl || '/users/create', payloadData);
       }
       if ( ![200, 201].includes(response.status)) {
         const errorData = response.data;
