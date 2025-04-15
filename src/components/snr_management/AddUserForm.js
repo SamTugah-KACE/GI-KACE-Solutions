@@ -670,8 +670,9 @@ const renderField = (
       );
     }
     case 'submit': {
+      return (<button type="submit">Submit 3</button>);
       // Do not render any submit control from design. The modal actions handle submission.
-      return null;
+      // return null;
     }
     default: {
       return (
@@ -878,7 +879,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   // Check if the precompiled design already contains a submit field.
   const hasSubmitField = formDesign.fields.some(f => f.id === 'submit');
   console.log("hasSubmitField: ", hasSubmitField);
-  
+
   return (
     <div className="modal-overlay">
       <div className="modal-content">
@@ -897,9 +898,10 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
               <button type="button" onClick={nextStep}>Next</button>
             )}
             {/* Render a submit button only if no submit field exists in the design */}
-            {hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
+            {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
               <button type="submit">Submit</button>
             )}
+            <button type="submit">Submit 2</button>
             <button type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>
