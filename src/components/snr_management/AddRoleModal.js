@@ -75,7 +75,7 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
         throw new Error('Invalid response data format');
       }
       // Check if the response status is 200 and if the response is ok
-      if (res.status !== 200 || !res.ok ) {
+      if (res.status !== 200 ) {
         const errorData = res.data;
         throw new Error(errorData || errorData.detail || 'Failed to add role');
       }

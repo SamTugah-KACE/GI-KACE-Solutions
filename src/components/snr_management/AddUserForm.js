@@ -672,9 +672,13 @@ const renderField = (
       );
     }
     case 'submit': {
-     
+     return (
+      <button type="submit" className="submit-button">
+        Add New User
+      </button>
+     );
       // Do not render any submit control from design. The modal actions handle submission.
-      return null;
+      // return null;
     }
     default: {
       return (
@@ -816,7 +820,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         });
         response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payloadData));
       }
-      if (!response.ok || ![200, 201].includes(response.status)) {
+      if ( ![200, 201].includes(response.status)) {
         const errorData = response.data || await response.json();
         throw new Error(errorData.detail || 'Submission failed');
       }
