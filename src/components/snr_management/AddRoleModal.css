@@ -79,7 +79,7 @@
     font-weight: bold;
   }
   
-  /* Input Styling */
+  /* Input & Select Styling */
   .form-group input,
   .form-group select,
   .form-group textarea {
@@ -87,10 +87,11 @@
     border: 1px solid #ccc;
     border-radius: var(--border-radius);
     font-size: 1rem;
-
+    width: 100%;
+    box-sizing: border-box;
   }
   
-  /* Permissions Container: Responsive grid */
+  /* Permissions Container: Responsive grid layout */
   .permissions-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -108,7 +109,7 @@
     align-items: center;
     gap: 0.3rem;
     font-size: 0.9rem;
-    color:black;
+    color: #000;
   }
   
   /* Modal Actions */
@@ -136,6 +137,16 @@
   .role-modal-actions button:last-child {
     background: var(--secondary-color);
     color: #fff;
+  }
+  
+  /* Loading spinner placeholder */
+  .role-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+    font-size: 1.2rem;
+    color: var(--primary-color);
   }
   
   /* Animation */

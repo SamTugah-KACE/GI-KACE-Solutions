@@ -11,6 +11,7 @@ import UpdateDepartmentModal from './UpdateDepartmentModal';
 import AddBranchModal from './AddBranchModal';
 import './Dashboard.css';
 import ProfileCard from '../pages/ProfileCard';
+import Joyride from 'react-joyride';
 // import { useOrganization } from '../../context/OrganizationContext';
 
 const Dashboard = () => {
@@ -20,6 +21,19 @@ const Dashboard = () => {
   const [showAddDeptModal, setShowAddDeptModal] = useState(false);
   const [showUpdateDeptModal, setShowUpdateDeptModal] = useState(false);
   const [showAddBranchModal, setShowAddBranchModal] = useState(false);
+
+  const [runTour, setRunTour] = useState(true);
+  const steps = [
+    {
+      target: "../pages/Sidebar",
+      content: "Here you can navigate between modules.",
+    },
+    {
+      target: ".dashboard-header",
+      content: "This is where your dashboard title and notifications appear.",
+    },
+    // ... more steps
+  ];
 
 
   const handleDepartmentAdded = (newDept) => {
@@ -41,6 +55,9 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
+      <Joyride steps={steps} run={runTour} continuous={true} showSkipButton={true} styles={{ options: { zIndex: 10000 } }} />
+      {/* <Joyride steps={steps} run={runTour} continuous showSkipButton /> */}
+      {/* <Joyride steps={steps} run={runTour} continuous={true} showSkipButton={true} styles={{ options: { zIndex: 10000 } }} /> */}
       <Header  />
       <ProfileCard /> {/* Positioned immediately below header */}
       <div className="dashboard-content">
