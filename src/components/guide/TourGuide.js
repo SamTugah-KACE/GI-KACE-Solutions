@@ -62,7 +62,7 @@ const TourGuide = ({ steps, onStepCallback }) => {
       callback={handleJoyrideCallback}
       styles={{
         options: {
-          zIndex: 10000,                // low enough not to cover your header/profile images
+          zIndex: 1000,                // low enough not to cover your header/profile images
           overlayColor: 'rgba(0,0,0,0.4)',
         },
       }}
