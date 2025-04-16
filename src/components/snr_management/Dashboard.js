@@ -25,7 +25,7 @@ const Dashboard = () => {
   const [runTour, setRunTour] = useState(true);
   const steps = [
     {
-      target: "../pages/Sidebar",
+      target: ".sidebar",
       content: "Here you can navigate between modules.",
     },
     {
@@ -55,8 +55,8 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <Joyride steps={steps} run={runTour} continuous={true} showSkipButton={true} styles={{ options: { zIndex: 10000 } }} />
-      {/* <Joyride steps={steps} run={runTour} continuous showSkipButton /> */}
+      {/* <Joyride steps={steps} run={runTour} continuous={true} showSkipButton={true} styles={{ options: { zIndex: 10000 } }} /> */}
+      <Joyride steps={steps} run={runTour} continuous showSkipButton />
       {/* <Joyride steps={steps} run={runTour} continuous={true} showSkipButton={true} styles={{ options: { zIndex: 10000 } }} /> */}
       <Header  />
       <ProfileCard /> {/* Positioned immediately below header */}

@@ -1,5 +1,6 @@
 // src/components/AddRoleModal.jsx
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom'; // To use createPortal
 import './AddRoleModal.css';
 import request from '../request';
 import { toast } from 'react-toastify';
@@ -90,7 +91,7 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
   };
 
   if (isLoading) {
-    return (
+    return ReactDOM.createPortal(
       <div className="role-modal-overlay">
         <div className="role-modal-content">
         <div className="role-loading">
@@ -98,11 +99,12 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
           {/* Replace with a spinner component if desired */}
           </div>
         </div>
-      </div>
+      </div>,
+      document.body
     );
   }
 
-  return (
+  return ReactDOM.createPortal(
     <div className="role-modal-overlay">
       <div className="role-modal-content">
         <div className="role-modal-header">
