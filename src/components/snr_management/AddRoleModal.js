@@ -154,7 +154,8 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
           </form>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
