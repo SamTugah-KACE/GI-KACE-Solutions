@@ -24,6 +24,8 @@ const { auth } = useAuth();
   const [showUpdateDeptModal, setShowUpdateDeptModal] = useState(false);
   const [showAddBranchModal, setShowAddBranchModal] = useState(false);
 
+  // Lifted sidebar submenu state so TourGuide can open it programmatically
+  const [activeMenu, setActiveMenu] = useState(null);
   
   // Define the tour steps. The target selectors must match unique CSS classes set in your components.
   const tourSteps = [
@@ -42,22 +44,42 @@ const { auth } = useAuth();
     {
       target: '.bulk-insert-menu',
       content: 'This option lets you perform a bulk insert of users.',
+      orphan: true, // if the element is not mounted by default
     },
     {
       target: '.user-registration-form-menu',
-      content: 'Design and edit the User Registration Form here.',
+      content: 'Design and edit the User Registration Form here.\nNote: whiles you create the user registration form, it is compulsory to create fields for the following items: \n- First Name, \n - Last Name, and Email.',
+      orphan: true, // if the element is not mounted by default
     },
     {
       target: '.add-new-user-menu',
       content: 'Use this option to add a new user directly.',
+      orphan: true, // if the element is not mounted by default
     },
     {
       target: '.existing-users-menu',
       content: 'Click here to view the list of existing users.',
+      orphan: true, // if the element is not mounted by default
     },
     // Add further steps as needed.
   ];
 
+  // When Joyride is about to show a deeper submenu step, expand it
+  const handleTourEvent = (data) => {
+    if (data.type === 'step:before' && data.index >= 3 && data.index <= 6) {
+      // steps 3–6 are inside the New User submenu
+      setActiveMenu('users');
+    }
+  };
+
+  // When the tour is finished or skipped, close any open menus
+  const handleTourEnd = () => {
+    setActiveMenu(null);
+    // setShowNewUserModal(false);
+    // setShowAddDeptModal(false);
+    // setShowUpdateDeptModal(false);
+    // setShowAddBranchModal(false);
+  };
 
   const handleDepartmentAdded = (newDept) => {
     // Update your state or refresh the department list as needed.
@@ -79,12 +101,18 @@ const { auth } = useAuth();
   return (
     <div className="dashboard-container">
       {/* Pass the auth token into TourGuide for API calls */}
-      <TourGuide steps={tourSteps} authToken={auth.token} />
+      <TourGuide 
+      steps={tourSteps} 
+      authToken={auth.token}
+      onStepCallback={handleTourEvent}
+      />
 
       <Header  />
       <ProfileCard /> {/* Positioned immediately below header */}
       <div className="dashboard-content">
         <Sidebar 
+        activeMenu={activeMenu}
+        setActiveMenu={setActiveMenu}
         onNewUserClick={() => setShowNewUserModal(true)} 
         onNewDepartmentClick={() => setShowAddDeptModal(true)}
         onUpdateDepartmentClick={() => setShowUpdateDeptModal(true)}

@@ -1,66 +1,54 @@
-// TourGuide.js
+// src/components/guide/TourGuide.js
 import React, { useState, useEffect } from 'react';
 import Joyride, { STATUS } from 'react-joyride';
-import { request } from "../request";
+import request from '../request';           // ← your axios instance
+// import { getAuthToken } from '../context/auth'; // just in case you want direct access
 
-const TourGuide = ({ steps, authToken }) => {
-  // authToken is assumed to be passed from your global auth context or props.
+const TourGuide = ({ steps, onStepCallback }) => {
   const [runTour, setRunTour] = useState(false);
+  const shouldRun = process.env.REACT_APP_RUN_TOUR === 'true';
 
-  // Check server stored flag (with localStorage fallback) on mount.
+  // On mount: check server-stored flag (with localStorage fallback)
   useEffect(() => {
+    if (!shouldRun) return;
+
     const checkTourStatus = async () => {
       try {
-        const res = await fetch('/api/users/get-tour-status', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            // include token if needed for authentication, for example:
-            'Authorization': `Bearer ${authToken}`
-          },
-          credentials: 'include', // if you use cookies, etc.
-        });
-        if (!res.ok) {
-          throw new Error('Unable to fetch tour status from server');
-        }
-        const data = await res.json();
+        // GET /users/get-tour-status
+        const { data } = await request.get('/users/get-tour-status');
         if (!data.tourCompleted) {
           setRunTour(true);
         }
-      } catch (error) {
-        console.error('Error fetching tour status:', error);
-        // fallback: use localStorage
-        const tourCompleted = localStorage.getItem('tourCompleted');
-        if (!tourCompleted) {
+      } catch (err) {
+        // fallback to localStorage if your endpoint isn't live yet
+        if (!localStorage.getItem('tourCompleted')) {
           setRunTour(true);
         }
       }
     };
-    checkTourStatus();
-  }, [authToken]);
 
-  // Callback for Joyride events.
+    checkTourStatus();
+  }, [shouldRun]);
+
+  // When the tour finishes or is skipped:
   const handleJoyrideCallback = async (data) => {
+    onStepCallback?.(data);
+
     const { status } = data;
     const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
     if (finishedStatuses.includes(status)) {
-      // Save to localStorage
+      // 1) localStorage fallback
       localStorage.setItem('tourCompleted', 'true');
 
-      // Update tour status on server
+      // 2) persist to server
       try {
-        await fetch('/api/users/set-tour-completed', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`
-          },
-          credentials: 'include',
-          body: JSON.stringify({ tourCompleted: true }),
+        await request.post('/users/set-tour-completed', {
+          tourCompleted: true,
         });
-      } catch (error) {
-        console.error('Error setting tour status on server:', error);
+      } catch (err) {
+        console.error('Error persisting tour flag:', err);
       }
+
       setRunTour(false);
     }
   };
@@ -73,10 +61,19 @@ const TourGuide = ({ steps, authToken }) => {
       showSkipButton
       callback={handleJoyrideCallback}
       styles={{
-        options: { zIndex: 10000, primaryColor: '#1E90FF' },
+        options: {
+          zIndex: 10000,                // low enough not to cover your header/profile images
+          overlayColor: 'rgba(0,0,0,0.4)',
+        },
       }}
     />
   );
 };
 
 export default TourGuide;
+
+
+
+//options: { zIndex: 10000, primaryColor: '#1E90FF' },
+//spotlight: { zIndex: 9999 } // ensure this doesn’t block images
+//}}

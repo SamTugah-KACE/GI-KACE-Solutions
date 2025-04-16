@@ -18,9 +18,16 @@ import AddRoleModal from '../snr_management/AddRoleModal';
 
 
 
-const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNewBranchClick  }) => {
+const Sidebar = ({ 
+  activeMenu,
+  setActiveMenu,
+  onNewUserClick, 
+  onNewDepartmentClick,
+  onPromotionClick, 
+  onNewBranchClick  
+}) => {
   const [expanded, setExpanded] = useState(true);
-  const [activeMenu, setActiveMenu] = useState(null);
+  // const [activeMenu, setActiveMenu] = useState(null);
 
   const [showViewDeptModal, setShowViewDeptModal] = useState(false);
   const [showUpdateDeptModal, setShowUpdateDeptModal] = useState(false);
