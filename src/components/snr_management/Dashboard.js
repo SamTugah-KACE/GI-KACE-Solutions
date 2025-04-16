@@ -100,6 +100,11 @@ const { auth } = useAuth();
 
   return (
     <div className="dashboard-container">
+
+
+      <Header  />
+      <ProfileCard /> {/* Positioned immediately below header */}
+
       {/* Pass the auth token into TourGuide for API calls */}
       <TourGuide 
       steps={tourSteps} 
@@ -107,8 +112,6 @@ const { auth } = useAuth();
       onStepCallback={handleTourEvent}
       />
 
-      <Header  />
-      <ProfileCard /> {/* Positioned immediately below header */}
       <div className="dashboard-content">
         <Sidebar 
         activeMenu={activeMenu}

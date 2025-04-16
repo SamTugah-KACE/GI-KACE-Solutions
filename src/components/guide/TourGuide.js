@@ -63,7 +63,8 @@ const TourGuide = ({ steps, onStepCallback }) => {
       styles={{
         options: {
           zIndex: 1000,                // low enough not to cover your header/profile images
-          overlayColor: 'rgba(0,0,0,0.4)',
+        //   overlayColor: 'rgba(0,0,0,0.4)',
+          spotlight: { zIndex: 9999 } // ensure this doesn’t block images
         },
       }}
     />
