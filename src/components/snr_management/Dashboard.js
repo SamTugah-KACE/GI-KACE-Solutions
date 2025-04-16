@@ -102,19 +102,19 @@ const { auth } = useAuth();
     <div className="dashboard-container">
 
       {/* Pass the auth token into TourGuide for API calls */}
-      {/* <TourGuide 
+      <TourGuide 
       steps={tourSteps} 
       authToken={auth.token}
       onStepCallback={handleTourEvent}
-      /> */}
+      />
 
       <Header  />
       <ProfileCard /> {/* Positioned immediately below header */}
 
       <div className="dashboard-content">
         <Sidebar 
-        // activeMenu={activeMenu}
-        // setActiveMenu={setActiveMenu}
+        activeMenu={activeMenu}
+        setActiveMenu={setActiveMenu}
         onNewUserClick={() => setShowNewUserModal(true)} 
         onNewDepartmentClick={() => setShowAddDeptModal(true)}
         onUpdateDepartmentClick={() => setShowUpdateDeptModal(true)}
