@@ -29,6 +29,10 @@ const Dashboard = () => {
       content: "Here you can navigate between modules.",
     },
     {
+      target: ".add-user-button",
+      content: "Click here to add a new user.",
+    },
+    {
       target: ".dashboard-header",
       content: "This is where your dashboard title and notifications appear.",
     },
