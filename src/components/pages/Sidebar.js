@@ -90,14 +90,14 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
         {expanded ? '<<' : '>>'}
       </button>
       <ul className="menu-list">
-        <li className="menu-item" onClick={() => toggleSubmenu('users')}>
+        <li className="menu-item new-user-menu" onClick={() => toggleSubmenu('users')}>
           New User <span className="dropdown-indicator">▼</span>
           {expanded && activeMenu === 'users' && (
             <ul className="submenu">
-              <li onClick={() => setShowAddUserForm(true)}>Add New User</li>
-              <li onClick={() => setShowBulkInsertModal(true)}>Bulk Insert Users</li>
-              <li onClick={() => setShowExistingUsersModal(true)}>Existing Users</li>
-              <li onClick={() => setShowUserFormBuilderModal(true)}>User Registration Form</li>
+              <li  className="add-new-user-menu" onClick={() => setShowAddUserForm(true)}>Add New User</li>
+              <li className="bulk-insert-menu" onClick={() => setShowBulkInsertModal(true)}>Bulk Insert Users</li>
+              <li className="existing-users-menu" onClick={() => setShowExistingUsersModal(true)}>Existing Users</li>
+              <li  className="user-registration-form-menu" onClick={() => setShowUserFormBuilderModal(true)}>User Registration Form</li>
             </ul>
           )}
         </li>
@@ -165,7 +165,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
             organizationId={organization.id} // Pass the organization ID from context
             userId={auth.user.id}
             onClose={() => setShowUserFormBuilderModal(false)}
-            onSaveSuccess={() => alert("Form saved successfully")}
+            onSaveSuccess={() => toast.success("Form saved successfully")}
           />
         )
     }
@@ -176,7 +176,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
             organizationId={organization.id} // Pass the organization ID from context
             userId={auth.user.id}  // Pass the user ID from auth context
             onClose={() => setShowAddUserForm(false)}
-            onUserAdded={() => alert("User added")}
+            onUserAdded={() => toast.success("User added.\ntherefore he/she should check his/her registered email for system credentials.")}
           />
         )
     }
@@ -201,7 +201,7 @@ const Sidebar = ({ onNewUserClick, onNewDepartmentClick, onPromotionClick, onNew
           <AddRoleModal
             organizationId={organization.id}
             onClose={() => setShowAddRoleModal(false)}
-            onRoleAdded={() => alert("Role added")}
+            onRoleAdded={() => toast.success("Role added successfully.")}
           />
         )
       }

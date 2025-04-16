@@ -11,32 +11,51 @@ import UpdateDepartmentModal from './UpdateDepartmentModal';
 import AddBranchModal from './AddBranchModal';
 import './Dashboard.css';
 import ProfileCard from '../pages/ProfileCard';
-import Joyride from 'react-joyride';
+// import Joyride from 'react-joyride';
 // import { useOrganization } from '../../context/OrganizationContext';
+import { useAuth } from '../../context/AuthContext';
+import TourGuide from '../guide/TourGuide';
 
 const Dashboard = () => {
 
-
+const { auth } = useAuth();
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [showAddDeptModal, setShowAddDeptModal] = useState(false);
   const [showUpdateDeptModal, setShowUpdateDeptModal] = useState(false);
   const [showAddBranchModal, setShowAddBranchModal] = useState(false);
 
-  const [runTour, setRunTour] = useState(true);
-  const steps = [
+  
+  // Define the tour steps. The target selectors must match unique CSS classes set in your components.
+  const tourSteps = [
     {
-      target: ".sidebar",
-      content: "Here you can navigate between modules.",
+      target: '.dashboard-header',
+      content: 'This is your dashboard header where notifications and the title are displayed.',
     },
     {
-      target: ".add-user-button",
-      content: "Click here to add a new user.",
+      target: '.sidebar',
+      content: 'Use this sidebar to navigate between different modules.',
     },
     {
-      target: ".dashboard-header",
-      content: "This is where your dashboard title and notifications appear.",
+      target: '.new-user-menu',
+      content: 'Click here to access the New User options.',
     },
-    // ... more steps
+    {
+      target: '.bulk-insert-menu',
+      content: 'This option lets you perform a bulk insert of users.',
+    },
+    {
+      target: '.user-registration-form-menu',
+      content: 'Design and edit the User Registration Form here.',
+    },
+    {
+      target: '.add-new-user-menu',
+      content: 'Use this option to add a new user directly.',
+    },
+    {
+      target: '.existing-users-menu',
+      content: 'Click here to view the list of existing users.',
+    },
+    // Add further steps as needed.
   ];
 
 
@@ -59,9 +78,9 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      {/* <Joyride steps={steps} run={runTour} continuous={true} showSkipButton={true} styles={{ options: { zIndex: 10000 } }} /> */}
-      <Joyride steps={steps} run={runTour} continuous showSkipButton />
-      {/* <Joyride steps={steps} run={runTour} continuous={true} showSkipButton={true} styles={{ options: { zIndex: 10000 } }} /> */}
+      {/* Pass the auth token into TourGuide for API calls */}
+      <TourGuide steps={tourSteps} authToken={auth.token} />
+
       <Header  />
       <ProfileCard /> {/* Positioned immediately below header */}
       <div className="dashboard-content">
