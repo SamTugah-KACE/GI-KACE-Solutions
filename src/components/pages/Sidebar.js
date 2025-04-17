@@ -19,6 +19,8 @@ import AddRoleModal from '../snr_management/AddRoleModal';
 
 
 const Sidebar = ({ 
+  // expanded,
+  onToggle,
   activeMenu,
   setActiveMenu,
   onNewUserClick, 
@@ -113,7 +115,7 @@ const Sidebar = ({
           {expanded && activeMenu === 'roles' && (
             <ul className="submenu">
               <li onClick={() => setShowAddRoleModal(true)}>Add New Role</li>
-              <li onClick={() => alert("Existing Roles modal")}>Existing Roles</li>
+              <li onClick={() =>  toast.info('Feature coming soon.')}>Existing Roles</li>
             </ul>
           )}
         </li>
@@ -135,10 +137,10 @@ const Sidebar = ({
             {expanded && activeMenu === 'branch' && (
               <ul className="submenu">
                 <li onClick={() => setShowAddBranchModal(true)}>Add New Branch</li>
-                <li onClick={() => alert("View Branches modal")}>View Branches</li>
-                <li onClick={() => alert("Assign Branch Manager modal")}>Assign Branch Manager</li>
-                <li onClick={() => alert("Update Branch modal")}>Update Branch</li>
-                <li onClick={() => alert("Delete Branch modal")}>Delete Branch</li>
+                <li onClick={() => toast.info('Feature coming soon.')}>View Branches</li>
+                <li onClick={() => toast.info('Feature coming soon.')}>Assign Branch Manager</li>
+                <li onClick={() => toast.info('Feature coming soon.')}>Update Branch</li>
+                <li onClick={() => toast.info('Feature coming soon.')}>Delete Branch</li>
               </ul>
             )}
           </li>
@@ -147,9 +149,9 @@ const Sidebar = ({
           Promotions <span className="dropdown-indicator">▼</span>
           {expanded && activeMenu === 'promotion' && (
             <ul className="submenu">
-              <li onClick={() => alert("Ranks modal")}>Ranks</li>
-              <li onClick={() => alert("Policy modal")}>Policy</li>
-              <li onClick={() => alert("Applications modal")}>Applications</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Ranks</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Policy</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Applications</li>
             </ul>
           )}
         </li>
@@ -165,6 +167,11 @@ const Sidebar = ({
           onCancel={handleCancelLogout}
         />
       )}
+
+{/* {showViewDeptModal && <ViewDepartmentsModal onClose={() => setShowViewDeptModal(false)} />}
+      {showUpdateDeptModal && <UpdateDepartmentModal onClose={() => setShowUpdateDeptModal(false)} />}
+      {showAddBranchModal && <AddBranchModal onClose={() => setShowAddBranchModal(false)} />} */}
+
     
     {
         showUserFormBuilderModal && (

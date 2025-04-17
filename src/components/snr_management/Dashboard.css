@@ -25,65 +25,60 @@
 
 
 /* src/components/Dashboard.css */
-
-/* 2‑col / 3‑row grid: header / content / footer */
-.dashboard-container {
+/* src/components/Dashboard.css */
+.dashboard-frame {
   display: grid;
-  grid-template-columns: minmax(200px, 250px) 1fr;
   grid-template-rows: auto 1fr auto;
   height: 100vh;
+}
+.dashboard-header { grid-row: 1; }
+.dashboard-footer { grid-row: 3; }
+
+.dashboard-body {
+  display: flex;
+  grid-row: 2;
   overflow: hidden;
 }
 
-/* Header across top */
-.dashboard-header {
-  grid-column: 1 / -1;
-  grid-row: 1;
-  z-index: 2;
+/* sidebar flex‑basis driven by CSS var set inline from Dashboard */
+.dashboard-body > aside {
+  flex: 0 0 var(--sidebar-width);
 }
 
-/* Sidebar down left, row 2→3 */
-.dashboard-sidebar {
-  grid-column: 1;
-  grid-row: 2 / 4;
-  background: var(--sidebar-bg);
-  overflow-y: auto; /* scroll the menu if it grows */
-}
-
-/* Main column on right, row 2 */
-.dashboard-main {
-  grid-column: 2;
-  grid-row: 2;
+/* main content takes the rest */
+.main-content {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* prevent main from growing past its grid cell */
-  background: var(--background);
   padding: 1rem;
+  background: var(--background);
+  overflow: hidden;
 }
 
-/* Static pieces get their natural height */
+/* fixed parts */
 .dashboard-profile,
-.dashboard-main > .search-bar,
-.dashboard-main > .summary-cards {
+.dashboard-search,
+.cards-wrapper {
   flex: 0 0 auto;
+  margin-bottom: 1rem;
 }
 
-/* Table container fills remaining space and scrolls */
-.dashboard-table-container {
+/* cards scroll horizontally if necessary */
+.cards-wrapper {
+  overflow-x: auto;
+}
+
+/* table fills remaining vertical space */
+.table-wrapper {
   flex: 1 1 auto;
   overflow-y: auto;
-  margin-top: 1rem; /* optional spacing */
 }
 
-/* Footer across bottom */
-.dashboard-footer {
-  grid-column: 1 / -1;
-  grid-row: 3;
-}
-
-/* Ensure full‐height html/body */
+/* full‑height reset */
 html, body, #root {
   height: 100%;
   margin: 0;
 }
+
+
 

@@ -23,7 +23,7 @@ const { auth } = useAuth();
   const [showAddDeptModal, setShowAddDeptModal] = useState(false);
   const [showUpdateDeptModal, setShowUpdateDeptModal] = useState(false);
   const [showAddBranchModal, setShowAddBranchModal] = useState(false);
-
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
   // Lifted sidebar submenu state so TourGuide can open it programmatically
   const [activeMenu, setActiveMenu] = useState(null);
   
@@ -79,8 +79,7 @@ const { auth } = useAuth();
 
 
   return (
-    <div className="dashboard-container">
-      {/* tour guide lives at top level */}
+    <div className="dashboard-frame">
       <TourGuide
         steps={tourSteps}
         authToken={auth.token}
@@ -90,28 +89,32 @@ const { auth } = useAuth();
 
       <Header className="dashboard-header" />
 
-      {/* sidebar (col 1,row 2–3) */}
-      <div className="dashboard-sidebar">
-        <Sidebar
-          activeMenu={activeMenu}
-          setActiveMenu={setActiveMenu}
-          onNewUserClick={() => setShowNewUserModal(true)}
-          onNewDepartmentClick={() => setShowAddDeptModal(true)}
-          onUpdateDepartmentClick={() => setShowUpdateDeptModal(true)}
-          onNewBranchClick={() => setShowAddBranchModal(true)}
-        />
-      </div>
+      <div className="dashboard-body"
+       style={{ '--sidebar-width': sidebarExpanded ? '250px' : '60px' }}
+       >
+        <aside className="sidebar">
+          <Sidebar
+            activeMenu={activeMenu}
+            setActiveMenu={setActiveMenu}
+            onNewUserClick={()=>setShowNewUserModal(true)}
+            onNewDepartmentClick={()=>setShowAddDeptModal(true)}
+            onUpdateDepartmentClick={()=>setShowUpdateDeptModal(true)}
+            onNewBranchClick={()=>setShowAddBranchModal(true)}
+          />
+        </aside>
 
-      {/* main panel (col 2,row 2) */}
-      <div className="dashboard-main">
-        <ProfileCard className="dashboard-profile" />
-        <SearchBar />
-        <SummaryCards />
-        
-        {/* flex‐1 scrollable table */}
-        <div className="dashboard-table-container">
-          <DashboardTable />
-        </div>
+        <main className="main-content">
+          <ProfileCard className="dashboard-profile" />
+          <SearchBar className="dashboard-search" />
+
+          <div className="cards-wrapper">
+            <SummaryCards />
+          </div>
+
+          <div className="table-wrapper">
+            <DashboardTable />
+          </div>
+        </main>
       </div>
 
       <Footer className="dashboard-footer" />
