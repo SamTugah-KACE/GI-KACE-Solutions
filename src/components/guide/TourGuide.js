@@ -30,13 +30,16 @@ const TourGuide = ({ steps, onStepCallback, onTourEnd }) => {
   }, [checkServer]);
 
   const handleCallback = async (data) => {
-    // Expand submenu on any step ≥ 3
-    if (data.index >= 3 && data.index <= 6) {
-      onStepCallback?.();
-    }
+    const { type, index, status } = data;
 
-    // If user finishes or skips, persist and stop
-    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(data.status)) {
+  // Expand submenu before highlighting steps 3–6:
+  if (type === 'step:before' && index >= 3 && index <= 6) {
+    onStepCallback?.(data);
+  }
+
+
+    // // If user finishes or skips, persist and stop
+    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
       localStorage.setItem('tourCompleted', 'true');
       if (checkServer) {
         try {
@@ -61,6 +64,7 @@ const TourGuide = ({ steps, onStepCallback, onTourEnd }) => {
       callback={handleCallback}
       styles={{
         options: { zIndex: 1000 },
+        spotlight: { zIndex: 9999 } // ensure this doesn’t block images
       }}
     />
   );

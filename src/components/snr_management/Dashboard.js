@@ -33,22 +33,17 @@ const { auth } = useAuth();
     { target: '.sidebar',        content: 'Use this sidebar to navigate.' },
     { target: '.new-user-menu',  content: 'Here are the New User options.' },
     { target: '.bulk-insert-menu', content: 'Bulk insert many users here.' },
-    { target: '.user-registration-form-menu',
-      content: `Design your registration form. Make sure to include:
-      • First Name
-      • Last Name
-      • Email`
-    },
+    { target: '.user-registration-form-menu', content: "Design your registration form.\nNote: First Name, Last Name, and Email are required fields." },
     { target: '.add-new-user-menu', content: 'Add one new user here.' },
     { target: '.existing-users-menu', content: 'View existing users here.' },
   ];
 
   // When Joyride is about to show a deeper submenu step, expand it
   const handleTourEvent = (data) => {
-    if (data.type === 'step:before' && data.index >= 3 && data.index <= 6) {
+    // if (data.type === 'step:before' && data.index >= 3 && data.index <= 6) {
       // steps 3–6 are inside the New User submenu
       setActiveMenu('users');
-    }
+    // }
   };
 
   // When the tour is finished or skipped, close any open menus
@@ -90,7 +85,7 @@ const { auth } = useAuth();
       <Header className="dashboard-header" />
 
       <div className="dashboard-body"
-       style={{ '--sidebar-width': sidebarExpanded ? '250px' : '60px' }}
+      //  style={{ '--sidebar-width': sidebarExpanded ? '250px' : '60px' }}
        >
         <aside className="sidebar">
           <Sidebar
