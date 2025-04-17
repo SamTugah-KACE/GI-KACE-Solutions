@@ -1,98 +1,54 @@
-// // TourGuide.js
-// import React, { useState, useEffect } from 'react';
-// import Joyride, { STATUS } from 'react-joyride';
-
-// const TourGuide = ({ steps }) => {
-//   // Check localStorage on mount to decide if tour should run.
-//   const [runTour, setRunTour] = useState(false);
-
-//   useEffect(() => {
-//     const tourCompleted = localStorage.getItem('tourCompleted');
-//     if (!tourCompleted) {
-//       setRunTour(true);
-//     }
-//   }, []);
-
-//   // When tour is finished or skipped, mark it as completed.
-//   const handleJoyrideCallback = (data) => {
-//     const { status } = data;
-//     const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
-//     if (finishedStatuses.includes(status)) {
-//       localStorage.setItem('tourCompleted', 'true');
-//       setRunTour(false);
-//     }
-//   };
-
-//   return (
-//     <Joyride
-//       steps={steps}
-//       run={runTour}
-//       continuous
-//       showSkipButton
-//       callback={handleJoyrideCallback}
-//       styles={{
-//         options: { zIndex: 10000, primaryColor: '#1E90FF' },
-//         spotlight: { zIndex: 9999 } // ensure this doesn’t block images
-//       }}
-//     />
-//   );
-// };
-
-// export default TourGuide;
-
-
-// // src/components/guide/TourGuide.js
 import React, { useState, useEffect } from 'react';
 import Joyride, { STATUS } from 'react-joyride';
-import request from '../request';           // ← your axios instance
-// import { getAuthToken } from '../context/auth'; // just in case you want direct access
+import request from '../request';
 
-const TourGuide = ({ steps, onStepCallback }) => {
+const TourGuide = ({ steps, onStepCallback, onTourEnd }) => {
   const [runTour, setRunTour] = useState(false);
-  const shouldRun = process.env.REACT_APP_RUN_TOUR === 'true';
+  const checkServer = process.env.REACT_APP_RUN_TOUR === 'true';
 
-  // On mount: check server-stored flag (with localStorage fallback)
   useEffect(() => {
-    if (!shouldRun) return;
+    const init = async () => {
+      // If they've already done the tour on this device, never run it.
+      if (localStorage.getItem('tourCompleted')) return;
 
-    const checkTourStatus = async () => {
-      try {
-        // GET /users/get-tour-status
-        const { data } = await request.get('/users/get-tour-status');
-        if (!data.tourCompleted) {
+      if (checkServer) {
+        try {
+          const { data } = await request.get('/users/get-tour-status');
+          if (!data.tourCompleted) {
+            setRunTour(true);
+          }
+        } catch {
+          // server not ready → fallback immediately
           setRunTour(true);
         }
-      } catch (err) {
-        // fallback to localStorage if your endpoint isn't live yet
-        if (!localStorage.getItem('tourCompleted')) {
-          setRunTour(true);
-        }
+      } else {
+        // env says "don't hit server" but still use localStorage fallback
+        setRunTour(true);
       }
     };
+    init();
+  }, [checkServer]);
 
-    checkTourStatus();
-  }, [shouldRun]);
+  const handleCallback = async (data) => {
+    // Expand submenu on any step ≥ 3
+    if (data.index >= 3 && data.index <= 6) {
+      onStepCallback?.();
+    }
 
-  // When the tour finishes or is skipped:
-  const handleJoyrideCallback = async (data) => {
-    onStepCallback?.(data);
-
-    const { status } = data;
-    const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
-    if (finishedStatuses.includes(status)) {
-      // 1) localStorage fallback
+    // If user finishes or skips, persist and stop
+    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(data.status)) {
       localStorage.setItem('tourCompleted', 'true');
-
-      // 2) persist to server
-      try {
-        await request.post('/users/set-tour-completed', {
-          tourCompleted: true,
-        });
-      } catch (err) {
-        console.error('Error persisting tour flag:', err);
+      if (checkServer) {
+        try {
+          await request.post('/users/set-tour-completed', {
+            tourCompleted: true,
+          });
+        } catch {
+          /* silent */
+        }
       }
-
       setRunTour(false);
+      onTourEnd?.();
     }
   };
 
@@ -102,19 +58,16 @@ const TourGuide = ({ steps, onStepCallback }) => {
       run={runTour}
       continuous
       showSkipButton
-      // callback={handleJoyrideCallback}
+      callback={handleCallback}
       styles={{
-        options: {
-          zIndex: 10000,                // low enough not to cover your header/profile images
-        //   overlayColor: 'rgba(0,0,0,0.4)',
-          spotlight: { zIndex: 9999 } // ensure this doesn’t block images
-        },
+        options: { zIndex: 1000 },
       }}
     />
   );
 };
 
 export default TourGuide;
+
 
 
 

@@ -1,22 +1,89 @@
 /* Dashboard.css */
 
-.dashboard-container {
+/* .dashboard-container {
     display: flex;
     flex-direction: column;
     height: 100vh;
-  }
+  } */
   
-  .dashboard-content {
+  /* .dashboard-content {
     display: flex;
     flex: 1;
     overflow: hidden;
   }
-  
-  .main-panel {
+   */
+  /* .main-panel {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
+    padding: 20px; */
     /* background-color: inherit; */
-    background-color: var(--background);
+    /* background-color: var(--background);
   }
-   
+    */
+
+
+
+
+/* src/components/Dashboard.css */
+
+/* 2‑col / 3‑row grid: header / content / footer */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: minmax(200px, 250px) 1fr;
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Header across top */
+.dashboard-header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  z-index: 2;
+}
+
+/* Sidebar down left, row 2→3 */
+.dashboard-sidebar {
+  grid-column: 1;
+  grid-row: 2 / 4;
+  background: var(--sidebar-bg);
+  overflow-y: auto; /* scroll the menu if it grows */
+}
+
+/* Main column on right, row 2 */
+.dashboard-main {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* prevent main from growing past its grid cell */
+  background: var(--background);
+  padding: 1rem;
+}
+
+/* Static pieces get their natural height */
+.dashboard-profile,
+.dashboard-main > .search-bar,
+.dashboard-main > .summary-cards {
+  flex: 0 0 auto;
+}
+
+/* Table container fills remaining space and scrolls */
+.dashboard-table-container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  margin-top: 1rem; /* optional spacing */
+}
+
+/* Footer across bottom */
+.dashboard-footer {
+  grid-column: 1 / -1;
+  grid-row: 3;
+}
+
+/* Ensure full‐height html/body */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+

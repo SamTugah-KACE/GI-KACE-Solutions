@@ -62,6 +62,8 @@ function App() {
           {/* Add more protected routes here */}
         </Route>
     {/* <Route path="/staff" element={<Staff />} /> */}
+      <Route path="/dashboard" element={<Dashboard />} />
+ 
     </Routes>
      </AuthProvider>
   );
