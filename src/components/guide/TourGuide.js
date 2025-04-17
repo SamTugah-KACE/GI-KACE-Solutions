@@ -102,7 +102,7 @@ const TourGuide = ({ steps, onStepCallback }) => {
       run={runTour}
       continuous
       showSkipButton
-      callback={handleJoyrideCallback}
+      // callback={handleJoyrideCallback}
       styles={{
         options: {
           zIndex: 10000,                // low enough not to cover your header/profile images
