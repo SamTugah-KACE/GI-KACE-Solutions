@@ -44,7 +44,7 @@ export default function useSummaryData(orgId, userId) {
   const wsRef = useRef(null);
 
   const { auth } = useAuth(); // Get auth context
-  const { token } = localStorage.getItem('authToken') || auth?.token  || auth.token; // Extract the token from auth context
+  const  token  = localStorage.getItem('authToken') || auth?.token  || auth.token; // Extract the token from auth context
   // Fetch the JWT from wherever you store it (e.g., localStorage)
   // const token = localStorage.getItem('authToken');
 

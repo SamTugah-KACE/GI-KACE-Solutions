@@ -46,7 +46,7 @@ const Staff = () => {
   const staffId = auth.emp && auth.emp.id;
  
   // const token = auth.token;
-  const token = auth.token || localStorage.getItem('token'); // Adjust based on your auth context
+  const token = auth.token || localStorage.getItem('authToken'); // Adjust based on your auth context
   const [employeeData, setEmployeeData] = useState(null);
   const [wsError, setWsError] = useState(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
