@@ -41,16 +41,18 @@ const { auth } = useAuth();
   
 
  const staffId = auth.emp && auth.emp.id;
-
+const userId = auth.user && auth.user.id;
   const { organization } = useOrganization();           // assume you have this
   const orgId = organization?.id;
   console.log("\n\norg_id: ", orgId);
   console.log("\n\nstaff_id: ", staffId);
+  console.log("\n\nuser_id: ", userId);
+
   // const orgId = "298e49e5-441a-4b3d-8769-008e0358b1a6";
   // const { summary, isLoading: loadingSummary, error: summaryError } = useOrganizationSummary(orgId);
-  const { data, loading, error } = useSummaryData(orgId, staffId);
+  const { data, loading, error } = useSummaryData(orgId, userId);
 
-
+  console.log("data: ", data);
   console.log("\n\nloading:: ", loading);
 
   // Define the tour steps. The target selectors must match unique CSS classes set in your components.
