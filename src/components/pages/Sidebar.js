@@ -130,9 +130,9 @@ const Sidebar = ({
             <ul className="submenu">
               <li onClick={onNewDepartmentClick}>Add New Department</li>
               <li onClick={() => setShowViewDeptModal(true)}>View Departments</li>
-              <li onClick={() => alert("Assign Head of Department modal")}>Assign Head of Department<br/>(HoD)</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Assign Head of Department<br/>(HoD)</li>
               <li onClick={() =>  setShowUpdateDeptModal(true)}>Update Department</li>
-              <li onClick={() => alert("Delete Department modal")}>Delete Department</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Delete Department</li>
             </ul>
           )}
         </li>
@@ -227,7 +227,7 @@ const Sidebar = ({
 
      {showUpdateDeptModal && (
         <UpdateDepartmentModal onClose={() => setShowUpdateDeptModal(false)} 
-        onDepartmentUpdated={() => alert("Department Updated")}
+        onDepartmentUpdated={() => toast.success("Department Updated successfully")}
 
         />
       )}
@@ -240,7 +240,7 @@ const Sidebar = ({
       {showAddBranchModal && (
         <AddBranchModal
           onClose={() => setShowAddBranchModal(false)}
-          onBranchAdded={() => alert("Branch added")}
+          onBranchAdded={() => toast.success("Branch added successfully")}
         />
       )}
     </aside>

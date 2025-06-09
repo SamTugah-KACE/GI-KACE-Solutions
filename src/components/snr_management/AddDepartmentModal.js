@@ -19,7 +19,9 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
   useEffect(() => {
     if (orgId) {
       request
-        .get(`/api/staff?organization_id=${orgId}&skip=0&limit=1000`)
+        .get(`/api/staff`, {
+    params: { organization_id: orgId, skip: 0, limit: 1000, sort: 'asc' }
+        })
         .then((response) => {
           // Map each employee to an option with value = employee id and label as "title firstname [middlename] lastname"
           const options = response.data.map((emp) => ({
