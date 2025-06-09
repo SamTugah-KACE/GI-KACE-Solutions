@@ -35,6 +35,7 @@
 
 // src/hooks/useSummaryData.js
 import { useState, useEffect, useRef, useCallback } from 'react';
+import {useAuth} from '../context/AuthContext'; // Adjust the import path as needed
 
 export default function useSummaryData(orgId, userId) {
   const [data, setData] = useState(null);
@@ -42,9 +43,12 @@ export default function useSummaryData(orgId, userId) {
   const [error, setError] = useState(null);
   const wsRef = useRef(null);
 
+  const { auth } = useAuth(); // Get auth context
+  const { token } = auth?.token; // Extract the token from auth context
   // Fetch the JWT from wherever you store it (e.g., localStorage)
-  const token = localStorage.getItem('authToken');
+  // const token = localStorage.getItem('authToken');
 
+  console.log('useSummaryData called with orgId:', orgId, 'userId:', userId, 'token:', token);
   // Function to send a "refresh" message over the socket
   const refresh = useCallback(() => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -61,7 +65,9 @@ export default function useSummaryData(orgId, userId) {
       return;
     }
 
-    const wsUrl = `${process.env.REACT_APP_API_WS_URL || 'ws://localhost:8000'}/organizations/ws/summary/${orgId}/${userId}?token=${token}`;
+    const tokenParam = encodeURIComponent(token);
+    console.log('Connecting to WebSocket with token:', tokenParam);
+    const wsUrl = `${process.env.REACT_APP_API_WS_URL || 'ws://localhost:8000'}/ws/summary/${orgId}/${userId}?token=${tokenParam}`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
