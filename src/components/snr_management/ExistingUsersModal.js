@@ -18,9 +18,38 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
     departmentOptions: [],
     branchOptions: [],
   });
+   const [roles, setRoles] = useState([]);          // <-- hold fetched roles
+  const [rolesLoading, setRolesLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [updatedRows, setUpdatedRows] = useState({});
+
+
+  // 1) Fetch all roles for this organization:
+  const fetchRoles = async () => {
+    setRolesLoading(true);
+    try {
+      const resp = await request.get(
+        `/fetch?organization_id=${organizationId}&skip=0&limit=100`
+      );
+      const data = resp.data; // expecting an array of {id, name, …}
+      console.log("\n\n\norganizational Roles:: ", data);
+      if (Array.isArray(data)) {
+        setRoles(data);
+      } else {
+        // If your API nests roles inside an object, adjust here. Example:
+        // setRoles(data.roles || []);
+        setRoles([]);
+      }
+    } catch (err) {
+      console.error('Error fetching roles:', err);
+      toast.error('Could not load roles.');
+      setRoles([]);
+    } finally {
+      setRolesLoading(false);
+    }
+  };
+
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -29,7 +58,7 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
         `/users/employees?organization_id=${organizationId}&skip=0&limit=1000&sort=asc`
       );
       const data = response.data || await response.json();
-
+      console.log("data:: ", data);
       const { summary = {}, employees = [] } = data;
       const departmentOptions = Object.keys(summary.department_summary || {}).map(depName => ({
         id: depName, name: depName,
@@ -39,24 +68,38 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
       }));
 
       const processed = employees.map((entry) => {
-        const empKey = Object.keys(entry).find(key => key.startsWith("employee_row"));
+        const empKey = Object.keys(entry).find(key => key.startsWith("employee-row"));
+        console.log("empKey:: ", empKey);
         const emp = entry[empKey];
+        console.log("\n\nemp:: ", emp);
         const fullName = [emp.first_name, emp.middle_name, emp.last_name].filter(Boolean).join(' ');
         const dept = entry.department || {};
         const branch = dept.branch_name ? { id: dept.branch_name, name: dept.branch_name } : null;
-        const role = emp.role || { id: ROLE_OPTIONS_STATIC[0].id, name: ROLE_OPTIONS_STATIC[0].name };
+        
+        // emp.role may already exist on the employee record,
+        // but we want to show the up-to-date role name from our fetched roles.
+        let role = emp.role || null;
+        if (!role) {
+          // fallback: if no role object on emp, use first role from `roles` once loaded
+          role =
+            rolesLoading || roles.length === 0
+              ? { id: '', name: '' }
+              : { id: roles[0].id, name: roles[0].name };
+        }
+        
+        // const role = emp.role || { id: ROLE_OPTIONS_STATIC[0].id, name: ROLE_OPTIONS_STATIC[0].name };
 
         return {
           id: emp.id,
           staffId: emp.staffId || 'N/A',
           name: fullName,
-          department: dept,
+          department: dept || {},
           branch: branch,
           role: role,
           original: {
             department: dept.name || '',
             branch: branch ? branch.name : '',
-            role: role.name || '',
+            role: role?.name || '',
           },
         };
       });
@@ -74,8 +117,18 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
     }
   };
 
+  // useEffect(() => {
+  //   fetchUsers();
+  // }, [organizationId]);
+
+   // On mount (or when organizationId changes), fetch roles first, then users.
   useEffect(() => {
-    fetchUsers();
+    if (!organizationId) return;
+    fetchRoles().then(() => {
+      // Once roles are in state, fetch the users so we can assign correct role names
+      fetchUsers();
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organizationId]);
 
   const totalPages = Math.ceil(usersData.employees.length / ITEMS_PER_PAGE);
@@ -104,31 +157,39 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
     const updates = updatedRows[user.id];
     if (!updates) return;
     try {
+      const newDepartment =  updates.department || user.department?.name || '';
+      const    newBranch = updates.branch || user.branch?.name || '';
+      // 3. Determine new role_id by looking up the selected role’s id from `roles` array:
+      const selectedRoleName = updates.role || user.role?.name || '';
+      const matchedRole = roles.find((r) => r.name === selectedRoleName);
+      const newRoleId = matchedRole ? matchedRole.id : user.role.id;
+
+      const payload = {
+        department: newDepartment,
+        branch: newBranch,
+        role_id: newRoleId,
+      };
+
       const response = await request.patch(
-        `/users/${user.id}`,
+        `/records/${user.id}`,
+        payload,
+      // );
         {
-          department: updates.department || user.department?.name,
-          branch: updates.branch || user.branch?.name,
-          role_id:
-            ROLE_OPTIONS_STATIC.find(r => r.name === (updates.role || user.role?.name))?.id ||
-            user.role.id,
-        },
-        // {
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     Authorization: `Bearer ${localStorage.getItem('token')}`,
-        //   },
-        // }
-      );
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+    );
       if (response.status !== 200) {
         const errorData = response.data || await response.json();
         throw new Error(errorData.detail || 'Update failed');
       }
       toast.success(`User ${user.name} updated successfully`);
       setUpdatedRows(prev => {
-        const newState = { ...prev };
-        delete newState[user.id];
-        return newState;
+        const copy = { ...prev };
+        delete copy[user.id];
+        return copy;
       });
       fetchUsers();
     } catch (error) {
@@ -138,15 +199,15 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
   };
 
   const handleArchive = async (user) => {
-    if (window.confirm(`Archive (soft delete) user ${user.name}?`)) {
+    if (window.confirm(`Archive (soft delete) user ${user.name} records?`)) {
       try {
-        const response = await request.delete(
-          `/users/${user.id}?deleteType=soft`,
-        //   {
-        //     headers: {
-        //       Authorization: `Bearer ${localStorage.getItem('token')}`,
-        //     },
-        //   }
+        const response = await request.delete(`/records/${user.id}?deleteType=soft`,
+           {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
         );
         if (response.status !== 200) {
           const errorData = response.data || await response.json();
@@ -164,13 +225,13 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
   const handleDelete = async (user) => {
     if (window.confirm(`Delete user ${user.name}? This is permanent.`)) {
       try {
-        const response = await request.delete(
-          `/users/${user.id}`,
-        //   {
-        //     headers: {
-        //       Authorization: `Bearer ${localStorage.getItem('token')}`,
-        //     },
-        //   }
+        const response = await request.delete(`/records/${user.id}?deleteType=hard`,
+           {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
         );
         if (response.status !== 200) {
           const errorData = response.data || await response.json();
@@ -273,11 +334,12 @@ const ExistingUsersModal = ({ organizationId, onClose }) => {
                             }
                           >
                             <option value={user.role?.name}>{user.role?.name}</option>
-                            {ROLE_OPTIONS_STATIC
-                              .filter(opt => opt.name !== user.role?.name)
-                              .map(opt => (
-                                <option key={opt.id} value={opt.name}>
-                                  {opt.name}
+                            {/* Then list any other roles in the organization */}
+                            {roles
+                              .filter((r) => r.name !== user.role?.name)
+                              .map((r) => (
+                                <option key={r.id} value={r.name}>
+                                  {r.name}
                                 </option>
                               ))}
                           </select>

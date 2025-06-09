@@ -72,7 +72,7 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
     try {
       // Send a GET request to the download API.
       // Send a GET request to the download API with responseType: 'blob'
-      const response = await request.get('/download/sample-file', { responseType: 'blob' });
+      const response = await request.get(`/download/sample-file/${organizationId}`, { responseType: 'blob' });
       if (response.status !== 200) {
         // Handle error response from the server.
         throw new Error("Failed to download sample file");

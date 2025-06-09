@@ -11,7 +11,7 @@ const SearchBar = () => {
   };
 
   return (
-    <form className="search-bar" onSubmit={handleSearch}>
+    <form className="search-bar" onSubmit={handleSearch}  style={{ display: 'flex' }}>
       <input
         type="text"
         placeholder="Search records..."

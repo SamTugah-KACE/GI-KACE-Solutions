@@ -2,6 +2,11 @@
 import React, { useState } from 'react';
 import './ExpandableSection.css';
 import { FaChevronDown, FaChevronUp, FaUser, FaGraduationCap, FaBook, FaBriefcase, FaBuilding } from 'react-icons/fa';
+import { GiMoneyStack } from "react-icons/gi";
+import { BsFillPeopleFill } from "react-icons/bs";
+import { MdOutlineWork } from "react-icons/md";
+import { AiOutlineFileDone } from "react-icons/ai";
+import { HistoryOutlined, CreditCardOutlined,PhoneOutlined} from '@ant-design/icons';
 // You may use a library like FontAwesome for icons.
 // import { FaChevronDown, FaChevronUp, FaIcon } from 'react-icons/fa';
 
@@ -11,7 +16,12 @@ const iconMap = {
   'graduation-cap': <FaGraduationCap />,
   book: <FaBook />,
   briefcase: <FaBriefcase />,
-  building: <FaBuilding />
+  building: <FaBuilding />,
+  money: <GiMoneyStack style={{ fontWeight: "bolder", fontSize: 20 }}/>,
+  history: <HistoryOutlined style={{ fontWeight: 'bold' }}/>,
+  credit: <CreditCardOutlined style={{ fontWeight: 'bold',fontSize: 20 }}/>,
+  team: <BsFillPeopleFill  style={{ fontWeight: 'bold',fontSize: 20 }}/>,
+  phone: <PhoneOutlined style={{ fontWeight: 'bold',fontSize: 20 }}/>,
 };
 
 const ExpandableSection = ({ title, icon, children }) => {

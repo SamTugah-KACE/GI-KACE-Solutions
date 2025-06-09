@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import CarouselCard from './CarouselCard';
 import Footer from './Footer';
 import './LandingPage.css';
+import {toast} from 'react-toastify';
 
 // Import local images (ensure these files exist in src/assets/images/)
 import softwareA from '../assets/images/e-asset.jpg';
@@ -44,10 +45,12 @@ const LandingPage = () => {
 
   const handleGetStarted = (product) => {
     // Pass along the selected product if needed
-    if (product.id == 2) 
+    if (product.id === 2) 
     navigate('/signup', { state: { product } });
   else{
-    alert("Oops!, Sorry Product will be ready soon.")
+    toast.error("Oops!, Sorry Product will be ready soon.");
+    // alert("Oops!, Sorry Product will be ready soon.");
+
   }
   };
 

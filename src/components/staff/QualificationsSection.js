@@ -1,35 +1,32 @@
 // src/components/QualificationsSection.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FileModal from './FileModal';
+import { Button, Modal, Table, Badge } from 'antd';
+import QualificationsTable from './QualificationsTable';
+import AcademicForm from './AcademicForm';
+import ProfessionalForm from './ProfessionalForm';
 import './QualificationsSection.css';
 
-const QualificationsSection = ({ type }) => {
-  // Simulated table data for demonstration.
-  const initialData = [
-    {
-      id: 1,
-      institution: 'University A',
-      degree: type === 'academic' ? 'B.Sc. in Computer Science' : 'Certified Professional',
-      yearObtained: 2010,
-      details: 'Additional details...',
-      filePath: '/files/certificate1.pdf'
-    },
-    {
-      id: 2,
-      institution: 'Institute B',
-      degree: type === 'academic' ? 'M.Sc. in Software Engineering' : 'Advanced Certification',
-      yearObtained: 2014,
-      details: 'More details...',
-      filePath: '/files/certificate2.pdf'
-    }
-  ];
-
+const QualificationsSection = ({ type, items=[], pending, onRequestChange }) => {
+ 
+  const [showModal, setShowModal] = useState(false);
+  const [currentRecord, setCurrentRecord] = useState(null);
   const [modalFile, setModalFile] = useState(null);
+  const [editing, setEditing] = useState(false);
 
-  const handleView = (filePath) => {
-    // In production, you might validate file existence and open modal.
-    setModalFile(filePath);
+  // Keep local copy of items for table refresh
+  const [data, setData] = useState(items);
+  useEffect(() => setData(items), [items]);
+
+
+  const handleAdd = () => {
+    setCurrentRecord(null);
+    setEditing(false);
+    setShowModal(true);
+    
   };
+  
+ 
 
   const handleCloseModal = () => {
     setModalFile(null);
@@ -45,49 +42,125 @@ const QualificationsSection = ({ type }) => {
     document.body.removeChild(link);
   };
 
-  const handleSave = () => {
-    console.log("Saving qualification updates.");
-  };
-
   const handleProposeUpdate = () => {
     console.log("Proposing qualification update.");
   };
 
+  const handleDelete = (id) => {
+    setData(data.filter(item => item.id !== id));
+  };
+
+  
+
+  const handleSave = async (qualification,  newFiles ) => {
+  
+    try {
+      console.log('Saving qualification:', qualification);
+      console.log('Files to upload:', newFiles);
+      console.log('Saving qualification:', qualification);
+      console.log('Files to upload:', qualification.documents);
+   
+      // console.log('New files:', newFiles);
+      console.log('\nExisting id::', qualification?.id);
+      // console.log("r\n\nequets_type:: ", rq_type);
+
+      // Call the onRequestChange function with the new data
+      await onRequestChange({
+        data: qualification,
+        requestType: qualification?.id ? "update" :"save",
+        dataType: type === 'academic' ? 'academic_qualifications' : 'professional_qualifications',
+        files: newFiles,
+      });
+    
+      // Update the local data state with the new qualification
+      // if (currentRecord) {
+      //   // Update existing record
+      //   setData(data.map(item => (item.id === currentRecord.id ? { ...item, ...qualification } : item)));
+      // } else {
+      //   // Add new record
+      //   setData([...data, { ...qualification, id: Date.now() }]); // Use a temporary ID for new records
+      // }
+
+     
+      setShowModal(false);
+      setCurrentRecord(null);
+    } catch (error) {
+      console.error('Error saving qualification:', error);
+    }
+  };
+
+  const handleCancel = () => {
+    setShowModal(false);
+    setCurrentRecord(null);
+  };
+
+  const handleEdit = (record) => {
+    
+    setCurrentRecord(record);
+    setEditing(true);
+    setShowModal(true);
+   
+  }
+
+
+  
+  const modalTitle = `${currentRecord ? 'Edit' : 'Add'} ${type === 'academic' ? 'Academic' : 'Professional'} Qualification`;
+
+
   return (
     <div className="qualifications-section">
-      <table>
-        <thead>
-          <tr>
-            <th>Institution</th>
-            <th>{type === 'academic' ? 'Degree' : 'Qualification'}</th>
-            <th>Year Obtained</th>
-            <th>File</th>
-          </tr>
-        </thead>
-        <tbody>
-          {initialData.map(item => (
-            <tr key={item.id}>
-              <td>{item.institution}</td>
-              <td>{item.degree}</td>
-              <td>{item.yearObtained}</td>
-              <td>
-                {item.filePath ? (
-                  <>
-                    <button onClick={() => handleView(item.filePath)}>View</button>
-                    <button onClick={() => handleDownload(item.filePath)}>Download</button>
-                  </>
-                ) : (
-                  "No file"
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="section-actions">
+      {pending && (
+        <div className="pending-banner">
+          ⚠️ Your { type==='academic' ? 'Academic' : 'Professional' } qualifications changes are pending approval
+        </div>
+      )}
+       <div className="action-buttons">
+        <Button
+          type="primary"
+          onClick={handleAdd}
+          disabled={pending}
+          
+        >
+          Add {type === 'academic' ? 'Academic' : 'Professional'} Qualification
+        </Button>
+      </div>
+
+
+<QualificationsTable
+        data={data}
+        type={type}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+      
+       {/* Modal for qualification forms */}
+       <Modal
+        title={modalTitle}
+        visible={showModal}
+        onCancel={handleCancel}
+        footer={null}
+        width={800}
+        destroyOnClose={true}
+      >
+        {type === 'academic' ? (
+          <AcademicForm
+            initialValues={currentRecord || {documents: []}}
+            onSave={handleSave} 
+            onCancel={handleCancel}
+          />
+        ) : (
+          <ProfessionalForm
+            initialValues={currentRecord || {documents: []}}
+            onSave={handleSave}
+            onCancel={handleCancel}
+          />
+        )}
+      </Modal>
+
+      {/* <div className="section-actions">
         <button onClick={handleSave}>Save</button>
         <button onClick={handleProposeUpdate}>Propose Update</button>
-      </div>
+      </div> */}
       {modalFile && <FileModal filePath={modalFile} onClose={handleCloseModal} />}
     </div>
   );

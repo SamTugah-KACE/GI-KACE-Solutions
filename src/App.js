@@ -10,9 +10,13 @@ import Staff from './components/staff/Staff';
 import ProtectedRoute from './components/ProtectedRoute';
 import UnauthorizedPage from './components/UnauthorizedPage';
 import { AuthProvider } from './context/AuthContext';
+import SuperAdminLoginPage from './components/SuperAdmin/SuperAdmin';
+import SuperAdminDashboard from './components/SuperAdmin/components/Organisations Table';
 // import AlertNotifier from './components/AlertNotifier';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+
 
 
 // A simple hook to set a dark/light theme based on time
@@ -61,10 +65,14 @@ function App() {
           <Route path="/:orgSlug/staff" element={<Staff />} />
           {/* Add more protected routes here */}
         </Route>
-    {/* <Route path="/staff" element={<Staff />} /> */}
+        <Route path="/dev/dashboard" element={<SuperAdminDashboard />} />
+    <Route path="/staff" element={<Staff />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/oauth/login" element={<SuperAdminLoginPage />} />
  
     </Routes>
+    {/** Add page not found ui */}
+    {/* <Route path="*" element={<PageNotFound />} /> */}
      </AuthProvider>
   );
 

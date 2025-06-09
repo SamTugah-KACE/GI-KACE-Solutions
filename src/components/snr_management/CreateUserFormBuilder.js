@@ -444,6 +444,9 @@ const FormBuilderArea = ({ formFields, setFormFields, moveField, updateField, re
           onRemove={removeField}
         />
       ))}
+      {formFields.length === 0 && (
+        <div className="empty-state">Drag fields from the palette to build your form</div>
+      )}
     </div>
   );
 };
@@ -576,6 +579,17 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
       <div className="modal-overlay">
         <div className="modal-content">
           <h2>Form Builder</h2>
+        {/* provide a close button which aligns at the extreme right corner of the above h2 tag using style with size 20 x 20, and leverage on onClose function */}
+          <button  style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '20px', cursor: 'pointer' }} onClick={onClose}>
+            &times;
+          </button>
+
+
+          {/*center the p tag below using style */}
+          <span style={{ textAlign: 'center', marginBottom: '5px' }}>
+            Drag fields from the palette to build your form. Configure each field as needed.
+          </span>
+
           <div className="builder-container">
             <div className="field-palette">
               <h3>Available Fields</h3>
@@ -598,6 +612,7 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
         </div>
       </div>
     </DndProvider>
+    
   );
 };
 

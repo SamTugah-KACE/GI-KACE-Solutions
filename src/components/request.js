@@ -3,8 +3,8 @@ import { getAuthToken } from '../context/auth';
 import { toast } from 'react-toastify';
 
 const instance = axios.create({
-  // baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
-  baseURL: process.env.REACT_APP_API_URL || 'https://staff-records-backend.onrender.com/api',
+  baseURL: process.env.REACT_APP_API_URL ||  'https://staff-records-backend.onrender.com/api',   //'http://localhost:8000/api',
+  // baseURL: process.env.REACT_APP_API_URL || 'https://staff-records-backend.onrender.com/api',
   // timeout: 100000,
   // Set timeout to 30 minutes for long processing tasks like large excel file processing
   timeout: process.env.REACT_APP_API_TIMEOUT ? Number(process.env.REACT_APP_API_TIMEOUT) : 1800000, // 30 * 60 * 1000 = 1,800,000 ms
@@ -20,9 +20,17 @@ instance.interceptors.request.use(
       config.headers['Authorization'] = `Bearer ${token}`;
     }
     // Set default Content-Type header if not set
-    if (!config.headers['Content-Type']) {
-      config.headers['Content-Type'] = 'application/json';
-    }
+    // if (!config.headers['Content-Type']) {
+    //   config.headers['Content-Type'] = 'application/json';
+    // }
+    // *** Add this block: if data is FormData, let the browser set the correct
+  // multipart headers (with boundary). Otherwise default to JSON ***
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
+  } else if (!config.headers['Content-Type']) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
     return config;
   },
   (error) => {

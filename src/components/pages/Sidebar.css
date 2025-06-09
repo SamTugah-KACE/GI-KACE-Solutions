@@ -1,11 +1,29 @@
+:root {
+  /* --sidebar-width-expanded: 250px;
+  --sidebar-width-collapsed: 60px;
+  --header-height: 60px;
+  --footer-height: 40px;
+  --primary-color: #2c3e50;
+  --background: #f5f6fa; */
+  --sidebar-bg: #2c3e50;
+  --primary-color: #2c3e50;
+  --text-color: #fff;
+}
+
+
 .sidebar {
   background-color: var(--sidebar-bg);
-  color: #fff;
+  color: var(--text-color);
   box-sizing: border-box;
   padding: 10px;
   padding: 0.5rem;
   transition: width 0.3s ease;
-  height: 100%;
+  /* height: 100%; */
+  /* Adjusted for header height */
+    /* height: calc(100vh - 60px);  */
+    height: 100vh;
+    z-index: 900;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

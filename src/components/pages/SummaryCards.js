@@ -1,60 +1,449 @@
-import React from 'react';
-import './SummaryCard.css';
-import { FaUserCheck, FaUserTimes, FaBuilding } from 'react-icons/fa'; // using react-icons
+// import React, { useState, useEffect } from 'react';
+// import './SummaryCard.css';
+// import { FaUserCheck, FaUserTimes, FaBuilding } from 'react-icons/fa';
+// import Carousel from 'react-multi-carousel';
+// import 'react-multi-carousel/lib/styles.css'; // npm install react-multi-carousel
 
-const SummaryCards = () => {
-  // Dummy data
-  const accountSummary = {
-    active: { male: 20, female: 25 },
-    inactive: { male: 5, female: 7 },
-    total: 57
+// const SummaryCards = ({ data }) => {
+//   const [isMobile, setIsMobile] = useState(false);
+
+//   useEffect(() => {
+//     const handleResize = () => setIsMobile(window.innerWidth < 768);
+//     window.addEventListener('resize', handleResize);
+//     handleResize(); // run initially
+//     return () => window.removeEventListener('resize', handleResize);
+//   }, []);
+
+//   const cards = [
+//     {
+//       title: 'Accounts',
+//       icon: <FaUserCheck className="icon" />,
+//       content: (
+//         <>
+//           <div><strong>Active:</strong> Male {data.accounts.active.male}, Female {data.accounts.active.female}</div>
+//           <div><strong>Inactive:</strong> Male {data.accounts.inactive.male}, Female {data.accounts.inactive.female}</div>
+//           <div><strong>Total:</strong> {data.accounts.total}</div>
+//         </>
+//       )
+//     },
+//     {
+//       title: 'Departments',
+//       icon: <FaBuilding className="icon" />,
+//       content: (
+//         <>
+//           <ul>
+//             {data.departments.list.map((dept, idx) => <li key={idx}>{dept}</li>)}
+//           </ul>
+//           <div><strong>Total:</strong> {data.departments.total}</div>
+//         </>
+//       )
+//     },
+//     // Add more cards as needed...
+//   ];
+
+//   if (isMobile) {
+//     return (
+//       <Carousel
+//         additionalTransfrom={0}
+//         arrows
+//         autoPlaySpeed={3000}
+//         centerMode={false}
+//         className="summary-cards-carousel"
+//         containerClass="container"
+//         draggable
+//         infinite
+//         keyBoardControl
+//         minimumTouchDrag={80}
+//         renderButtonGroupOutside={false}
+//         responsive={{
+//           superLargeDesktop: { breakpoint: { max: 4000, min: 1024 }, items: 1 },
+//           desktop: { breakpoint: { max: 1024, min: 768 }, items: 1 },
+//           tablet: { breakpoint: { max: 768, min: 464 }, items: 1 },
+//           mobile: { breakpoint: { max: 464, min: 0 }, items: 1 },
+//         }}
+//         showDots
+//         slidesToSlide={1}
+//       >
+//         {cards.map((card, idx) => (
+//           <div className="card" key={idx}>
+//             <h3>{card.icon} {card.title}</h3>
+//             <div className="card-details">{card.content}</div>
+//           </div>
+//         ))}
+//       </Carousel>
+//     );
+//   }
+
+//   return (
+//     <div className="summary-cards">
+//       {cards.map((card, idx) => (
+//         <div className="card" key={idx}>
+//           <h3>{card.icon} {card.title}</h3>
+//           <div className="card-details">{card.content}</div>
+//         </div>
+//       ))}
+//     </div>
+//   );
+// };
+
+// export default SummaryCards;
+
+
+
+
+
+// import React from 'react';
+// import { useMediaQuery } from 'react-responsive';
+// import { motion, AnimatePresence } from 'framer-motion';
+// import './SummaryCard.css';
+// import { FaUserCheck, FaUserTimes, FaBuilding } from 'react-icons/fa';
+
+// const cardVariants = {
+//   offscreen: { opacity: 0, y: 50 },
+//   onscreen:  { opacity: 1, y: 0, transition: { type: 'spring', bounce: 0.4, duration: 0.8 } }
+// };
+
+// const SummaryCards = ({ data }) => {
+//   // fall back to dummy if no data
+//   const accountSummary = data?.accountSummary || { active: { male:0,female:0 }, inactive:{male:0,female:0}, total:0 };
+//   const departmentSummary = data?.departmentSummary || { departments:[], total:0 };
+
+//   // breakpoints
+//   const isSmall = useMediaQuery({ maxWidth: 600 });
+//   const isMedium = useMediaQuery({ minWidth: 601, maxWidth: 1024 });
+
+//   const cards = [
+//     {
+//       id: 'accounts',
+//       title: 'Accounts',
+//       icon: <FaUserCheck/>,
+//       content: (
+//         <div className="card-details">
+//           <div>
+//             <strong>Active:</strong><br/>
+//             Male: {accountSummary.active.male}<br/>
+//             Female: {accountSummary.active.female}
+//           </div>
+//           <div>
+//             <strong>Inactive:</strong><br/>
+//             Male: {accountSummary.inactive.male}<br/>
+//             Female: {accountSummary.inactive.female}
+//           </div>
+//           <p><strong>Total: {accountSummary.total}</strong></p>
+//         </div>
+//       )
+//     },
+//     {
+//       id: 'departments',
+//       title: 'Departments',
+//       icon: <FaBuilding/>,
+//       content: (
+//         <div>
+//           <ul>
+//             {departmentSummary.departments.map((d,i)=><li key={i}>{d}</li>)}
+//           </ul>
+//           <p><strong>Total: {departmentSummary.total}</strong></p>
+//         </div>
+//       )
+//     }
+//   ];
+
+//   if (isSmall) {
+//     // single-card carousel
+//     return (
+//       <div className="cards-carousel">
+//         <AnimatePresence initial={false}>
+//           {cards.map(card=>(
+//             <motion.div
+//               key={card.id}
+//               className="card"
+//               variants={cardVariants}
+//               initial="offscreen"
+//               animate="onscreen"
+//               exit="offscreen"
+//             >
+//               <h3>{card.icon} {card.title}</h3>
+//               {card.content}
+//             </motion.div>
+//           ))}
+//         </AnimatePresence>
+//       </div>
+//     );
+//   }
+
+//   // medium+ screens: grid wrap
+//   return (
+//     <div className="summary-cards grid">
+//       {cards.map(card=>(
+//         <motion.div
+//           key={card.id}
+//           className="card"
+//           variants={cardVariants}
+//           initial="offscreen"
+//           whileInView="onscreen"
+//           viewport={{ once: true }}
+//         >
+//           <h3>{card.icon} {card.title}</h3>
+//           {card.content}
+//         </motion.div>
+//       ))}
+//     </div>
+//   );
+// };
+
+// export default SummaryCards;
+
+
+
+/* -------------------- SummaryCards.js -------------------- */
+import React, { useState, useEffect, useMemo } from 'react';
+import Slider from 'react-slick';
+// import slick CSS for proper rendering
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import './SummaryCard.css';
+import * as Icons from 'react-icons/fa';
+
+export default function SummaryCards({ data, loading, error }) {
+  const [slidesToShow, setSlidesToShow] = useState(4);
+  useEffect(() => {
+    const updateSlides = () => {
+      const w = window.innerWidth;
+      if (w < 500) setSlidesToShow(1);
+      else if (w < 768) setSlidesToShow(2);
+      else if (w < 1024) setSlidesToShow(3);
+      else setSlidesToShow(4);
+    };
+    updateSlides();
+    window.addEventListener('resize', updateSlides);
+    return () => window.removeEventListener('resize', updateSlides);
+  }, []);
+
+  const keys = useMemo(() => data ? Object.keys(data) : [], [data]);
+  const settings = {
+    dots: true,
+    infinite: keys.length > slidesToShow,
+    speed: 300,
+    slidesToShow,
+    slidesToScroll: 1,
+    arrows: true,
+    adaptiveHeight: true,
+    swipeToSlide: true,
+    autoplay: true,
+    autoplaySpeed: 4000,
+    pauseOnHover: true,
   };
-  const departmentSummary = {
-    departments: ['HR', 'IT', 'Finance', 'Sales'],
-    total: 4
+
+  if (loading) return <div className="summary-skeletons">Loading...</div>;
+  if (error) return <div className="summary-error">Error loading summary data.</div>;
+  if (!keys.length) return <div className="no-summary">No summary data available.</div>;
+
+  const renderCard = key => {
+    const iconName = `Fa${key.replace(/(^\w|_\w)/g, m => m.replace('_','').toUpperCase())}`;
+    const IconComp = Icons[iconName] || Icons.FaClipboardList;
+    return (
+      <div key={key} className="card">
+        <div className="card-header">
+          <IconComp className="icon" />
+          <span className="card-title">{key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+        </div>
+        <p className="card-value">{data[key]}</p>
+      </div>
+    );
   };
 
   return (
     <div className="summary-cards">
-      <div className="card">
-        <h3>
-          <FaUserCheck className="icon" /> Accounts
-        </h3>
-        <div className="card-details">
-          <div>
-            <strong>Active:</strong>
-            <br />
-            Male: {accountSummary.active.male}
-            <br />
-            Female: {accountSummary.active.female}
-          </div>
-          <div>
-            <strong>Inactive:</strong>
-            <br />
-            Male: {accountSummary.inactive.male}
-            <br />
-            Female: {accountSummary.inactive.female}
-          </div>
-        </div>
-        <p>
-          <strong>Total: {accountSummary.total}</strong>
-        </p>
-      </div>
-      <div className="card">
-        <h3>
-          <FaBuilding className="icon" /> Departments
-        </h3>
-        <ul>
-          {departmentSummary.departments.map((dept, i) => (
-            <li key={i}>{dept}</li>
-          ))}
-        </ul>
-        <p>
-          <strong>Total: {departmentSummary.total}</strong>
-        </p>
-      </div>
+      <Slider {...settings} className="cards-slider">
+        {keys.map(renderCard)}
+      </Slider>
     </div>
   );
-};
+}
 
-export default SummaryCards;
+// Uncomment below to use the original code with Slider
+
+
+
+
+
+  // return (
+  //   <div className="summary-cards">
+  //     {data && Object.keys(data).length > 0 ? (
+  //       <Slider {...settings}>
+  //         {Object.entries(data).map(([key, value]) => (
+  //           <div key={key} className="card">
+  //             <h3>
+  //               {ICON_MAP[key] || <FaClipboardList />}{" "}
+  //               {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+  //             </h3>
+  //             <p className="card-value">{value}</p>
+  //           </div>
+  //         ))}
+  //       </Slider>
+  //     ) : (
+  //       <div className="no-data">No summary data available</div> // or just leave empty
+  //     )}
+  //   </div>
+  // );
+ 
+
+  // return (
+  //   <div className="summary-cards">
+  //     <Slider {...settings}>
+  //       {Object.entries(data).map(([key, value]) => (
+          
+  //         <div key={key} className="card">
+  //           <h3>
+  //             {ICON_MAP[key] || <FaClipboardList />}{" "}
+  //             {key.replace(/_/g,' ').replace(/\b\w/g,l=>l.toUpperCase())}
+  //           </h3>
+  //           <p className="card-value">{value}</p>
+  //         </div>
+  //       ))}
+  //     </Slider>
+  //   </div>
+  // );
+// }
+
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import Slider from 'react-slick';
+// import './SummaryCard.css';
+// import {
+//   FaUserCheck, FaUserTimes, FaBuilding, FaSitemap,
+//   FaUsers, FaClipboardList, FaFileInvoiceDollar, FaMoneyBillWave
+// } from 'react-icons/fa';
+
+// const ICON_MAP = {
+//   branches:    <FaBuilding />,
+//   departments: <FaSitemap />,
+//   ranks:       <FaClipboardList />,
+//   roles:       <FaUsers />,
+//   users:       <FaUserCheck />,
+//   employees:   <FaUserTimes />,
+//   promotion_policies: <FaClipboardList />,
+//   tenancies:   <FaFileInvoiceDollar />,
+//   bills:       <FaFileInvoiceDollar />,
+//   payments:    <FaMoneyBillWave />,
+// };
+
+// export default function SummaryCards({ data }) {
+//   const [slidesToShow, setSlidesToShow] = useState(4);
+
+//   useEffect(() => {
+//     function handleResize() {
+//       const width = window.innerWidth;
+//       if (width < 500)        setSlidesToShow(1);
+//       else if (width < 768)   setSlidesToShow(2);
+//       else if (width < 1024)  setSlidesToShow(3);
+//       else                    setSlidesToShow(4);
+//     }
+//     handleResize();
+//     window.addEventListener('resize', handleResize);
+//     return () => window.removeEventListener('resize', handleResize);
+//   }, []);
+
+//   if (!data) return null;
+//   const entries = Object.entries(data);
+
+//   const settings = {
+//     dots: true,
+//     infinite: entries.length > slidesToShow,
+//     speed: 500,
+//     slidesToShow,
+//     slidesToScroll: 1,
+//     arrows: true,
+//     swipeToSlide: true,
+//     adaptiveHeight: true,
+//   };
+
+//   return (
+//     <div className="summary-cards">
+//       <Slider {...settings}>
+//         {entries.map(([key, value]) => (
+//           <div key={key} className="card">
+//             <h3>
+//               {ICON_MAP[key] || <FaClipboardList />}{" "}
+//               {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+//             </h3>
+//             <p className="card-value">{value}</p>
+//           </div>
+//         ))}
+//       </Slider>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+// import React from 'react';
+// import './SummaryCard.css';
+// import { FaUserCheck, FaUserTimes, FaBuilding } from 'react-icons/fa'; // using react-icons
+// import Carousel from 'react-multi-carousel';
+// import 'react-multi-carousel/lib/styles.css'; // npm install react-multi-carousel
+
+// const SummaryCards = () => {
+//   // Dummy data
+//   const accountSummary = {
+//     active: { male: 20, female: 25 },
+//     inactive: { male: 5, female: 7 },
+//     total: 57
+//   };
+//   const departmentSummary = {
+//     departments: ['HR', 'IT', 'Finance', 'Sales'],
+//     total: 4
+//   };
+
+  
+
+//   return (
+//     <div className="summary-cards">
+//       <div className="card">
+//         <h3>
+//           <FaUserCheck className="icon" /> Accounts
+//         </h3>
+//         <div className="card-details">
+//           <div>
+//             <strong>Active:</strong>
+//             <br />
+//             Male: {accountSummary.active.male}
+//             <br />
+//             Female: {accountSummary.active.female}
+//           </div>
+//           <div>
+//             <strong>Inactive:</strong>
+//             <br />
+//             Male: {accountSummary.inactive.male}
+//             <br />
+//             Female: {accountSummary.inactive.female}
+//           </div>
+//         </div>
+//         <p>
+//           <strong>Total: {accountSummary.total}</strong>
+//         </p>
+//       </div>
+//       <div className="card">
+//         <h3>
+//           <FaBuilding className="icon" /> Departments
+//         </h3>
+//         <ul>
+//           {departmentSummary.departments.map((dept, i) => (
+//             <li key={i}>{dept}</li>
+//           ))}
+//         </ul>
+//         <p>
+//           <strong>Total: {departmentSummary.total}</strong>
+//         </p>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default SummaryCards;

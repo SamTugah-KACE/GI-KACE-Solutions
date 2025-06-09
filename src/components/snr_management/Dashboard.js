@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../pages/Header';
 import Footer from '../Footer';
 import Sidebar from '../pages/Sidebar';
@@ -11,14 +11,26 @@ import UpdateDepartmentModal from './UpdateDepartmentModal';
 import AddBranchModal from './AddBranchModal';
 import './Dashboard.css';
 import ProfileCard from '../pages/ProfileCard';
-// import Joyride from 'react-joyride';
-// import { useOrganization } from '../../context/OrganizationContext';
 import { useAuth } from '../../context/AuthContext';
+import { useOrganization } from '../../context/OrganizationContext';
+import { useOrganizationSummary } from '../../hooks/useOrganizationSummary';
 import TourGuide from '../guide/TourGuide';
+import useSummaryData from '../../hooks/useSummaryData';
+import Slider  from 'react-slick';
+
+
 
 const Dashboard = () => {
 
 const { auth } = useAuth();
+
+// const auth = {
+//   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOGU3NzY2YmItZmFkMi00NzZmLTgyMDctZDAyYjAyNWVkMzM4IiwidXNlcm5hbWUiOiJzYW11ZWwua3VzaS1kdWFoQGdpLWthY2UuZ292LmdoIiwicm9sZV9pZCI6ImE4ZmZlYjViLTY4MmMtNGU4NS1hYTAyLWNmMjExN2IwOTUzYiIsIm9yZ2FuaXphdGlvbl9pZCI6IjdiMzZmODE3LTBjODgtNGM2OC04MGEwLTIwM2VhOTkzNmZlNiIsImxvZ2luX29wdGlvbiI6InBhc3N3b3JkIiwiaWF0IjoxNzQ5MTM1MDcyLjg5MDAxOCwibGFzdF9hY3Rpdml0eSI6MTc0OTEzNTA3Mi44OTAwMTgsImV4cCI6MTc0OTE2Mzg3Mn0.qLBZAfMcpgITVwKWcySeMKQLg5NOHpSFKwY_l0kt5jE",
+//   "emp": {
+//     "id": "a127342f-813d-4465-a89a-22af89ca9606"},
+
+// }
+// const [summaryData, setSummaryData] = useState(null);
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [showAddDeptModal, setShowAddDeptModal] = useState(false);
   const [showUpdateDeptModal, setShowUpdateDeptModal] = useState(false);
@@ -27,6 +39,20 @@ const { auth } = useAuth();
   // Lifted sidebar submenu state so TourGuide can open it programmatically
   const [activeMenu, setActiveMenu] = useState(null);
   
+
+ const staffId = auth.emp && auth.emp.id;
+
+  const { organization } = useOrganization();           // assume you have this
+  const orgId = organization?.id;
+  console.log("\n\norg_id: ", orgId);
+  console.log("\n\nstaff_id: ", staffId);
+  // const orgId = "298e49e5-441a-4b3d-8769-008e0358b1a6";
+  // const { summary, isLoading: loadingSummary, error: summaryError } = useOrganizationSummary(orgId);
+  const { data, loading, error } = useSummaryData(orgId, staffId);
+
+
+  console.log("\n\nloading:: ", loading);
+
   // Define the tour steps. The target selectors must match unique CSS classes set in your components.
   const tourSteps = [
     { target: '.dashboard-header', content: 'This is your dashboard header.' },
@@ -39,7 +65,7 @@ const { auth } = useAuth();
   ];
 
   // When Joyride is about to show a deeper submenu step, expand it
-  const handleTourEvent = (data) => {
+  const handleTourEvent = (datum) => {
     // if (data.type === 'step:before' && data.index >= 3 && data.index <= 6) {
       // steps 3–6 are inside the New User submenu
       setActiveMenu('users');
@@ -49,29 +75,23 @@ const { auth } = useAuth();
   // When the tour is finished or skipped, close any open menus
   const handleTourEnd = () => {
     setActiveMenu(null);
-    // setShowNewUserModal(false);
-    // setShowAddDeptModal(false);
-    // setShowUpdateDeptModal(false);
-    // setShowAddBranchModal(false);
-  };
-
-  const handleDepartmentAdded = (newDept) => {
-    // Update your state or refresh the department list as needed.
-    console.log("New department added:", newDept);
+    
   };
 
 
-  const handleDepartmentUpdated = (newDept) => {
-    // Update your state or refresh the department list as needed.
-    console.log("Department Updated:", newDept);
+  // slider config for “other panels” (e.g. table)
+  const panelSettings = {
+    dots: true,
+    infinite: false,
+    speed: 300,
+    slidesToShow: 1,
+    arrows: true,
   };
 
   
-  const handleBranchAdded = (newBranch) => {
-    console.log("New branch added:", newBranch);
-    // Refresh the branch list as needed.
-  };
-
+  console.log("data: ", data);
+  
+  if (error)   return <div className="error">Error loading summary.</div>;
 
   return (
     <div className="dashboard-frame">
@@ -82,13 +102,15 @@ const { auth } = useAuth();
         onTourEnd={handleTourEnd}
       />
 
-      <Header className="dashboard-header" />
+      <Header className="dashboard-header" onToggleSidebar={() => setSidebarExpanded(!sidebarExpanded)} />
 
       <div className="dashboard-body"
       //  style={{ '--sidebar-width': sidebarExpanded ? '250px' : '60px' }}
        >
-        <aside className="sidebar">
+        {/* <aside className="sidebar"> */}
           <Sidebar
+          expanded={sidebarExpanded}
+           onToggle={() => setSidebarExpanded(!sidebarExpanded)}
             activeMenu={activeMenu}
             setActiveMenu={setActiveMenu}
             onNewUserClick={()=>setShowNewUserModal(true)}
@@ -96,32 +118,52 @@ const { auth } = useAuth();
             onUpdateDepartmentClick={()=>setShowUpdateDeptModal(true)}
             onNewBranchClick={()=>setShowAddBranchModal(true)}
           />
-        </aside>
+        {/* </aside> */}
 
         <main className="main-content">
+            {sidebarExpanded && window.innerWidth <= 768 && (
+    <div 
+      className="mobile-overlay"
+      onClick={() => setSidebarExpanded(false)}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        zIndex: 800
+      }}
+    />
+  )}
           <ProfileCard className="dashboard-profile" />
           <SearchBar className="dashboard-search" />
 
           <div className="cards-wrapper">
-            <SummaryCards />
+    <SummaryCards data={data} loading={loading} error={error} /> 
           </div>
 
-          <div className="table-wrapper">
-            <DashboardTable />
+
+         {/* wrap table (and future panels) in a slider */}
+         <div className="panel-slider">
+            <Slider {...panelSettings}>
+              <div>
+                <DashboardTable orgId={orgId} token={auth.token} />
+              </div>
+              {/* e.g. future panel */}
+              {/* <div><OtherWidget /></div> */}
+            </Slider>
           </div>
+
+
         </main>
       </div>
 
       <Footer className="dashboard-footer" />
 
-      {showNewUserModal && (
-        <NewUserModal onClose={() => setShowNewUserModal(false)} />
-      )}
-      {showAddDeptModal && (
-        <AddDepartmentModal
-          onClose={() => setShowAddDeptModal(false)}
-        />
-      )}
+            {/* Modals */}
+      {showNewUserModal && (<NewUserModal onClose={() => setShowNewUserModal(false)} />)}
+      {showAddDeptModal && (<AddDepartmentModal onClose={() => setShowAddDeptModal(false)} /> )}
       {showUpdateDeptModal && (
         <UpdateDepartmentModal
           onClose={() => setShowUpdateDeptModal(false)}
