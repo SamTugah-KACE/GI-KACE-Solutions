@@ -43,7 +43,7 @@ export default function useSummaryData(orgId, userId) {
   const wsRef = useRef(null);
 
   // Fetch the JWT from wherever you store it (e.g., localStorage)
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('authToken');
 
   // Function to send a "refresh" message over the socket
   const refresh = useCallback(() => {
