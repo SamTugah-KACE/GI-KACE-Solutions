@@ -91,7 +91,7 @@ const { auth } = useAuth();
   
   console.log("data: ", data);
   
-  if (error)   return <div className="error">Error loading summary.</div>;
+  if (error)   return <div className="error">Error loading summary. <p>{error}</p></div>;
 
   return (
     <div className="dashboard-frame">
