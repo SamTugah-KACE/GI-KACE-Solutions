@@ -61,7 +61,7 @@ export default function useSummaryData(orgId, userId) {
       return;
     }
 
-    const wsUrl = `${process.env.REACT_APP_API_WS_URL || 'ws://localhost:8000'}/ws/summary/${orgId}/${userId}?token=${token}`;
+    const wsUrl = `${process.env.REACT_APP_API_WS_URL || 'ws://localhost:8000'}/organizations/ws/summary/${orgId}/${userId}?token=${token}`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
