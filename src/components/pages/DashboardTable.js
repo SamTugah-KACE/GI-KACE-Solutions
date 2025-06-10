@@ -79,10 +79,19 @@ const DashboardTable = ({ orgId, token }) => {
       };
 
       ws.onclose = (ev) => {
-        console.log(`WS closed (code ${ev.code}). Reconnecting in 5s…`);
-        wsRef.current = null;
-        reconnectTimeout.current = setTimeout(connect, 5000);
-      };
+  console.log(`WS closed (code ${ev.code})`);
+  wsRef.current = null;
+
+  // 1008 = POLICY_VIOLATION (invalid token / unauthorized)
+  if (ev.code === 1008) {
+    setWsError('Unauthorized or session expired.  No more reconnect attempts.');
+    return;
+  }
+
+  // otherwise, schedule a reconnect
+  reconnectTimeout.current = setTimeout(connect, 5000);
+};
+
 
       wsRef.current = ws;
     };
@@ -120,7 +129,7 @@ const DashboardTable = ({ orgId, token }) => {
       }
 
       const resp = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/employee-data-inputs/${rowId}`,
+        `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/employee-data-inputs/${rowId}`,
         {
           method: 'PATCH',
           headers: {
