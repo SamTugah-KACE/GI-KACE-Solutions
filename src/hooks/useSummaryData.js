@@ -177,6 +177,6 @@ export default function useSummaryData(orgId, userId) {
   //   };
   // }, [orgId, userId, token, error]);
 
-  return { data, loading, error, refresh };
+  return { data, loading, error};
 
 }

@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import Select from 'react-select';
 import request from '../request';
 import { useOrganization } from '../../context/OrganizationContext';
+import { toast } from 'react-toastify';
 
 const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
   const { organization } = useOrganization();
@@ -89,6 +90,8 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
       .then((response) => {
         onDepartmentAdded(response.data);
         resetForm();
+        toast.success('Department added successfully!');
+        console.log('Department added:', response.data);
         onClose();
       })
       .catch((error) => {

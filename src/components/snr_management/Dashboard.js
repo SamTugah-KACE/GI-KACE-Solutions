@@ -50,7 +50,7 @@ const userId = auth.user && auth.user.id;
 
   // const orgId = "298e49e5-441a-4b3d-8769-008e0358b1a6";
   // const { summary, isLoading: loadingSummary, error: summaryError } = useOrganizationSummary(orgId);
-  const { data, loading, error, refresh } = useSummaryData(orgId, userId);
+  const { data, loading, error} = useSummaryData(orgId, userId);
 
   console.log("data: ", data);
   console.log("\n\nloading:: ", loading);
