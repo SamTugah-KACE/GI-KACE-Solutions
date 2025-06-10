@@ -447,7 +447,7 @@ const FormBuilderArea = ({ formFields, setFormFields, moveField, updateField, re
       {formFields.length === 0 && (
         <div className="empty-state">
           Drag fields from the palette to build your form
-          <p>Please include fields for the following</p>
+          <p>Please include fields for the following records</p>
           <i>First Name or Given Name</i>
           <i>Middle Name</i>
           <i>Last Name or Surname</i> 
