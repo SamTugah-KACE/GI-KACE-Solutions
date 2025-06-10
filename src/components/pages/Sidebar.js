@@ -69,6 +69,29 @@ const Sidebar = ({
     setShowLogoutModal(true);
   };
 
+  {/** download function for downloading own data */}
+  const handleDownloadOwnData = async () => {
+    try {
+      const response = await request.get(`/download-employee-data/${auth.emp?.id}/download`, {
+        headers: { 'Authorization': `Bearer ${auth.token}` },
+        responseType: 'blob' // Ensure the response is treated as a blob for file download
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link
+        .href = url;
+      link.setAttribute('download', `${auth.user?.username}_data.zip`); // Set the file name
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link); // Clean up the link element
+      toast.success('Your data has been downloaded successfully.');
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Failed to download your data. Please try again.');
+    }
+  };
+
+
 
   const handleConfirmLogout = async () => {
     console.log("\n\norgSlug in logout function: ", orgSlug);
@@ -160,6 +183,42 @@ const Sidebar = ({
             </ul>
           )}
         </li>
+
+        {/** download button onclick pops-up sends request to /download-employee-data/{employee_id}/download and organizationId  */}
+        <li className="menu-item" onClick={() => toggleSubmenu('reports')}>
+          Reports <span className="dropdown-indicator">▼</span>
+          {expanded && activeMenu === 'reports' && (
+            <ul className="submenu">
+              <li onClick={() => toast.info('Feature coming soon.')}>Employee Reports</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Department Reports</li>
+              {/** for organization.nature which is Branch Managed*/}
+              {isBranchManaged && (
+                <li onClick={() => toast.info('Feature coming soon.')}>Branch Reports</li>
+              )}
+          
+              <li onClick={() => toast.info('Feature coming soon.')}>Promotion Reports</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Attendance Reports</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Payroll Reports</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Leave Reports</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Performance Reports</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Custom Reports</li>
+            </ul>
+          )}
+        </li>
+        <li className="menu-item" onClick={() => toggleSubmenu('download')}>
+          Download Data <span className="dropdown-indicator">▼</span>
+          {expanded && activeMenu === 'download' && (
+            <ul className="submenu">
+              {/** create a function for download own data via api /download-employee-data/{employee_id}/download and organizationId */}
+
+              <li onClick={handleDownloadOwnData}>Download Own Data</li>
+
+              <li onClick={() => toast.info('Feature coming soon.')}>Download Employee Data</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Download Department Data</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Download Branch Data</li>
+            </ul>
+          )}
+      </li>
       </ul>
       <div className="logout-container">
         <button className="logout-btn"  onClick={handleLogoutClick}>
@@ -172,6 +231,9 @@ const Sidebar = ({
           onCancel={handleCancelLogout}
         />
       )}
+
+
+
 
 {/* {showViewDeptModal && <ViewDepartmentsModal onClose={() => setShowViewDeptModal(false)} />}
       {showUpdateDeptModal && <UpdateDepartmentModal onClose={() => setShowUpdateDeptModal(false)} />}
