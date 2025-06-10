@@ -42,6 +42,9 @@ export default function useSummaryData(orgId, userId) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const wsRef = useRef(null);
+  // Ref to manage reconnection attempts
+  // This will hold the timeout ID for reconnection attempts
+  const reconnectRef = useRef(null);
 
   const { auth } = useAuth(); // Get auth context
   const  token  = auth?.token ||  localStorage.getItem('authToken'); // Extract the token from auth context
