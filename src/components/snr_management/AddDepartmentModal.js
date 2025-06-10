@@ -50,7 +50,7 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
   useEffect(() => {
     if (orgId && isBranchManaged) {
       request
-        .get(`/api/organizations/${orgId}/branches?skip=0&limit=1000`)
+        .get(`/organizations/${orgId}/branches?skip=0&limit=1000`)
         .then((response) => {
           const options = response.data.map((branch) => ({
             value: branch.id,
@@ -85,7 +85,7 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
     };
 
     request
-      .post(`/api/organizations/${orgId}/departments`, payload)
+      .post(`/organizations/${orgId}/departments`, payload)
       .then((response) => {
         onDepartmentAdded(response.data);
         resetForm();
