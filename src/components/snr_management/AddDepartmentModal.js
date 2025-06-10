@@ -81,7 +81,7 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
       name: values.departmentName,
       department_head_id: values.headOfDepartment.value ? values.headOfDepartment.value : null,
       branch_id: isBranchManaged ? values.branch.value : null,
-      organization_id: orgId,
+      // organization_id: orgId,
     };
 
     request

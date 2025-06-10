@@ -92,8 +92,14 @@ const userId = auth.user && auth.user.id;
 
   
   console.log("data: ", data);
+
+  useEffect(() => {
+  if (data) {
+    console.log("Summary data updated:", data);
+  }
+}, [data]);
   
-  if (error)   return <div className="error">Error loading summary. <p>{error}</p></div>;
+  // if (error)   return <div className="error">Error loading summary. <p>{error}</p></div>;
 
   return (
     <div className="dashboard-frame">
