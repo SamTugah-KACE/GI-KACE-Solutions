@@ -19,10 +19,22 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
   useEffect(() => {
     if (orgId) {
       request
-        .get(`/api/staff`, {
+        .get(`/enlist/staff`, {
     params: { organization_id: orgId, skip: 0, limit: 1000, sort: 'asc' }
         })
         .then((response) => {
+          console.log('Staff list fetched:', response.data);
+          // Check if response.data is an empty array
+          console.log('Response data:', response.data);
+          console.log('Organization ID:', orgId);
+          // Log the response to see its structure
+          console.log('Response data length:', response.data.length);
+          // if response.data is an empty array, return early
+          if (!response.data || response.data.length === 0) {
+            console.warn('No staff data found for organization:', orgId);
+            return;
+          }
+          // Ensure response.data is an array before mapping
           // Map each employee to an option with value = employee id and label as "title firstname [middlename] lastname"
           const options = response.data.map((emp) => ({
             value: emp.id,
@@ -58,7 +70,7 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
 
   const validationSchema = Yup.object({
     departmentName: Yup.string().required('Department name is required'),
-    headOfDepartment: Yup.object().nullable().required('Head of Department is required'),
+    // headOfDepartment: Yup.object().nullable().required('Head of Department is required'),
     branch: isBranchManaged
       ? Yup.object().nullable().required('Branch is required')
       : Yup.mixed().notRequired(),
@@ -119,9 +131,9 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
                   placeholder="Select head of department..."
                   isClearable
                 />
-                {errors.headOfDepartment && touched.headOfDepartment ? (
+                {/* {errors.headOfDepartment && touched.headOfDepartment ? (
                   <div className="error-message">{errors.headOfDepartment}</div>
-                ) : null}
+                ) : null} */}
               </div>
               {isBranchManaged && (
                 <div className="form-group">
