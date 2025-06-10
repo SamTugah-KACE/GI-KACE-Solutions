@@ -56,7 +56,7 @@ function App() {
       />
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      
+      <Route path="/signup" element={<SignupPage />} />
       <Route path="/:orgSlug/signin" element={<SigninPage />}   />
       {/* <Route path="/:orgSlug" element={<SigninPage />} /> */}
        {/* Add a route for the unauthorized page */}
