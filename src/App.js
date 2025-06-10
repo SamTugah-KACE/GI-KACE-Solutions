@@ -56,8 +56,10 @@ function App() {
       />
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/signup" element={<SignupPage />} />
+      
       <Route path="/:orgSlug/signin" element={<SigninPage />}   />
+      {/* <Route path="/:orgSlug" element={<SigninPage />} /> */}
+       {/* Add a route for the unauthorized page */}
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
        {/* Wrap protected routes */}
        <Route element={<ProtectedRoute />}>
@@ -65,9 +67,9 @@ function App() {
           <Route path="/:orgSlug/staff" element={<Staff />} />
           {/* Add more protected routes here */}
         </Route>
-        <Route path="/dev/dashboard" element={<SuperAdminDashboard />} />
+        {/* <Route path="/dev/dashboard" element={<SuperAdminDashboard />} />
     <Route path="/staff" element={<Staff />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard" element={<Dashboard />} /> */}
       <Route path="/oauth/login" element={<SuperAdminLoginPage />} />
  
     </Routes>
