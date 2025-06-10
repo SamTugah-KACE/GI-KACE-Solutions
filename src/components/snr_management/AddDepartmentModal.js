@@ -79,7 +79,7 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
     const payload = {
       name: values.departmentName,
-      department_head_id: values.headOfDepartment.value,
+      department_head_id: values.headOfDepartment.value ? values.headOfDepartment.value : null,
       branch_id: isBranchManaged ? values.branch.value : null,
       organization_id: orgId,
     };
