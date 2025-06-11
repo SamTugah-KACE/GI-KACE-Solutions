@@ -120,7 +120,7 @@ export default function useSummaryData(orgId, userId) {
 
     return () => {
       clearTimeout(reconnectRef.current);
-      wsRef.current?.close();
+      // wsRef.current?.close();
       wsRef.current = null;
     };
   }, [orgId, userId, token]);
