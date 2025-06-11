@@ -56,7 +56,7 @@ const LoginPage = () => {
 
 
   if (slugLoading) return <div>Loading organization info...</div>;
-  if (slugError) return <div style={{ padding: '40px', textAlign: 'center' }}>
+  if (slugError) return <div style={{ padding: '40px', textAlign: 'center', color: 'black' }}>
     <h1>This site can't be reached</h1>
     
     {slugError}
@@ -64,7 +64,7 @@ const LoginPage = () => {
     </div>;
   
   // Add a safeguard in case org is still null (should not happen if slugError is false)
-  if (!org) return <div style={{ padding: '40px', textAlign: 'center' }}>No organization information available.</div>;
+  if (!org) return <div style={{ padding: '40px', textAlign: 'center', color:'black' }}>No organization information available.</div>;
 
   // Use a fallback for org.name if org is null.
   const organizationName = org?.name || "";
