@@ -209,7 +209,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 80px; /* enforce minimum width to avoid resizing */
+  min-width: 40px; /* enforce minimum width to avoid resizing */
 }
 
 /* Simple spinner styled to not break layout */
@@ -217,15 +217,19 @@
   border: 4px solid #f3f3f3;
   border-top: 4px solid #fff; /* contrast with button background */
   border-radius: 50%;
-  width: 8px;
-  height: 8px;
+  width: 16px;
+  height: 16px;
   animation: spin 1s linear infinite;
+  margin: 20px auto;
 }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
+
 
 /* Media queries for responsiveness */
 @media (max-width: 600px) {

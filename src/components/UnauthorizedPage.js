@@ -16,7 +16,7 @@ const UnauthorizedPage = ({ message }) => {
   };
 
   return (
-    <div style={{ padding: '40px', textAlign: 'center' }}>
+    <div style={{ padding: '40px', textAlign: 'center', backgroundColor: '#f8f9fa', color: '#343a40' }}>
       <h1>Access Denied</h1>
       <div>
         {message ||

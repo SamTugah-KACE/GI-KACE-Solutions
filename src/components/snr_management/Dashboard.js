@@ -24,12 +24,6 @@ const Dashboard = () => {
 
 const { auth } = useAuth();
 
-// const auth = {
-//   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOGU3NzY2YmItZmFkMi00NzZmLTgyMDctZDAyYjAyNWVkMzM4IiwidXNlcm5hbWUiOiJzYW11ZWwua3VzaS1kdWFoQGdpLWthY2UuZ292LmdoIiwicm9sZV9pZCI6ImE4ZmZlYjViLTY4MmMtNGU4NS1hYTAyLWNmMjExN2IwOTUzYiIsIm9yZ2FuaXphdGlvbl9pZCI6IjdiMzZmODE3LTBjODgtNGM2OC04MGEwLTIwM2VhOTkzNmZlNiIsImxvZ2luX29wdGlvbiI6InBhc3N3b3JkIiwiaWF0IjoxNzQ5MTM1MDcyLjg5MDAxOCwibGFzdF9hY3Rpdml0eSI6MTc0OTEzNTA3Mi44OTAwMTgsImV4cCI6MTc0OTE2Mzg3Mn0.qLBZAfMcpgITVwKWcySeMKQLg5NOHpSFKwY_l0kt5jE",
-//   "emp": {
-//     "id": "a127342f-813d-4465-a89a-22af89ca9606"},
-
-// }
 // const [summaryData, setSummaryData] = useState(null);
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [showAddDeptModal, setShowAddDeptModal] = useState(false);
