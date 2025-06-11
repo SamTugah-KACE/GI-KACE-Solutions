@@ -56,7 +56,7 @@ const DashboardTable = ({ orgId, token }) => {
     if (!orgId || !token) return;
 
     const connect = () => {
-      const wsUrl = `${process.env.REACT_APP_API_WS_URL || 'ws://localhost:8000'}/ws/employee-inputs?token=${token}&organization_id=${orgId}`;
+      const wsUrl = `${process.env.REACT_APP_API_WS_URL || 'ws://localhost:8000'}/ws/employee-inputs?organization_id=${orgId}&token=${token}`;
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
