@@ -131,6 +131,7 @@
 
 .login-container h2 {
   margin-bottom: 20px;
+  color: black;
 }
 
 .login-container form {
@@ -142,6 +143,7 @@
 .login-container label {
   text-align: left;
   font-weight: bold;
+  color: black;
 }
 
 .login-container input[type="text"],
