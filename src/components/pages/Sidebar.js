@@ -72,7 +72,9 @@ const Sidebar = ({
   {/** download function for downloading own data */}
   const handleDownloadOwnData = async () => {
     try {
-      const response = await request.get(`/download-employee-data/${auth.emp?.id}/download`, {
+      const response = await request.get(`/download-employee-data/${auth.emp?.id}/download`,
+         { organization_id: auth.user?.organization_id }, // Pass the organization ID as a query parameter
+        {
         headers: { 'Authorization': `Bearer ${auth.token}` },
         responseType: 'blob' // Ensure the response is treated as a blob for file download
       });
@@ -80,7 +82,7 @@ const Sidebar = ({
       const link = document.createElement('a');
       link
         .href = url;
-      link.setAttribute('download', `${auth.user?.username}_data.zip`); // Set the file name
+      link.setAttribute('download', `${auth.user?.username}_data.pdf`); // Set the file name
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link); // Clean up the link element
