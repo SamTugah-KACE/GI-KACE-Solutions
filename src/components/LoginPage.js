@@ -56,10 +56,24 @@ const LoginPage = () => {
 
 
   if (slugLoading) return <div>Loading organization info...</div>;
-  if (slugError) return <div style={{ padding: '40px', textAlign: 'center', color: 'black' }}>
-    <h1>This site can't be reached</h1>
+  if (slugError) return <div style={{ padding: '40px', textAlign: 'center',  fontSize: '18px', color: 'red' }}>
+    {/* Display a more user-friendly error message */}
+    <h1 style={{ color: 'red' }}>This site can't be reached</h1>
+    <p style={{ color: 'black' }}>
+    {`The organization with slug "${orgSlug}" could not be found.
+    Please check the URL for typos or contact your Systems Administrator for assistance.`}
+    </p>
+    {/* Optionally, you can provide a link to go back or to the home page */}
+    <p style={{ color: 'black' }}>
+    <a href="/" style={{ color: 'blue' }}>Go to Home Page</a>
+    </p>
+    {/* If you want to display the slugError message, you can do so */}
+    <div style={{ color: 'black', marginTop: '20px' }}>
+    <p>{slugError}</p>
+    </div>
+    {/* <h1>This site can't be reached</h1> */}
     
-    {slugError}
+    {/* {slugError} */}
     
     </div>;
   
