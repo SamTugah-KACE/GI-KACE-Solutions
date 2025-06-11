@@ -25,7 +25,7 @@ const PersonalDataForm = () => {
         const rolesItem = data.find(item => item.data_name === "roles");
         if (rolesItem && Array.isArray(rolesItem.data)) {
           // Only allow these roles.
-          const allowedRoles = ["CEO", "Admin", "HR Manager"];
+          const allowedRoles = ["CEO",  "HR Manager"];
           const filteredRoles = rolesItem.data.filter(role =>
             allowedRoles.includes(role.name)
           );

@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { useOrganization } from '../context/OrganizationContext';
 import stockPhoto from '../assets/images/stock-photo.jpg'; // Import the default background image
 import { toast } from 'react-toastify';
-
+import {Spin} from 'antd';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -232,7 +232,7 @@ const LoginPage = () => {
           <button type="submit" className="login-btn" disabled={loading}>
           {/* The wrapper ensures that the button size remains fixed */}
           <span className="btn-content">
-          {loading ? <div className="spinner"></div> : "Login"}
+          {loading ? <Spin size="small" /> : "Login"}
           </span>
           </button>
         </form>
