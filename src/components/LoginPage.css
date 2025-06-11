@@ -209,7 +209,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px; /* enforce minimum width to avoid resizing */
+  min-width: 80px; /* enforce minimum width to avoid resizing */
 }
 
 /* Simple spinner styled to not break layout */
