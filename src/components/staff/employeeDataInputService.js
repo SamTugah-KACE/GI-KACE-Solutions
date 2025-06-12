@@ -1,7 +1,7 @@
 // src/services/employeeDataInputService.js
 import request from '../request';
 
-const BASE = '/employee-data-inputs/employee/';
+const BASE = '/employee-data-inputs/';
 
 const employeeDataInputService = {
   async fetchPending(employeeId) {
