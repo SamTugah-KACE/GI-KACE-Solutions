@@ -293,11 +293,11 @@ const DashboardTable = ({ orgId, token }) => {
         <tbody>
            {wsError && <div className="ws-error">{wsError}</div>}
           {data.map((row, idx) => {
-            const accountName = row["Account Name"];
-            const role        = row.Role;
-            const issues      = row.Issues;
-            const attachments = row.Attachments || [];
-            const actions     = row.Actions;
+            const accountName = row.account_name;
+            const role        = row.role;
+            const issues      = row.issues;
+            const attachments = row.attachments || [];
+            const actions     = row.actions;
             const record = row.Data;
 
             return (
