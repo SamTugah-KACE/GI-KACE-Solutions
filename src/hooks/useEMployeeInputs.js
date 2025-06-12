@@ -24,7 +24,7 @@ export default function useEmployeeInputs(orgId) {
       try {
         const resp = await request.get("/employee-data-inputs/", {
           params: { organization_id: orgId },
-          headers: { Authorization: `Bearer ${token}` },
+        //   headers: { Authorization: `Bearer ${token}` },
         });
         setData(resp.data);
       } catch (err) {
