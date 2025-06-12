@@ -22,10 +22,12 @@ export default function useEmployeeInputs(orgId) {
 
     const fetchInitial = async () => {
       try {
-        const resp = await request.get("/employee-data-inputs/", {
+        const resp = await request.get("/employee-data-inputs/org/", {
           params: { organization_id: orgId },
         //   headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("\n\nresp: ", resp);
+        console.log("\n\nresp.data:: ", resp.data);
         setData(resp.data);
       } catch (err) {
         console.error("Failed to fetch inputs:", err);
