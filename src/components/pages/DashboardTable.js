@@ -5,6 +5,8 @@ import ActionModal from './ActionModal';
 import { Modal, Descriptions, Button, message } from "antd";
 import './DashboardTable.css';
 import { toast } from 'react-toastify';
+// import useEmployeeInputs from '../../hooks/useEmployeeInputs';
+import useEmployeeInputs from '../../hooks/useEMployeeInputs';
 
 
 
@@ -43,7 +45,9 @@ const LABEL_MAP = {
 
 
 const DashboardTable = ({ orgId, token }) => {
-  const [data, setData] = useState([]);
+  // const [data, setData] = useState([]);
+   // 1) Initial load + setData from hook
+  const { data, loading, error, setData } = useEmployeeInputs(orgId);
   const [fileToView, setFileToView] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [recordModal, setRecordModal] = useState({ visible: false, record: null });
@@ -55,19 +59,34 @@ const DashboardTable = ({ orgId, token }) => {
   useEffect(() => {
     if (!orgId || !token) return;
 
+  let ws;
+  let backoff = 1000;
+
+  
+
     const connect = () => {
-      const wsUrl = `${process.env.REACT_APP_API_WS_URL || 'ws://localhost:8000'}/ws/employee-inputs?token=${token}&organization_id=${orgId}`;
+      const wsUrl = `${process.env.REACT_APP_API_WS_URL || 'ws://localhost:8000'}/ws/employee-inputs?token=${encodeURIComponent(token)}&organization_id=${orgId}`;
       const ws = new WebSocket(wsUrl);
 
+       wsRef.current = ws;
+
       ws.onopen = () => {
+        backoff = 1000;
         console.log('WS connected');
         setWsError(null);
       };
 
       ws.onmessage = (ev) => {
         try {
-          const payload = JSON.parse(ev.data);
-          setData(payload);
+          const {type, payload} = JSON.parse(ev.data);
+          // setData(payload);
+          setData(current => {
+            switch (type) {
+              case 'new_input': return [payload, ...current];
+              case 'updated_input': return current.map(r => r.id === payload.id ? payload : r);
+              default: return current;
+            }
+          });
         } catch (err) {
           console.error('Invalid WS message', err);
         }
@@ -89,11 +108,10 @@ const DashboardTable = ({ orgId, token }) => {
   }
 
   // otherwise, schedule a reconnect
-  reconnectTimeout.current = setTimeout(connect, 5000);
+  reconnectTimeout.current = setTimeout(connect, backoff);
+   backoff = Math.min(backoff * 2, 30000);
 };
-
-
-      wsRef.current = ws;
+      // wsRef.current = ws;
     };
 
     connect();
@@ -102,7 +120,7 @@ const DashboardTable = ({ orgId, token }) => {
       if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
       if (wsRef.current) wsRef.current.close();
     };
-  }, [orgId, token]);
+  }, [orgId, token, setData]);
 
   const handleViewFile = (att) => setFileToView(att);
   const handleCloseModal = () => setFileToView(null);
