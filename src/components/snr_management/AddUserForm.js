@@ -46,57 +46,7 @@ const useDepartments = (organizationId) => {
   return departments;
 };
 
-/**
- * MAPPING HELPERS
- */
 
-// Mapping dictionary: UI keys (normalized) -> canonical backend keys.
-// const FIELD_SYNONYMS = {
-//   "title": "title",
-//   "prefix": "title",
-//   "given name": "first_name",
-//   "firstname": "first_name",
-//   "first": "first_name",
-//   "surname": "last_name",
-//   "lastname": "last_name",
-//   "last name": "last_name",
-//   "middle name": "middle_name",
-//   "middle": "middle_name",
-//   "middle initial": "middle_name",
-//   "middle_name": "middle_name",
-//   "family name": "last_name",
-//   "family": "last_name",
-//   "family_name": "last_name",
-//   "sex": "gender",
-//   "gender": "gender",
-//   "dob": "date_of_birth",
-//   "date of birth": "date_of_birth",
-//   "birth date": "date_of_birth",
-//   "birthdate": "date_of_birth",
-//   "date_of_birth": "date_of_birth",
-//   "birthday": "date_of_birth",
-//   "email": "email",
-//   "e-mail": "email",
-//   "email address": "email",
-//   "email input": "email",
-//   "email_input": "email",
-//   "mail": "email",
-//   "mail address": "email",
-//   "phone number": "contact_info",
-//   "contact": "contact_info",
-//   "employee type": "employee_type",
-//   "employee_type": "employee_type", // Synonym for employee_type
-//   "employment type": "employee_type",
-//   "employment_type": "employee_type",
-//   "role selection": "role_id",
-//   "role": "role_id",
-//   "role_select": "role_id",
-//   "system_role": "role_id",
-//   "role_select_input": "role_id",
-//   "system role": "role_id",
-//   // "submit button": "submit", // Normally empty
-//   // ... add as many synonyms as required.
-// };
 
 /**
  * Normalizes a key: lowercases it, trims spaces, and removes punctuation.
@@ -430,15 +380,15 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         throw new Error(errorData.detail || 'Submission failed');
       }
       // If the form design has embedded submit code, execute it.
-      if (formDesign && formDesign.submitCode) {
-        try {
-          const submitFunc = new Function(`"use strict"; return (${formDesign.submitCode})`)();
-          await submitFunc(fieldValues);
-        } catch (error) {
-          console.error("Submission error from submitCode:", error);
-          toast.error(`Error executing submit code: ${error.message}`);
-        }
-      }
+      // if (formDesign && formDesign.submitCode) {
+      //   try {
+      //     const submitFunc = new Function(`"use strict"; return (${formDesign.submitCode})`)();
+      //     await submitFunc(fieldValues);
+      //   } catch (error) {
+      //     console.error("Submission error from submitCode:", error);
+      //     toast.error(`Error executing submit code: ${error.message}`);
+      //   }
+      // }
       onUserAdded();
       onClose();
     } catch (error) {
