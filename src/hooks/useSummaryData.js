@@ -38,7 +38,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import {useAuth} from '../context/AuthContext'; // Adjust the import path as needed
 
 export default function useSummaryData(orgId, userId) {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const wsRef = useRef(null);
@@ -88,7 +88,8 @@ export default function useSummaryData(orgId, userId) {
         try {
           const { type, payload } = JSON.parse(msg);
           if (type === 'initial' || type === 'update') {
-            setData(payload.counts);
+            setData(payload.counts ?? payload);
+            console.log('\n\ndata in useSummaryHook: ', data);
             setLoading(false);
           }
         } catch {
@@ -124,6 +125,11 @@ export default function useSummaryData(orgId, userId) {
       wsRef.current = null;
     };
   }, [orgId, userId, token]);
+
+   return { data, loading, error};
+
+}
+
 
     // ws.onopen = () => {
     //   // Connection established; we expect the server to send an "initial" message immediately.
@@ -177,6 +183,4 @@ export default function useSummaryData(orgId, userId) {
   //   };
   // }, [orgId, userId, token, error]);
 
-  return { data, loading, error};
-
-}
+ 

@@ -236,7 +236,7 @@ export default function SummaryCards({ data, loading, error }) {
 
   if (loading) return <div className="summary-skeletons">Loading...</div>;
   if (error) return <div className="summary-error">Error loading summary data.</div>;
-  if (!keys.length) return <div className="no-summary">No summary data available.</div>;
+  if (!Object.keys(data).length  || !keys.length ) return <div className="no-summary">No summary data available.</div>;
 
   const renderCard = key => {
     const iconName = `Fa${key.replace(/(^\w|_\w)/g, m => m.replace('_','').toUpperCase())}`;
