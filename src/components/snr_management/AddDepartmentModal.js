@@ -71,7 +71,7 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
 
   const validationSchema = Yup.object({
     departmentName: Yup.string().required('Department name is required'),
-    headOfDepartment: Yup.object().nullable().notRequired(), //required('Head of Department is required'),
+    // headOfDepartment: Yup.object().nullable().notRequired(), //required('Head of Department is required'),
     branch: isBranchManaged
       ? Yup.object().nullable().required('Branch is required')
       : Yup.mixed().notRequired(),
@@ -88,7 +88,7 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
     request
       .post(`/organizations/${orgId}/departments`, payload)
       .then((response) => {
-        onDepartmentAdded(response.data);
+        // onDepartmentAdded(response.data);
         // resetForm();
         toast.success('Department added successfully!');
         console.log('Department added:', response.data);
