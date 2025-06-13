@@ -88,7 +88,7 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
     request
       .post(`/organizations/${orgId}/departments`, payload)
       .then((response) => {
-        // onDepartmentAdded(response.data);
+        onDepartmentAdded(response.data);
         // resetForm();
         toast.success('Department added successfully!');
         console.log('Department added:', response.data);
