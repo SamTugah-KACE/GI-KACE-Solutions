@@ -17,7 +17,7 @@ import { useOrganizationSummary } from '../../hooks/useOrganizationSummary';
 import TourGuide from '../guide/TourGuide';
 import useSummaryData from '../../hooks/useSummaryData';
 import Slider  from 'react-slick';
-
+import { toast } from 'react-toastify';
 
 
 const Dashboard = () => {
@@ -165,7 +165,13 @@ const userId = auth.user && auth.user.id;
 
             {/* Modals */}
       {showNewUserModal && (<NewUserModal onClose={() => setShowNewUserModal(false)} />)}
-      {showAddDeptModal && (<AddDepartmentModal onClose={() => setShowAddDeptModal(false)} /> )}
+      {showAddDeptModal && (<AddDepartmentModal 
+      onClose={() => setShowAddDeptModal(false)} 
+      onDepartmentAdded={(newDept) => {
+      toast.success('Department added successfully!');
+      // …and maybe refresh your department list/table here…
+    }}
+      /> )}
       {showUpdateDeptModal && (
         <UpdateDepartmentModal
           onClose={() => setShowUpdateDeptModal(false)}

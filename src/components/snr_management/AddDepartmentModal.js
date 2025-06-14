@@ -8,7 +8,7 @@ import request from '../request';
 import { useOrganization } from '../../context/OrganizationContext';
 import { toast } from 'react-toastify';
 
-const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
+const AddDepartmentModal = ({ onClose, onDepartmentAdded= () => {} }) => { 
   const { organization } = useOrganization();
   const orgId = organization?.id;
   const isBranchManaged = organization?.nature?.toLowerCase().includes('branch');
@@ -71,7 +71,7 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
 
   const validationSchema = Yup.object({
     departmentName: Yup.string().required('Department name is required'),
-    // headOfDepartment: Yup.object().nullable().notRequired(), //required('Head of Department is required'),
+    headOfDepartment: Yup.object().nullable().notRequired(), //required('Head of Department is required'),
     branch: isBranchManaged
       ? Yup.object().nullable().required('Branch is required')
       : Yup.mixed().notRequired(),
@@ -80,8 +80,8 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded }) => {
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
     const payload = {
       name: values.departmentName,
-      department_head_id: values.headOfDepartment.value ? values.headOfDepartment.value : null,
-      branch_id: isBranchManaged ? values.branch.value : null,
+      department_head_id: values.headOfDepartment?.value ??  null,
+      branch_id: isBranchManaged ? values.branch?.value ?? null : null,
       // organization_id: orgId,
     };
 
