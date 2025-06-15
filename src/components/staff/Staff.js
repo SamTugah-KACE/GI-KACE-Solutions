@@ -372,9 +372,35 @@ useEffect(() => {
     ws.onmessage = (ev) => {
       const msg = JSON.parse(ev.data);
       console.log("\n\nweb sock payload: ", msg.payload);
-      if (['initial','update'].includes(msg.type)) {
-        setEmployeeData(msg.payload);
-      }
+      // if (['initial','update'].includes(msg.type)) {
+      //   setEmployeeData(msg.payload);
+      // }
+
+        switch (msg.type) {
+    case 'initial':
+    case 'update':
+      setEmployeeData(msg.payload);
+      break;
+
+    case 'change_request':
+      // Remove the now‑handled request from `pendingInputs`
+      setPendingInputs(curr =>
+        curr
+          .filter(pi => pi.id !== msg.payload.request_id)
+          .map(pi =>
+            pi.id === msg.payload.request_id
+              ? { ...pi, status: msg.payload.status, comments: msg.payload.comments }
+              : pi
+          )
+      );
+      toast.success(`Your change request was ${msg.payload.status.toLowerCase()}.`);
+      break;
+
+    default:
+      console.warn('Unknown WS message type', msg.type);
+  }
+
+
     };
     ws.onerror = (err) => {
       console.error('WS error', err);
@@ -835,7 +861,7 @@ useEffect(() => {
         )}
         {/* Other Information Section */}
        {/* Other Information */}
-       <div className="block-section">
+       <div className="block-section" style={{color:"black"}}>
           <ExpandableSection title="Other Information" icon="info-circle">
             <OthersSectionForm
               customData={getSectionData('Others').custom_data}

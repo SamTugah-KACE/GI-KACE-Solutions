@@ -72,12 +72,18 @@ const Sidebar = ({
   {/** download function for downloading own data */}
   const handleDownloadOwnData = async () => {
     try {
-      const response = await request.get(`/download-employee-data/${auth.emp?.id}/download`,
-         { organization_id: auth.user?.organization_id }, // Pass the organization ID as a query parameter
+      const response = await request.get(
+        `/download-employee-data/${auth.emp?.id}/download`,
         {
-        headers: { 'Authorization': `Bearer ${auth.token}` },
-        responseType: 'blob' // Ensure the response is treated as a blob for file download
-      });
+        params: { organization_id: auth.user?.organization_id }, // Pass the organization ID as a query parameter
+        
+        headers: { 
+          'Authorization': `Bearer ${auth.token}` 
+        },
+       
+       responseType: 'blob' // Ensure the response is treated as a blob for file download
+      }
+    );
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link
@@ -259,7 +265,7 @@ const Sidebar = ({
             organizationId={organization?.id || ''} // Pass the organization ID from context
             userId={auth.user?.id || ''}  // Pass the user ID from auth context
             onClose={() => setShowAddUserForm(false)}
-            onUserAdded={() => toast.success("User added.\ntherefore he/she should check his/her registered email for system credentials.")}
+            onUserAdded={() => toast.success("User added.\nPlease prompt user to check his/her registered email for system credentials.")}
           />
         )
     }
