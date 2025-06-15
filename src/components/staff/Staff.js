@@ -383,18 +383,17 @@ useEffect(() => {
       break;
 
     case 'change_request':
-      // Remove the now‑handled request from `pendingInputs`
-      setPendingInputs(curr =>
-        curr
-          .filter(pi => pi.id !== msg.payload.request_id)
-          .map(pi =>
-            pi.id === msg.payload.request_id
-              ? { ...pi, status: msg.payload.status, comments: msg.payload.comments }
-              : pi
-          )
-      );
-      toast.success(`Your change request was ${msg.payload.status.toLowerCase()}.`);
-      break;
+  setPendingInputs(curr =>
+    curr
+      .map(pi =>
+        pi.id === msg.payload.request_id
+          ? { ...pi, status: msg.payload.status, comments: msg.payload.comments }
+          : pi
+      )
+      .filter(pi => pi.id !== msg.payload.request_id)
+  );
+  toast.success(`Your change request was ${msg.payload.status.toLowerCase()}.`);
+  break;
 
     default:
       console.warn('Unknown WS message type', msg.type);
