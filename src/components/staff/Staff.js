@@ -847,12 +847,12 @@ useEffect(() => {
         <div className="block-section">
           <ExpandableSection title="Salary Payments" icon="money">
             <div className="action-buttons">
-              <button
+              {/* <button
                 className="add-button"
                 onClick={handleAddSalary}
               >
                 Add Salary Payment
-              </button>
+              </button> */}
             </div>
             <SalaryPaymentTable
               data={getSectionData('Salary-payments')}
