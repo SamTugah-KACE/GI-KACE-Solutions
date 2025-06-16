@@ -24,6 +24,11 @@ export default function EmploymentHistoryModal({
           ? dayjs(initialValues.end_date)
           : null,
         details:   initialValues.details.details || ''
+        // details: (
+        //             typeof initialValues.details === 'object'
+        //               ? initialValues.details.details
+        //               : initialValues.details
+        //           ) || ''
       });
     }
   }, [open, initialValues, form]);

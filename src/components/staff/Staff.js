@@ -662,7 +662,7 @@ useEffect(() => {
               </button>
             </div> */}
             <EmployeePaymentDetailTable 
-              data={employeeData['Payment-details']}
+              data={employeeData('Payment-details')}
               pending={isPending(sectionToDataType['Payment-details'])}
               onRequestChange={({ data, requestType }) =>
                 submitChangeRequest({
@@ -688,17 +688,18 @@ useEffect(() => {
             <div className="action-buttons">
             <button
             className="add-button"
-            onClick={() => {
-              setCurrentHistory({});           // empty = Add
-              setShowHistoryForm(true);
-            }}
+            onClick = {handleAddHistory}
+            // onClick={() => {
+            //   setCurrentHistory({});           // empty = Add
+            //   setShowHistoryForm(true);
+            // }}
             disabled={isPending('employment_history')}
           >
                 Add Employment Record
               </button>
             </div>
             <EmploymentHistoryTable 
-              data={employeeData['Employment-history']}
+              data={employeeData('Employment-history')}
               pending={isPending(sectionToDataType['Employment-history'])}
               onRequestChange={({ data, requestType, files }) =>
                 submitChangeRequest({
