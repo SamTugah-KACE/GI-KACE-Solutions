@@ -844,7 +844,7 @@ useEffect(() => {
 
         {/* Salary Payment Section */}
         {isPrivateOrg && (
-        <div className="block-section">
+        <div className="block-section" style={{color:"black"}}>
           <ExpandableSection title="Salary Payments" icon="money">
             <div className="action-buttons">
               {/* <button
@@ -859,14 +859,14 @@ useEffect(() => {
               onEdit={handleEditSalary}
               onDelete={handleDeleteSalary}
             />
-            <SalaryPaymentModal
+            {/* <SalaryPaymentModal
               visible={showSalaryForm}
               initialValues={currentSalary}
               onFinish={handleSaveSalary}
               onCancel={handleCancelSalaryForm}
               ranks={employeeData['Employment-details'].rank}
               users={employeeData['Employment-details'].users}
-            />
+            /> */}
           </ExpandableSection>
         </div>
         )}
