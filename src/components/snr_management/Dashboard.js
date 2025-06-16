@@ -99,7 +99,8 @@ const userId = auth.user && auth.user.id;
     <div className="dashboard-frame">
       <TourGuide
         steps={tourSteps}
-        authToken={auth.token}
+        user_id = {userId}
+        // authToken={auth.token}
         onStepCallback={handleTourEvent}
         onTourEnd={handleTourEnd}
       />

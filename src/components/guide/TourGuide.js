@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Joyride, { STATUS } from 'react-joyride';
 import request from '../request';
 
-const TourGuide = ({ steps, onStepCallback, onTourEnd }) => {
+const TourGuide = ({ steps, user_id, onStepCallback, onTourEnd }) => {
   const [runTour, setRunTour] = useState(false);
   const checkServer = process.env.REACT_APP_RUN_TOUR === 'true';
-
+ 
   useEffect(() => {
     const init = async () => {
       // If they've already done the tour on this device, never run it.
@@ -13,7 +13,8 @@ const TourGuide = ({ steps, onStepCallback, onTourEnd }) => {
 
       if (checkServer) {
         try {
-          const { data } = await request.get('/users/get-tour-status');
+          const { data } = await request.get(`/users/${user_id}/tour-completed`);
+          console.log("is tour completed?:: ", data);
           if (!data.tourCompleted) {
             setRunTour(true);
           }
@@ -43,7 +44,7 @@ const TourGuide = ({ steps, onStepCallback, onTourEnd }) => {
       localStorage.setItem('tourCompleted', 'true');
       if (checkServer) {
         try {
-          await request.post('/users/set-tour-completed', {
+          await request.post(`/users/${user_id}/tour-completed`, {
             tourCompleted: true,
           });
         } catch {

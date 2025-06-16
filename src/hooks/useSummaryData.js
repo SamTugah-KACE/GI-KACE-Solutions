@@ -1,38 +1,3 @@
-// // src/hooks/useSummaryData.js
-// import { useState, useEffect } from 'react';
-// import request from '../components/request';
-
-// export default function useSummaryData(orgId) {
-//   const [data, setData] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     if (!orgId) return;
-
-//     const fetchData = async () => {
-//       try {
-//         const response = await request.get(`/organizations/${orgId}/summary`);
-//         setData(response.data.counts);
-//         console.log("Summary data fetched:", response.data.counts);
-
-//       } catch (err) {
-//         setError(err.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchData();
-//   }, [orgId]);
-
-//   console.log("useSummaryData hook called with orgId:", orgId);
-//   console.log("Current summary data:", data);
-//   console.log("Loading state:", loading);
-//   return { data, loading, error };
-// }
-
-
 // src/hooks/useSummaryData.js
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {useAuth} from '../context/AuthContext'; // Adjust the import path as needed
