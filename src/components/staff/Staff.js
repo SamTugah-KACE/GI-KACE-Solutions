@@ -672,7 +672,7 @@ useEffect(() => {
               </button>
             </div> */}
             <EmployeePaymentDetailTable 
-              data={employeeData('Payment-details')}
+              data={employeeData['Payment-details']}
               pending={isPending(sectionToDataType['Payment-details'])}
               onRequestChange={({ data, requestType }) =>
                 submitChangeRequest({
@@ -709,7 +709,7 @@ useEffect(() => {
               </button>
             </div>
             <EmploymentHistoryTable 
-              data={employeeData('Employment-history')}
+              data={employeeData['Employment-history']}
               pending={isPending(sectionToDataType['Employment-history'])}
               onRequestChange={({ data, requestType, files }) =>
                 submitChangeRequest({
