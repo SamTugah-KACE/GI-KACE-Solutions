@@ -231,6 +231,16 @@ const Staff = () => {
     setShowContactModal(true);
   };
 
+  const handleAddContact = () => {
+    setCurrentContact({
+      name: '',
+      relation: '',
+      emergency_phone: '',
+      emergency_address: '',
+      details: ''
+    });
+    setShowContactModal(true);
+  }
   
   const handleSaveContact = (values) => {
     if (currentContact?.id) {
@@ -741,10 +751,11 @@ useEffect(() => {
             <div className="action-buttons">
               <button 
                 className="add-button" 
-                onClick={() => {
-                  setCurrentContact({});             // empty → add
-                  setShowContactModal(true);
-                }}
+                onClick = {handleAddContact}
+                // onClick={() => {
+                //   setCurrentContact({});             // empty → add
+                //   setShowContactModal(true);
+                // }}
                 disabled={isPending('emergency_contacts')}
               >
                 Add Emergency Contact
