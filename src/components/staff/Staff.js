@@ -672,7 +672,7 @@ useEffect(() => {
               </button>
             </div> */}
             <EmployeePaymentDetailTable 
-              data={employeeData('Payment-details')}
+              data={getSectionData('Payment-details')}
               pending={isPending(sectionToDataType['Payment-details'])}
               onRequestChange={({ data, requestType }) =>
                 submitChangeRequest({
@@ -709,7 +709,7 @@ useEffect(() => {
               </button>
             </div>
             <EmploymentHistoryTable 
-              data={employeeData('Employment-history')}
+              data={getSectionData('Employment-history')}
               pending={isPending(sectionToDataType['Employment-history'])}
               onRequestChange={({ data, requestType, files }) =>
                 submitChangeRequest({
@@ -762,7 +762,7 @@ useEffect(() => {
               </button>
             </div>
             <EmergencyContactTable 
-              data={employeeData['Emergency-contacts']}
+              data={getSectionData('Emergency-contacts')}
               pending={isPending(sectionToDataType['Emergency-contacts'])}
               onEdit={record => {
                 setCurrentContact(record);
@@ -811,7 +811,7 @@ useEffect(() => {
               </button>
             </div>
             <NextOfKinTable 
-              data={employeeData['Next-of-kin']}
+              data={getSectionData('Next-of-kin')}
               pending={isPending(sectionToDataType['Next-of-kin'])}
               onEdit={record => {
                 setCurrentNextOfKin(record);
@@ -855,7 +855,7 @@ useEffect(() => {
               </button>
             </div>
             <SalaryPaymentTable
-              data={employeeData['Salary-payments']}
+              data={getSectionData('Salary-payments')}
               onEdit={handleEditSalary}
               onDelete={handleDeleteSalary}
             />
