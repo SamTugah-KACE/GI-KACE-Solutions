@@ -698,11 +698,11 @@ useEffect(() => {
             <div className="action-buttons">
             <button
             className="add-button"
-            onClick = {handleAddHistory}
-            // onClick={() => {
-            //   setCurrentHistory({});           // empty = Add
-            //   setShowHistoryForm(true);
-            // }}
+            // onClick = {handleAddHistory}
+            onClick={() => {
+              setCurrentHistory({});           // empty = Add
+              setShowHistoryForm(true);
+            }}
             disabled={isPending('employment_history')}
           >
                 Add Employment Record
@@ -751,11 +751,11 @@ useEffect(() => {
             <div className="action-buttons">
               <button 
                 className="add-button" 
-                onClick = {handleAddContact}
-                // onClick={() => {
-                //   setCurrentContact({});             // empty → add
-                //   setShowContactModal(true);
-                // }}
+                // onClick = {handleAddContact}
+                onClick={() => {
+                  setCurrentContact({});             // empty → add
+                  setShowContactModal(true);
+                }}
                 disabled={isPending('emergency_contacts')}
               >
                 Add Emergency Contact
