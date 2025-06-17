@@ -482,46 +482,7 @@ useEffect(() => {
     const isPending = (dataType) =>
       pendingInputs.some(pi => pi.data_type === dataType);
 
-  // const getSectionData = (key) => {
-  //   if (!employeeData) return Array.isArray([]) ? [] : {}; // safety
   
-  //   // 1️⃣ Find approved data either top-level or under Qualifications
-  //   let approvedRaw;
-  //   if (key in employeeData) {
-  //     approvedRaw = employeeData[key];
-  //   } else if (employeeData.Qualifications && key in employeeData.Qualifications) {
-  //     approvedRaw = employeeData.Qualifications[key];
-  //   } else {
-  //     approvedRaw = undefined;
-  //   }
-  
-  //   // 2️⃣ Normalize to array or object
-  //   const approved = Array.isArray(approvedRaw)
-  //     ? approvedRaw
-  //     : (approvedRaw && typeof approvedRaw === 'object')
-  //       ? approvedRaw
-  //       : Array.isArray([]) // you decide by convention: if key looks like array
-  //         ? []
-  //         : {};
-  
-  //   // 3️⃣ Pull pending change-requests matching that key
-  //   const dataType = sectionToDataType[key];
-  //   const pend = pendingInputs
-  //     .filter(pi => pi.data_type === dataType)
-  //     .map(pi => ({ ...pi.data, pending: true }));
-  //   console.log("pending inputs: ", pend);
-  //   // 4️⃣ Merge approved + pending
-  //   if (Array.isArray(approved)) {
-  //     return [...approved, ...pend];
-  //     // build docs + merge
-   
-  //   } else {
-  //     // For object-based sections, overlay pending fields
-  //     return { ...approved, ...pend.reduce((acc, d) => ({ ...acc, ...d }), {}) };
-      
-  //   }
-  // };
-
     // Unified data getter for all sections
   const getSectionData = key => {
     if (!employeeData) {
@@ -582,7 +543,7 @@ useEffect(() => {
           </div>
       
 
-        <div className="block-section">
+       <div className="block-section" style={{color:"black"}}>
           <ExpandableSection title="Bio-Data" icon="user">
            {/* <BioDataSection staffData={employeeData['Bio-data']} /> */}
            <BioDataSection
@@ -596,7 +557,7 @@ useEffect(() => {
         </div>
 
           {/* Qualifications: two nested tables */}
-        <div className="block-section">
+       <div className="block-section" style={{color:"black"}}>
           <ExpandableSection title="Qualifications" icon="graduation-cap">
             {/* <div className="nested-blocks">
               <div className="nested-section"> */}
@@ -645,7 +606,7 @@ useEffect(() => {
           </ExpandableSection>
         </div>
 
-        <div className="block-section">
+       <div className="block-section" style={{color:"black"}}>
           <ExpandableSection title="Employment Details" icon="building">
             <EmploymentDetailsSection employmentDetails={employeeData['Employment-details']} onEdit={handleEditEmploymentDetails}/>
             <EmploymentDetailsModal
@@ -661,7 +622,7 @@ useEffect(() => {
       
 
        {/* Payment Details Section */}
-       <div className="block-section">
+      <div className="block-section" style={{color:"black"}}>
           <ExpandableSection title="Payment Details" icon="credit">
             {/* <div className="action-buttons">
               <button 
@@ -693,7 +654,7 @@ useEffect(() => {
           </ExpandableSection>
         </div>
         
-        <div className="block-section">
+       <div className="block-section" style={{color:"black"}}>
           <ExpandableSection title="Employment History" icon="history">
             <div className="action-buttons">
             <button
@@ -746,7 +707,7 @@ useEffect(() => {
           </ExpandableSection>
         </div>
 
-        <div className="block-section">
+       <div className="block-section" style={{color:"black"}}>
           <ExpandableSection title="Emergency Contacts" icon="phone">
             <div className="action-buttons">
               <button 
@@ -796,7 +757,7 @@ useEffect(() => {
 
 
         {/* Next of Kin Section */}
-         <div className="block-section">
+        <div className="block-section" style={{color:"black"}}>
           <ExpandableSection title="Next of Kin" icon="team">
             <div className="action-buttons">
               <button 

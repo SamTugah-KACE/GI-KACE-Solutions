@@ -12,19 +12,26 @@ const DepartmentRow = ({ department, organizationId, isBranchManaged }) => {
       if (department.department_head_id) {
         try {
           const response = await request.get(
-            `/api/staff/${department.department_head_id}?organization_id=${organizationId}&include_files=false&max_file_size=2097152`
+            `/organizations/${organizationId}/departments/${department.id}/head`
           );
-          const emp = response.data.main.Employee;
+          const emp = response.data;
           // Format the full name: include middle name only if non-empty.
-          const fullName = `${emp.title} ${emp.first_name}${emp.middle_name ? ' ' + emp.middle_name : ''} ${emp.last_name}`;
-          setHodName(fullName);
+          // const fullName = `${emp.title} ${emp.first_name}${emp.middle_name ? ' ' + emp.middle_name : ''} ${emp.last_name}`;
+          // setHodName(fullName);
+          // Build the full name
+        const parts = [emp.title, emp.first_name];
+        if (emp.middle_name) parts.push(emp.middle_name);
+        parts.push(emp.last_name);
+        setHodName(parts.join(' '));
         } catch (error) {
           console.error("Error fetching HoD details:", error);
         }
+      }else{
+        return;
       }
     };
     fetchHOD();
-  }, [department.department_head_id, organizationId]);
+  }, [department, organizationId]);
 
   // If the organization is branch-managed and the department has a branch_id,
   // fetch the branch details.
