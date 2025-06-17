@@ -388,16 +388,16 @@ useEffect(() => {
 
         switch (msg.type) {
     case 'initial':
-    // case 'update':
-      setEmployeeData(msg.payload);
-      break;
     case 'update':
       setEmployeeData(msg.payload);
-         // Ensure bio‑data pending banner is cleared on any full refresh
-         setPendingInputs(curr =>
-           curr.filter(pi => pi.data_type !== 'employees')
-         );
-         break;
+      break;
+    // case 'update':
+    //   setEmployeeData(msg.payload);
+    //      // Ensure bio‑data pending banner is cleared on any full refresh
+    //      setPendingInputs(curr =>
+    //        curr.filter(pi => pi.data_type !== 'employees')
+    //      );
+    //      break;
 
     case 'change_request':
   const { request_id, data_type, status } = msg.payload;
