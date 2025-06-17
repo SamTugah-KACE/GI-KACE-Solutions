@@ -45,6 +45,8 @@ const LABEL_MAP = {
 
 
 const DashboardTable = ({ orgId, token }) => {
+  const [rowsPerPage, setRowsPerPage] = useState(3);
+
   // const [data, setData] = useState([]);
    // 1) Initial load + setData from hook
   const { data, loading, error, setData } = useEmployeeInputs(orgId);
@@ -271,14 +273,31 @@ const DashboardTable = ({ orgId, token }) => {
   };
 
 
-  
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+// const totalPages = Math.ceil(data.length / 3);
+
   return (
     <div className="dashboard-table">
      
 
-      <div className="table-header">
+      {/* <div className="table-header">
         <span>Page {currentPage}</span>
-      </div>
+      </div> */}
+      <div className="pagination-controls">
+  <label htmlFor="rowsPerPage">Rows per page: </label>
+  <select
+    id="rowsPerPage"
+    value={rowsPerPage}
+    onChange={(e) => {
+      setRowsPerPage(Number(e.target.value));
+      setCurrentPage(1); // Reset to first page
+    }}
+  >
+    <option value={3}>3</option>
+    <option value={5}>5</option>
+    <option value={10}>10</option>
+  </select>
+</div>
 
       <table>
         <thead>
@@ -292,7 +311,12 @@ const DashboardTable = ({ orgId, token }) => {
         </thead>
         <tbody>
            {wsError && <div className="ws-error">{wsError}</div>}
-          {data.map((row, idx) => {
+          {/* {data.map((row, idx) => */}
+          {data
+            // .slice((currentPage - 1) * 3, currentPage * 3)
+            .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+            .map((row, idx) =>
+           {
             const accountName = row["Account Name"];
             const role        = row.Role;
             const issues      = row.Issues;
@@ -300,12 +324,13 @@ const DashboardTable = ({ orgId, token }) => {
             const actions     = row.Actions;
             const record = row.Data;
 
+
             return (
               <tr key={idx}>
-                <td>{accountName}</td>
-                <td>{role}</td>
+                <td data-label="Account Name">{accountName}</td>
+                <td data-label="Role">{role}</td>
                   {/* “Records” column */}
-                <td>
+                <td data-label="Issue(s)">
                   {record ? (
                     <Button type="link" onClick={() => openRecordModal(record)}>
                       View Details
@@ -314,7 +339,7 @@ const DashboardTable = ({ orgId, token }) => {
                     <span>N/A</span>
                   )}
                 </td>
-                <td>
+                <td data-label="Attachment(s)">
                   {attachments.map((att, i) => (
                     <div key={i} className="attachment-cell">
                       <div className="file-name">{att.filename}</div>
@@ -327,7 +352,7 @@ const DashboardTable = ({ orgId, token }) => {
                     </div>
                   ))}
                 </td>
-                <td>
+                <td data-label="Actions">
                            {issues === 'Request Approval' && (
                     <>
                       <button onClick={() => openActionModal(row.id, 'Approved')} className="table-btn">
@@ -353,7 +378,16 @@ const DashboardTable = ({ orgId, token }) => {
         >
           Prev
         </button>
-        <button onClick={() => setCurrentPage((p) => p + 1)}>Next</button>
+        {/* <button onClick={() => setCurrentPage((p) => p + 1)}>Next</button> */}
+       <span style={{ margin: '0 1rem' }}>
+    Page {currentPage} of {totalPages}
+  </span>
+  <button
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+  >
+    Next
+  </button>
       </div>
 
       {fileToView && (
