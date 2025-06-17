@@ -410,7 +410,7 @@ useEffect(() => {
           ? { ...pi, status: msg.payload.status, comments: msg.payload.comments }
           : pi
       )
-      .filter(
+      .filter(pi =>
         // pi => pi.id !== msg.payload.request_id
         String(pi.data_type) !== String(data_type) &&
         String(pi.id)       !== String(request_id)
