@@ -393,6 +393,16 @@ useEffect(() => {
       break;
 
     case 'change_request':
+  const { request_id, data_type, status } = msg.payload;
+
+  // 1️⃣ Remove **all** pendingInputs for this data_type
+  // setPendingInputs(curr =>
+  //   curr.filter(pi =>
+  //     // normalize types: both as strings
+  //     String(pi.data_type) !== String(data_type)
+  //   )
+  // );
+
   setPendingInputs(curr =>
     curr
       .map(pi =>
@@ -400,7 +410,12 @@ useEffect(() => {
           ? { ...pi, status: msg.payload.status, comments: msg.payload.comments }
           : pi
       )
-      .filter(pi => pi.id !== msg.payload.request_id)
+      .filter(
+        // pi => pi.id !== msg.payload.request_id
+        String(pi.data_type) !== String(data_type) &&
+        String(pi.id)       !== String(request_id)
+      
+      )
   );
   toast.success(`Your change request was ${msg.payload.status.toLowerCase()}.`);
   break;
