@@ -68,10 +68,10 @@ function App() {
           {/* Add more protected routes here */}
         </Route>
         {/* <Route path="/dev/dashboard" element={<SuperAdminDashboard />} />
-    <Route path="/staff" element={<Staff />} />
+    
       <Route path="/dashboard" element={<Dashboard />} /> */}
       <Route path="/oauth/login" element={<SuperAdminLoginPage />} />
- 
+ {/* <Route path="/staff" element={<Staff />} /> */}
     </Routes>
     {/** Add page not found ui */}
     {/* <Route path="*" element={<PageNotFound />} /> */}

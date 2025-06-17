@@ -1,12 +1,14 @@
 // src/components/SearchBar.js
 import React, { useState } from 'react';
 import './SearchBar.css';
+import { toast } from 'react-toastify';
 
 const SearchBar = () => {
   const [query, setQuery] = useState('');
   const handleSearch = (e) => {
     e.preventDefault();
     console.log("Searching for: ", query);
+    toast.info("features coming soon");
     // Implement search logic here
   };
 
