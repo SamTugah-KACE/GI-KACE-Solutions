@@ -344,6 +344,32 @@ const Staff = () => {
   console.log("org slug: ", orgSlug);
   console.log("org slug in staff: ", orgSlug);
 
+// ─── DOWNLOAD EMPLOYEE DATA ─────────────────────────────────────────
+  const handleDownload = useCallback(async () => {
+    try {
+      const url = `/download-employee-data/${staffId}/download`;
+      const response = await request.get(url, {
+        responseType: 'blob',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Create a blob link to download
+      const blob = new Blob([response.data], { type: response.data.type });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `employee_${staffId}_data.pdf`; // adjust extension as needed
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error('Download failed', err);
+      toast.error('Failed to download employee data.');
+    }
+  }, [staffId, token]);
+
+
+
+
   //  Fetch all pending change-requests once on mount
 useEffect(() => {
   if (!staffId) return;
@@ -554,7 +580,17 @@ useEffect(() => {
   return (
     <div className="dashboard-container">
       <Header className="main-header" />
-      <SecondaryHeader title="Staff Profile" />
+      <SecondaryHeader title="Staff Profile" 
+       extras={(
+          <button
+            onClick={handleDownload}
+            className="download-button"
+            title="Download Employee Data"
+          >
+            ↓ Download Data
+          </button>
+        )}
+      />
      
       <main className="dashboard-content">
       

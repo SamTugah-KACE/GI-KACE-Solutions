@@ -212,3 +212,21 @@
 .secondary-header__dropdown a:hover {
   background: var(--dropdown-hover, #f5f5f5);
 }
+
+
+.secondary-header__download-btn {
+  background: none;
+  border: 2px solid white;
+  color: white;
+  font-size: 1.25rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 12px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.secondary-header__download-btn:hover {
+  background: white;
+  color: #6C87FF;
+}
