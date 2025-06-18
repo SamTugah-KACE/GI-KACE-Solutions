@@ -1,5 +1,5 @@
 // src/components/Staff.js
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Header from '../pages/Header';
 import Footer from '../Footer';
