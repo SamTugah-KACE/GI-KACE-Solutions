@@ -180,7 +180,7 @@ const renderField = (
           : (field.options?.choices || []).map(choice => ({ id: choice, name: choice }));
       return (
         <select
-          name={field.label}
+          name={field.id}
           value={fieldValue || ""}
           onChange={(e) => {
             const selected = e.target.value;
