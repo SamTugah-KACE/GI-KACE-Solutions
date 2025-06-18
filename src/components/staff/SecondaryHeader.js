@@ -49,6 +49,10 @@ export default function SecondaryHeader({ title, extras }) {
   };
 
   const handleDownload = useCallback(async () => {
+    if (!staffId || !organizationId) {
+      toast.error('Missing staff or organization identifier.');
+      return;
+    }
     try {
       const url = `/download-employee-data/${staffId}/download`;
        const response = await request.get(url, {
@@ -67,7 +71,7 @@ export default function SecondaryHeader({ title, extras }) {
       console.error('Download failed', err);
       toast.error('Failed to download employee data.');
     }
-  }, [staffId, token]);
+  }, [staffId, organizationId, token]);
 
   return (
     <header className="secondary-header">

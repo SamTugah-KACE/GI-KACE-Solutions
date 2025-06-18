@@ -345,19 +345,22 @@ const Staff = () => {
   console.log("org slug in staff: ", orgSlug);
 
 // ─── DOWNLOAD EMPLOYEE DATA ─────────────────────────────────────────
-  const handleDownload = useCallback(async () => {
+   const handleDownload = useCallback(async () => {
+    if (!staffId || !organizationId) {
+      toast.error('Missing staff or organization identifier.');
+      return;
+    }
     try {
       const url = `/download-employee-data/${staffId}/download`;
-      const response = await request.get(url, {
+       const response = await request.get(url, {
+        params: { organization_id: organizationId },
         responseType: 'blob',
         headers: { Authorization: `Bearer ${token}` }
       });
-
-      // Create a blob link to download
       const blob = new Blob([response.data], { type: response.data.type });
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
-      link.download = `employee_${staffId}_data.pdf`; // adjust extension as needed
+      link.download = `employee_${staffId}_data.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -365,7 +368,7 @@ const Staff = () => {
       console.error('Download failed', err);
       toast.error('Failed to download employee data.');
     }
-  }, [staffId, token]);
+  }, [staffId, organizationId, token]);
 
 
 
