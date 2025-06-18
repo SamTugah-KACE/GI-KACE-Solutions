@@ -56,9 +56,10 @@ export default function SecondaryHeader({ title, extras }) {
         responseType: 'blob',
         headers: { Authorization: `Bearer ${token}` }
       });
+      const blob = new Blob([response.data], { type: response.data.type });
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
-      link.download = `employee_${staffId}_data.xlsx`;
+      link.download = `employee_${staffId}_data.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
