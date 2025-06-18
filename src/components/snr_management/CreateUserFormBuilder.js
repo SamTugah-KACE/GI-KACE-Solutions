@@ -449,12 +449,13 @@ const FormBuilderArea = ({ formFields, setFormFields, moveField, updateField, re
           Drag fields from the palette to build your form
           <p>Please include fields for the following records</p>
           <br/>
-          <i>First Name or Given Name</i> <br/>
-          <i>Middle Name</i> <br/>
-          <i>Last Name or Surname</i>  <br/>
-          <i>Email</i> & <br/>
-          <i>Role</i>
-        
+          <i>First Name or Given Name</i> - Input Field <br/>
+          <i>Middle Name</i> - Input Field <br/>
+          <i>Last Name or Surname</i> - Input Field <br/>
+          <i>Email</i> - Email Field & <br/>
+          <i>Role</i> - Role Selection Field
+          <br/>
+        <strong>System accepts just one File Upload Field</strong>
         </div>
       )}
     </div>
