@@ -55,18 +55,6 @@ const normalizeKey = (key) => {
   return key.trim().toLowerCase().replace(/[^\w\s]/g, "");
 };
 
-/**
- * Maps dynamic UI keys into canonical backend keys.
- */
-// const mapEmployeeFields = (data) => {
-//   const mapped = {};
-//   Object.entries(data).forEach(([key, value]) => {
-//     const normalized = normalizeKey(key);
-//     const canonical = FIELD_SYNONYMS[normalized] || key;
-//     mapped[canonical] = value;
-//   });
-//   return mapped;
-// };
 
 /**
  * Merges contact-related fields into the "contact_info" key.
@@ -125,7 +113,7 @@ const renderField = (
               <label key={idx} className="option-label">
                 <input
                   type="radio"
-                  name={field.label}
+                  name={field.id}
                   value={choice}
                   checked={fieldValue === choice}
                   onChange={handleChange}
@@ -148,7 +136,7 @@ const renderField = (
               <label key={idx} className="option-label">
                 <input
                   type="checkbox"
-                  name={field.label}
+                  name={field.id}
                   value={choice}
                   checked={values.includes(choice)}
                   onChange={(e) => {
@@ -157,7 +145,7 @@ const renderField = (
                     if (checked) newValues.push(choice);
                     else newValues = newValues.filter(v => v !== choice);
                     handleChange({
-                      target: { name: field.label, value: newValues, type: 'checkbox' },
+                      target: { name: field.id, value: newValues, type: 'checkbox' },
                     });
                   }}
                 />
@@ -193,7 +181,7 @@ const renderField = (
         >
           <option value="">Select an option</option>
           {options.map((option, idx) => (
-            <option key={option.id || idx} value={option.id || option.name}>
+            <option key={option.id || idx} value={option.id || idx}>
               {option.name || option}
             </option>
           ))}
@@ -205,7 +193,7 @@ const renderField = (
     }
     case 'file': {
       return (
-        <input type="file" name={field.label} multiple onChange={handleChange} />
+        <input type="file" name={field.id} multiple onChange={handleChange} />
       );
     }
     case 'submit': {
@@ -354,6 +342,15 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       }
       console.log("Payload Data: ", payloadData);
 
+      console.log("...fieldValues:: ", ...fieldValues);
+
+      // <<< NEW: inject role_id from your select state >>>
+  if (fieldValues.role_select) {
+    payloadData.role_id = fieldValues.role_select;
+    delete payloadData.role_select;
+  }
+
+  console.log("role_id:: ", payloadData.role_id);
       // Use FormData if there is a file field.
       const hasFileField = formDesign.fields.some(field => field.id === 'file');
       if (hasFileField) {
@@ -368,11 +365,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         formData.append('organization_id', organizationId);
         response = await request.post('/users/create', formData);
       } else {
-        // const payload = { organization_id: organizationId };
-        // Object.entries(payloadData).forEach(([label, value]) => {
-        //   payload[label] = value;
-        // });
-        // response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payloadData));
+      
         response = await request.post('/users/create', JSON.stringify(payloadData));
       }
       if ( ![200, 201].includes(response.status)) {
@@ -409,7 +402,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
           <label>{field.label}</label>
           {renderField(
             field,
-            fieldValues[field.label],
+            fieldValues[field.id],
             handleInputChange,
             organizationId,
             roleOptions,
