@@ -8,6 +8,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import LogoutConfirmationModal from '../pages/LogoutConfirmationModal';
 import { toast } from 'react-toastify';
 import request from "../request";
+import { useOrganization } from '../../context/OrganizationContext';
+
 
 export default function SecondaryHeader({ title, extras }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -16,6 +18,8 @@ export default function SecondaryHeader({ title, extras }) {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const { auth, logout } = useAuth();
+  const { organization } = useOrganization();
+  const organizationId = organization?.id;
   const name = auth.user_name || 'Guest';
   const role = auth.role || 'Guest';
   const { id: staffId, token } = auth.emp || {};
@@ -47,8 +51,11 @@ export default function SecondaryHeader({ title, extras }) {
   const handleDownload = useCallback(async () => {
     try {
       const url = `/download-employee-data/${staffId}/download`;
-      const response = await request.get(url, { responseType: 'blob', headers: { Authorization: `Bearer ${token}` } });
-      const blob = new Blob([response.data], { type: response.data.type });
+       const response = await request.get(url, {
+        params: { organization_id: organizationId },
+        responseType: 'blob',
+        headers: { Authorization: `Bearer ${token}` }
+      });
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
       link.download = `employee_${staffId}_data.xlsx`;
