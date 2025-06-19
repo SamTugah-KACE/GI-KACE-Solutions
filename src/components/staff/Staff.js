@@ -1,4 +1,5 @@
 // src/components/Staff.js
+import { FaSpinner } from 'react-icons/fa';
 import React, {useState, useEffect, useRef, useCallback} from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Header from '../pages/Header';
@@ -52,6 +53,7 @@ const Staff = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [pendingInputs, setPendingInputs] = useState([]);
   const wsRef = useRef(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Employment‑details edit modal
   const [showEmpModal, setShowEmpModal] = useState(false);
@@ -350,6 +352,7 @@ const Staff = () => {
       toast.error('Missing staff or organization identifier.');
       return;
     }
+    setIsDownloading(true);
     try {
       const url = `/download-employee-data/${staffId}/download`;
        const response = await request.get(url, {
@@ -367,7 +370,9 @@ const Staff = () => {
     } catch (err) {
       console.error('Download failed', err);
       toast.error('Failed to download employee data.');
-    }
+    }finally {
+     setIsDownloading(false);
+   }
   }, [staffId, organizationId, token]);
 
 
@@ -587,10 +592,13 @@ useEffect(() => {
        extras={(
           <button
             onClick={handleDownload}
+            disabled={isDownloading}
             className="download-button"
             title="Download Employee Data"
           >
-            ↓ Download Data
+            {isDownloading
+            ? <FaSpinner className="spin" />
+             : '↓ Download Data'}
           </button>
         )}
       />

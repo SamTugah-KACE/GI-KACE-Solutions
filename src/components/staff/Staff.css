@@ -456,7 +456,17 @@ color: #1890ff;
   background-color: #40a9ff;
 }
 
+/* Spinner animation */
+.spin {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  font-size: 1.25rem; /* match your button’s icon size */
+}
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
 
 
 
