@@ -78,9 +78,7 @@ export default function SecondaryHeader({ title, extras }) {
       <div className="secondary-header__left">
         <h2 className="secondary-header__title-text">{title}</h2>
         {extras}
-        <button onClick={handleDownload} className="secondary-header__download-btn" title="Download Data">
-          ↓
-        </button>
+        
       </div>
 
       <div className="secondary-header__notification">

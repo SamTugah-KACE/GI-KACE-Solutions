@@ -588,7 +588,7 @@ useEffect(() => {
   return (
     <div className="dashboard-container">
       <Header className="main-header" />
-      <SecondaryHeader title="Staff Profile" 
+      <SecondaryHeader title="" 
        extras={(
           <button
             onClick={handleDownload}
