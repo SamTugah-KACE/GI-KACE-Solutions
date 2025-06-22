@@ -6,6 +6,7 @@ import SearchBar from '../pages/SearchBar';
 import SummaryCards from '../pages/SummaryCards';
 import DashboardTable from '../pages/DashboardTable';
 import NewUserModal from '../pages/NewUserModal';
+import AddUserForm from './AddUserForm';
 import AddDepartmentModal from './AddDepartmentModal';
 import UpdateDepartmentModal from './UpdateDepartmentModal';
 import AddBranchModal from './AddBranchModal';
@@ -165,7 +166,7 @@ const userId = auth.user && auth.user.id;
       <Footer className="dashboard-footer" />
 
             {/* Modals */}
-      {showNewUserModal && (
+      {/* {showNewUserModal && (
         <NewUserModal 
         organizationId={orgId}
       userId={userId}
@@ -175,7 +176,23 @@ const userId = auth.user && auth.user.id;
         setShowNewUserModal(false);
       }}
         />
-        )}
+        )} */}
+
+        {showNewUserModal && (
+  <AddUserForm
+    organizationId={orgId}
+    userId={userId}
+    onClose={() => setShowNewUserModal(false)}
+    onUserAdded={() => {
+      toast.success('User created! Check their email.');
+      setShowNewUserModal(false);
+    }}
+  />
+)}
+
+
+
+
       {showAddDeptModal && (<AddDepartmentModal 
       onClose={() => setShowAddDeptModal(false)} 
       onDepartmentAdded={(newDept) => {
