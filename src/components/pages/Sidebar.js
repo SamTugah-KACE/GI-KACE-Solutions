@@ -139,7 +139,7 @@ const Sidebar = ({
           New User <span className="dropdown-indicator">▼</span>
           {expanded && activeMenu === 'users' && (
             <ul className="submenu">
-              <li  className="add-new-user-menu" onClick={() => setShowAddUserForm(true)}>Add New User</li>
+              <li  className="add-new-user-menu" onClick={onNewUserClick}>Add New User</li>
               <li className="bulk-insert-menu" onClick={() => setShowBulkInsertModal(true)}>Bulk Insert Users</li>
               <li className="existing-users-menu" onClick={() => setShowExistingUsersModal(true)}>Existing Users</li>
               <li  className="user-registration-form-menu" onClick={() => setShowUserFormBuilderModal(true)}>User Registration Form</li>
