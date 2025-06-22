@@ -384,22 +384,24 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       norm: f.label.toLowerCase()
     }));
 
-    const missing = [];
-    if (!fldInfo.some(f => /(first|given)/i.test(f.norm) && payloadData[f.label]?.toString().trim()))
-      missing.push('First Name');
-    if (!fldInfo.some(f => /middle/i.test(f.norm) && payloadData[f.label]?.toString().trim()))
-      missing.push('Middle Name');
-    if (!fldInfo.some(f => /(last|surname|family)/i.test(f.norm) && payloadData[f.label]?.toString().trim()))
-      missing.push('Last Name');
-    if (!fldInfo.some(f => f.id === 'email' && payloadData[f.label]?.toString().trim()))
-      missing.push('Email');
-    if (!fldInfo.some(f => f.id === 'role_select' && payloadData[f.label]?.toString().trim()))
-      missing.push('Role');
+    console.log("fldInfo:: ", fldInfo);
 
-    if (missing.length) {
-      toast.error(`Missing required fields: ${missing.join(', ')}`);
-      return;
-    }
+    // const missing = [];
+    // if (!fldInfo.some(f => /(first|given)/i.test(f.norm) && payloadData[f.label]?.toString().trim()))
+    //   missing.push('First Name');
+    // if (!fldInfo.some(f => /middle/i.test(f.norm) && payloadData[f.label]?.toString().trim()))
+    //   missing.push('Middle Name');
+    // if (!fldInfo.some(f => /(last|surname|family)/i.test(f.norm) && payloadData[f.label]?.toString().trim()))
+    //   missing.push('Last Name');
+    // if (!fldInfo.some(f => f.id === 'email' && payloadData[f.label]?.toString().trim()))
+    //   missing.push('Email');
+    // if (!fldInfo.some(f => f.id === 'role_select' && payloadData[f.label]?.toString().trim()))
+    //   missing.push('Role');
+
+    // if (missing.length) {
+    //   toast.error(`Missing required fields: ${missing.join(', ')}`);
+    //   return;
+    // }
 
         formData.append('organization_id', organizationId);
         response = await request.post('/users/create', formData);
