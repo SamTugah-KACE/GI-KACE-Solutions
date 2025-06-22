@@ -55,18 +55,6 @@ const normalizeKey = (key) => {
   return key.trim().toLowerCase().replace(/[^\w\s]/g, "");
 };
 
-/**
- * Maps dynamic UI keys into canonical backend keys.
- */
-// const mapEmployeeFields = (data) => {
-//   const mapped = {};
-//   Object.entries(data).forEach(([key, value]) => {
-//     const normalized = normalizeKey(key);
-//     const canonical = FIELD_SYNONYMS[normalized] || key;
-//     mapped[canonical] = value;
-//   });
-//   return mapped;
-// };
 
 /**
  * Merges contact-related fields into the "contact_info" key.
@@ -323,9 +311,26 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     setShowAddRoleModal(true);
   };
 
+    // Validate individual step (non-empty)
+  const validateStep = () => {
+    const fields = steps[currentStep];
+    return fields.every(fld => {
+      const val = fieldValues[fld.label];
+      if (fld.required) {
+        if (fld.id === 'file') return val?.length > 0;
+        return val !== undefined && val.toString().trim() !== '';
+      }
+      return true;
+    });
+  };
+
   // --- Submission: Map field keys using helper functions and build payload. ---
   const handleSubmit = async (e) => {
     e.preventDefault();
+     if (!validateStep()) {
+      toast.error('Please fill all required fields on this page.');
+      return;
+    }
     if (!formDesign || !formDesign.fields || formDesign.fields.length === 0) {
       toast.info("No form design available. Please contact your administrator.");
       return;
@@ -365,6 +370,37 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             formData.append(key, val);
           }
         });
+
+
+         // ** Tenant-mandated fields enforcement **
+    //  - first name: any label matching /(first|given)/i
+    //  - middle name: /middle/i
+    //  - last name: /(last|surname|family)/i
+    //  - email: fld.id==='email'
+    //  - role: fld.id==='role_select'
+    const fldInfo = formDesign.fields.map(f => ({
+      id: f.id,
+      label: f.label,
+      norm: f.label.toLowerCase()
+    }));
+
+    const missing = [];
+    if (!fldInfo.some(f => /(first|given)/i.test(f.norm) && payloadData[f.label]?.toString().trim()))
+      missing.push('First Name');
+    if (!fldInfo.some(f => /middle/i.test(f.norm) && payloadData[f.label]?.toString().trim()))
+      missing.push('Middle Name');
+    if (!fldInfo.some(f => /(last|surname|family)/i.test(f.norm) && payloadData[f.label]?.toString().trim()))
+      missing.push('Last Name');
+    if (!fldInfo.some(f => f.id === 'email' && payloadData[f.label]?.toString().trim()))
+      missing.push('Email');
+    if (!fldInfo.some(f => f.id === 'role_select' && payloadData[f.label]?.toString().trim()))
+      missing.push('Role');
+
+    if (missing.length) {
+      toast.error(`Missing required fields: ${missing.join(', ')}`);
+      return;
+    }
+
         formData.append('organization_id', organizationId);
         response = await request.post('/users/create', formData);
       } else {
@@ -397,7 +433,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     }
   };
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
+  const nextStep = () => validateStep() && setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
   const renderFields = () => {

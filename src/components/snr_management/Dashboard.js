@@ -165,7 +165,17 @@ const userId = auth.user && auth.user.id;
       <Footer className="dashboard-footer" />
 
             {/* Modals */}
-      {showNewUserModal && (<NewUserModal onClose={() => setShowNewUserModal(false)} />)}
+      {showNewUserModal && (
+        <NewUserModal 
+        organizationId={orgId}
+      userId={userId}
+        onClose={() => setShowNewUserModal(false)} 
+        onUserAdded={() => {
+        toast.success('User created! Check their email for credentials.');
+        setShowNewUserModal(false);
+      }}
+        />
+        )}
       {showAddDeptModal && (<AddDepartmentModal 
       onClose={() => setShowAddDeptModal(false)} 
       onDepartmentAdded={(newDept) => {
