@@ -61,7 +61,7 @@ const BulkInsertUsersModal = ({ organizationId, onClose, onSuccess }) => {
       } catch (error) {
         console.error("Bulk Insert Error:", error);
         // alert(error.message);
-        toast.error(`Error processing the uploaded file: ${error.message}`);
+        toast.error(`${error.message}`);
       } finally {
         setUploading(false);
       }

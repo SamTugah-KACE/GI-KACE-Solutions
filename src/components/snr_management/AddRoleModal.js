@@ -78,7 +78,7 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
       // Check if the response status is 200 and if the response is ok
       if (res.status !== 200 ) {
         const errorData = res.data;
-        throw new Error(errorData || errorData.detail || 'Failed to add role');
+        throw new Error(errorData.error || errorData.detail || 'Failed to add role');
       }
       const newRole = res.data;
       // toast.success("Role added successfully!");
@@ -86,7 +86,7 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
       onClose();
     } catch (error) {
       console.error('Error adding role:', error);
-      toast.error(`Error adding role: ${error.message}`);
+      toast.error(`${error.message}`);
     }
   };
 

@@ -418,7 +418,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         throw new Error(errorData.detail || 'Submission failed');
       }
       // If the form design has embedded submit code, execute it.
-      // if (formDesign && formDesign.submitCode) {
+      // if (formDesign && formDesign.s ubmitCode) {
       //   try {
       //     const submitFunc = new Function(`"use strict"; return (${formDesign.submitCode})`)();
       //     await submitFunc(fieldValues);
@@ -431,7 +431,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       onClose();
     } catch (error) {
       console.error("Submit Form Error:", error);
-      toast.error(`Error submitting form: \n${error.message}`);
+      toast.error(`${error.message}`);
     }
   };
 
