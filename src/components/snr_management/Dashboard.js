@@ -184,7 +184,7 @@ const userId = auth.user && auth.user.id;
     userId={userId}
     onClose={() => setShowNewUserModal(false)}
     onUserAdded={() => {
-      toast.success('User created! Check their email.');
+      toast.success("User added.\nPlease prompt user to check his/her registered email for system credentials.");
       setShowNewUserModal(false);
     }}
   />
