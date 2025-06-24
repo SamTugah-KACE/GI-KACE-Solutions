@@ -90,7 +90,7 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded= () => {} }) => {
       .then((response) => {
         onDepartmentAdded(response.data);
         // resetForm();
-        toast.success('Department added successfully!');
+        // toast.success('Department added successfully!');
         console.log('Department added:', response.data);
         onClose();
       })

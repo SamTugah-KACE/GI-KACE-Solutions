@@ -81,7 +81,7 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
         throw new Error(errorData || errorData.detail || 'Failed to add role');
       }
       const newRole = res.data;
-      toast.success("Role added successfully!");
+      // toast.success("Role added successfully!");
       onRoleAdded(newRole);
       onClose();
     } catch (error) {

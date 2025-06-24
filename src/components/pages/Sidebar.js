@@ -61,6 +61,7 @@ const Sidebar = ({
 //  const orgId = organization?.id || '998a55ed-5598-432e-b6f4-b808c9838bcf';
   const isBranchManaged = organization?.nature?.toLowerCase().includes('branch');
 
+  console.log("isBranch Managed: ", isBranchManaged);
   const toggleExpanded = () => setExpanded(!expanded);
   const toggleSubmenu = (menu) =>
     setActiveMenu((prev) => (prev === menu ? null : menu));
