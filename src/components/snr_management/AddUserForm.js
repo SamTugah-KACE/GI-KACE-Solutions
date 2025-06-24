@@ -431,7 +431,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       onClose();
     } catch (error) {
       console.error("Submit Form Error:", error);
-      toast.error(`Error submitting form: ${error.message}`);
+      toast.error(`Error submitting form: \n${error.data?.error}`);
     }
   };
 
