@@ -86,7 +86,7 @@ const AddRoleModal = ({ organizationId, onClose, onRoleAdded }) => {
       onClose();
     } catch (error) {
       console.error('Error adding role:', error);
-      toast.error(`Error adding role: ${error.data?.error}`);
+      toast.error(`Error adding role: ${error.message}`);
     }
   };
 

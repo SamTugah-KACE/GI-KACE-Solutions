@@ -98,7 +98,7 @@ const AddDepartmentModal = ({ onClose, onDepartmentAdded= () => {} }) => {
         console.error('Error creating department:', error);
         toast.error(
           'Error creating department: \n' +
-            (error.data?.error || error.data.error)
+            (error.message)
         );
         // Optionally reset the form if needed
         resetForm();

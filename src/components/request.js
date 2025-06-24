@@ -43,30 +43,41 @@ instance.interceptors.response.use(
   (response) => response,
   (error) => {
     console.log('API error:', error);
+    let message = 'An unexpected error occurred';
 
-    // Check if a response exists so we can handle specific status codes
     if (error.response) {
+      const data = error.response.data;
+      // Prefer explicit server message fields
+      if (data) {
+        if (typeof data === 'string') {
+          message = data;
+        } else if (data.message) {
+          message = data.message;
+        } else if (data.error) {
+          message = data.error;
+        } else if (data.detail) {
+          message = data.detail;
+        } else if (Array.isArray(data.errors) && data.errors.length) {
+          message = data.errors.join(', ');
+        }
+      }
+      // Fallback based on status
       const status = error.response.status;
-
-      // Handle unauthorized error: possibly trigger logout or token refresh logic
-      if (status === 401) {
-        toast.error('Unauthorized access. Please log in again.');
-        // Optionally, trigger a logout action here.
+      if (!message) {
+        if (status === 401) {
+          message = 'Unauthorized access. Please log in again.';
+        } else if (status >= 500) {
+          message = 'Server error. Please try again later.';
+        }
       }
-      // Handle server errors (500 and above)
-      if (status >= 500) {
-        toast.error('Server error. Please try again later.');
-      }
-    } else {
-      // Handle errors that are not HTTP responses such as network errors or timeouts.
-      toast.error('Network error or request timed out.');
+    } else if (error.request) {
+      // network error or no response
+      message = 'Network error or request timed out.';
     }
-    
-    // Log the error to an external monitoring service (e.g. Sentry)
-    // Sentry.captureException(error);
 
-    
-    return Promise.reject(error);
+    // Display toast and reject with clean Error
+    toast.error(message);
+    return Promise.reject(new Error(message));
   }
 );
 

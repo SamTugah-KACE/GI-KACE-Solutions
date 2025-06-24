@@ -327,10 +327,10 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   // --- Submission: Map field keys using helper functions and build payload. ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-     if (!validateStep()) {
-      toast.error('Please fill all required fields on this page.');
-      return;
-    }
+    //  if (!validateStep()) {
+    //   toast.error('Please fill all required fields on this page.');
+    //   return;
+    // }
     if (!formDesign || !formDesign.fields || formDesign.fields.length === 0) {
       toast.info("No form design available. Please contact your administrator.");
       return;
@@ -431,7 +431,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       onClose();
     } catch (error) {
       console.error("Submit Form Error:", error);
-      toast.error(`Error submitting form: \n${error.data?.error}`);
+      toast.error(`Error submitting form: \n${error.message}`);
     }
   };
 
