@@ -15,11 +15,19 @@ function parsePaths(raw) {
   return raw;
 }
 
+// Title‐case helper
+const toTitleCase = str =>
+  str.replace(/\b\w+/g, txt =>
+    txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
+  );
+
 
 const ProfessionalForm = ({ onSave, onCancel, initialValues }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showOtherInstitution, setShowOtherInstitution] = useState(false);
+const [showOtherQualification, setShowOtherQualification] = useState(false);
 
   const inputRef = React.useRef(null);
 
@@ -38,7 +46,8 @@ const ProfessionalForm = ({ onSave, onCancel, initialValues }) => {
     "BlueCrest College Ghana",
     "Academic City University College",
     "IPMC College of Technology",
-    "NIIT Ghana"
+    "NIIT Ghana",
+    "Other"
   ];
 
   // Qualification options for dropdown
@@ -52,7 +61,8 @@ const ProfessionalForm = ({ onSave, onCancel, initialValues }) => {
     "Certified Information Systems Security Professional (CISSP)",
     "Certified Ethical Hacker (CEH)",
     "Oracle Certifications ( Oracle Database Administrator)",
-    "Project Management Professional (PMP)"
+    "Project Management Professional (PMP)",
+    "Other"
   ];
 
 
@@ -169,12 +179,32 @@ const ProfessionalForm = ({ onSave, onCancel, initialValues }) => {
       .map(f => ({ uid: f.uid, name: f.name, url: f.url }));
       
       // Create qualification object
-      const qualification = {
-        ...values,
-        // id: initialValues?.id || Date.now().toString(),
-        id: initialValues?.id || '',
-        documents: existingDocs.length ? existingDocs : undefined
-      };
+      // const qualification = {
+      //   ...values,
+      //   // id: initialValues?.id || Date.now().toString(),
+      //   id: initialValues?.id || '',
+      //   documents: existingDocs.length ? existingDocs : undefined
+      // };
+
+      const institution = values.institution === 'Other'
+  ? values.institutionOther
+  : values.institution;
+
+const qualification_name = values.qualification_name === 'Other'
+  ? values.qualificationOther
+  : values.qualification_name;
+
+  // 3️⃣ Build your final payload
+  const qualification = {
+    id:                  initialValues?.id || '',
+    institution,                            // string
+    qualification_name,                     // string
+    year_obtained:       values.year_obtained,  
+    additional_info:     values.additional_info,
+    documents:           existingDocs.length ? existingDocs : undefined
+  };
+
+      
       
       console.log((initialValues?.id ? "update":"save"));
       console.log("Saving professional qualification with documents:", qualification);
@@ -270,6 +300,10 @@ const ProfessionalForm = ({ onSave, onCancel, initialValues }) => {
           filterOption={(input, option) =>
             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
           }
+          onChange={val => {
+             setShowOtherInstitution(val === 'Other');
+             form.setFieldsValue({ institutionOther: undefined });
+           }}
         >
           {institutionOptions.map(institution => (
             <Select.Option key={institution} value={institution}>
@@ -278,6 +312,13 @@ const ProfessionalForm = ({ onSave, onCancel, initialValues }) => {
           ))}
         </Select>
       </Form.Item>
+         {showOtherInstitution && (
+        <Form.Item name="institutionOther" label="Please specify Institution" rules={[{ required: true }]}>
+          <Input onChange={e =>
+            form.setFieldsValue({ institutionOther: toTitleCase(e.target.value) })
+          }/>
+        </Form.Item>
+      )}
 
       <Form.Item 
         name="qualification_name" 
@@ -291,6 +332,10 @@ const ProfessionalForm = ({ onSave, onCancel, initialValues }) => {
           filterOption={(input, option) =>
             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
           }
+            onChange={val => {
+             setShowOtherQualification(val === 'Other');
+             form.setFieldsValue({ qualificationOther: undefined });
+           }}
         >
           {qualificationOptions.map(qualification => (
             <Select.Option key={qualification} value={qualification}>
@@ -299,7 +344,13 @@ const ProfessionalForm = ({ onSave, onCancel, initialValues }) => {
           ))}
         </Select>
       </Form.Item>
-
+         {showOtherQualification && (
+        <Form.Item name="qualificationOther" label="Please specify Qualification" rules={[{ required: true }]}>
+          <Input onChange={e =>
+            form.setFieldsValue({ qualificationOther: toTitleCase(e.target.value) })
+          }/>
+        </Form.Item>
+      )}
 
       <Form.Item 
         name="year_obtained" 
