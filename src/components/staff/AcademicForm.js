@@ -16,11 +16,19 @@ function parsePaths(raw) {
 }
 
 
+// Title‐case helper
+const toTitleCase = str =>
+  str.replace(/\b\w+/g, txt =>
+    txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
+  );
+
 const AcademicForm = ({ onSave, onCancel, initialValues }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [preview, setPreview]   = useState(null);
+  const [showOtherInstitution, setShowOtherInstitution] = useState(false);
+  const [showOtherDegree, setShowOtherDegree]       = useState(false);
   
   // const fileInputRef = useRef(null)
   // Institution options for dropdown
@@ -38,7 +46,8 @@ const AcademicForm = ({ onSave, onCancel, initialValues }) => {
     "BlueCrest College Ghana",
     "Academic City University College",
     "IPMC College of Technology",
-    "NIIT Ghana"
+    "NIIT Ghana",
+    "Other"
   ];
 
   // Degree options for dropdown
@@ -53,7 +62,8 @@ const AcademicForm = ({ onSave, onCancel, initialValues }) => {
     "BSc IT Education",
     "BSc MIS",
     "Diploma in Software Engineering",
-    "BSc AI & Robotics"
+    "BSc AI & Robotics",
+    "Other"
   ];
 
   // Field of study options for dropdown
@@ -198,12 +208,12 @@ const AcademicForm = ({ onSave, onCancel, initialValues }) => {
       //   documents: existingDocs.length ? existingDocs : undefined
       // };
 
-      const qualification = {
-        ...values,
-        // id: initialValues?.id || Date.now().toString(),
-        id: initialValues?.id || '',
-        documents: existingDocs.length ? existingDocs : undefined
-      };
+      // const qualification = {
+      //   ...values,
+      //   // id: initialValues?.id || Date.now().toString(),
+      //   id: initialValues?.id || '',
+      //   documents: existingDocs.length ? existingDocs : undefined
+      // };
 
       // fileUpload = fileList.forEach(file => {
       //   if (file.originFileObj) {
@@ -221,10 +231,27 @@ const AcademicForm = ({ onSave, onCancel, initialValues }) => {
       //   }
       // });
 
-      console.log("Saving qualification with documents:", qualification);
-     
-        
+      
+        const institution = values.institution === 'Other'
+    ? values.institutionOther
+    : values.institution;
 
+  const degree = values.degree === 'Other'
+    ? values.degreeOther
+    : values.degree;
+
+  // now build your final payload
+  const qualification = {
+    id:           initialValues?.id || '',
+    institution,
+    degree,
+    year_obtained: values.year_obtained,
+    gpa:           values.gpa,
+    documents:     existingDocs.length ? existingDocs : undefined
+  };
+
+  console.log("Saving qualification with documents:", qualification);
+     
       // Call the parent's onSave function
       await onSave(qualification, newFiles? newFiles : documents);
       console.log('Files to upload in academicform:', newFiles[0]);
@@ -358,6 +385,10 @@ const AcademicForm = ({ onSave, onCancel, initialValues }) => {
           filterOption={(input, option) =>
             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
           }
+          onChange={val => {
+             setShowOtherInstitution(val === 'Other');
+             form.setFieldsValue({ institutionOther: undefined });
+           }}
         >
           {institutionOptions.map(institution => (
             <Select.Option key={institution} value={institution}>
@@ -366,6 +397,21 @@ const AcademicForm = ({ onSave, onCancel, initialValues }) => {
           ))}
         </Select>
       </Form.Item>
+      {showOtherInstitution && (
+        <Form.Item
+          name="institutionOther"
+          label="Please specify Institution"
+          rules={[{ required: true }]}
+        >
+          <Input
+            onChange={e =>
+              form.setFieldsValue({
+                institutionOther: toTitleCase(e.target.value)
+              })
+            }
+          />
+        </Form.Item>
+      )}
 
       <Form.Item 
         name="degree" 
@@ -379,6 +425,10 @@ const AcademicForm = ({ onSave, onCancel, initialValues }) => {
           filterOption={(input, option) =>
             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
           }
+           onChange={val => {
+             setShowOtherDegree(val === 'Other');
+             form.setFieldsValue({ degreeOther: undefined });
+           }}
         >
           {degreeOptions.map(degree => (
             <Select.Option key={degree} value={degree}>
@@ -387,7 +437,21 @@ const AcademicForm = ({ onSave, onCancel, initialValues }) => {
           ))}
         </Select>
       </Form.Item>
-
+            {showOtherDegree && (
+        <Form.Item
+          name="degreeOther"
+          label="Please specify Degree"
+          rules={[{ required: true }]}
+        >
+          <Input
+            onChange={e =>
+              form.setFieldsValue({
+                degreeOther: toTitleCase(e.target.value)
+              })
+            }
+          />
+        </Form.Item>
+      )}
       
       <Form.Item 
         name="year_obtained" 
