@@ -182,7 +182,7 @@ const renderField = (
           <option value="">Select an option</option>
           {options.map((option, idx) => (
             <option key={option.id || idx} value={option.id || option.name}>
-              {option.name || option}
+              {option.name !== undefined ? option.name : option}
             </option>
           ))}
           {/* {field.id === 'role_select' && (

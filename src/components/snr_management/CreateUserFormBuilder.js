@@ -449,9 +449,10 @@ const FormBuilderArea = ({ formFields, setFormFields, moveField, updateField, re
           Drag fields from the palette to build your form
           <p>Please include fields for the following records</p>
           <br/>
-          <i>First Name or Given Name</i> - Input Field <br/>
-          <i>Middle Name</i> - Input Field <br/>
-          <i>Last Name or Surname</i> - Input Field <br/>
+          <i>Title or Prefix</i> - Dropdown Selection <br/>
+          <i>First Name or Given Name</i> - Text Input <br/>
+          <i>Middle Name</i> - Text Input <br/>
+          <i>Last Name or Surname</i> - Text Input <br/>
           <i>Email</i> - Email Field & <br/>
           <i>Role</i> - Role Selection Field
           <br/>
@@ -566,12 +567,7 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
       const res = await request.post(
         '/dashboards/upsert',
         JSON.stringify(dashboardPayload),
-        // {
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     Authorization: `Bearer ${localStorage.getItem('token')}`,
-        //   },
-        // }
+       
       );
       if (res.status !== 201) {
         throw new Error('Error saving form design');
