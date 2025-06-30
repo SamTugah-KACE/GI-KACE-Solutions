@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import Select from 'react-select';
 import request from '../request';
 import { useOrganization } from '../../context/OrganizationContext';
+import { toast } from 'react-toastify';
 
 const AddBranchModal = ({ onClose, onBranchAdded }) => {
   const { organization } = useOrganization();
@@ -80,15 +81,16 @@ const AddBranchModal = ({ onClose, onBranchAdded }) => {
     request
       .post(`/organizations/${orgId}/branches`, payload)
       .then((response) => {
-        onBranchAdded(response.data);
+        console.log("\n\n\nresponse from add branch: ", response.data);
+        onBranchAdded();
         resetForm();
         onClose();
       })
       .catch((error) => {
         console.error('Error creating branch:', error);
-        alert(
-          'Error creating branch: ' +
-            (error.response?.data?.detail || error.message)
+        toast.error(
+          'Error creating branch: \n' +
+            (error.message)
         );
       })
       .finally(() => {
