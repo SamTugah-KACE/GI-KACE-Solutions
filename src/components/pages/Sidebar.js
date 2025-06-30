@@ -156,19 +156,8 @@ const Sidebar = ({
             </ul>
           )}
         </li>
-        <li className="menu-item" onClick={() => toggleSubmenu('dept')}>
-          Department <span className="dropdown-indicator">▼</span>
-          {expanded && activeMenu === 'dept' && (
-            <ul className="submenu">
-              <li onClick={onNewDepartmentClick}>Add New Department</li>
-              <li onClick={() => setShowViewDeptModal(true)}>View Departments</li>
-              <li onClick={() => toast.info('Feature coming soon.')}>Assign Head of Department<br/>(HoD)</li>
-              <li onClick={() =>  setShowUpdateDeptModal(true)}>Update Department</li>
-              <li onClick={() => toast.info('Feature coming soon.')}>Delete Department</li>
-            </ul>
-          )}
-        </li>
-        {isBranchManaged && (
+
+          {isBranchManaged && (
           <li className="menu-item" onClick={() => toggleSubmenu('branch')}>
             Branch <span className="dropdown-indicator">▼</span>
             {expanded && activeMenu === 'branch' && (
@@ -182,6 +171,21 @@ const Sidebar = ({
             )}
           </li>
         )}
+
+        <li className="menu-item" onClick={() => toggleSubmenu('dept')}>
+          Department <span className="dropdown-indicator">▼</span>
+          {expanded && activeMenu === 'dept' && (
+            <ul className="submenu">
+              <li onClick={onNewDepartmentClick}>Add New Department</li>
+              <li onClick={() => setShowViewDeptModal(true)}>View Departments</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Assign Head of Department<br/>(HoD)</li>
+              {isBranchManaged &&(<li onClick={() => toast.info('Feature coming soon.')}>Assign Dept. a Branch</li>)}
+              <li onClick={() =>  setShowUpdateDeptModal(true)}>Update Department</li>
+              <li onClick={() => toast.info('Feature coming soon.')}>Delete Department</li>
+            </ul>
+          )}
+        </li>
+      
         <li className="menu-item" onClick={() => toggleSubmenu('promotion')}>
           Promotions <span className="dropdown-indicator">▼</span>
           {expanded && activeMenu === 'promotion' && (

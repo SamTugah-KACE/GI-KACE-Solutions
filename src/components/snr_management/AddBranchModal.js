@@ -78,7 +78,7 @@ const AddBranchModal = ({ onClose, onBranchAdded }) => {
     };
 
     request
-      .post(`/api/organizations/${orgId}/branches`, payload)
+      .post(`/organizations/${orgId}/branches`, payload)
       .then((response) => {
         onBranchAdded(response.data);
         resetForm();
