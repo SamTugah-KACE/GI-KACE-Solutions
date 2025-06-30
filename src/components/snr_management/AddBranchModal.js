@@ -17,17 +17,46 @@ const AddBranchModal = ({ onClose, onBranchAdded }) => {
   useEffect(() => {
     if (orgId) {
       request
-        .get(`/api/staff?organization_id=${orgId}&skip=0&limit=1000`)
+        .get(`/enlist/staff`, {
+    params: { organization_id: orgId, skip: 0, limit: 1000, sort: 'asc' }
+        })
         .then((response) => {
+          console.log('Staff list fetched:', response.data);
+          // Check if response.data is an empty array
+          console.log('Response data:', response.data);
+          console.log('Organization ID:', orgId);
+          // Log the response to see its structure
+          console.log('Response data length:', response.data.length);
+          // if response.data is an empty array, return early
+          if (!response.data || response.data.length === 0) {
+            console.warn('No staff data found for organization:', orgId);
+            return;
+          }
+          // Ensure response.data is an array before mapping
+          // Map each employee to an option with value = employee id and label as "title firstname [middlename] lastname"
           const options = response.data.map((emp) => ({
             value: emp.id,
             label: `${emp.title} ${emp.first_name}${emp.middle_name ? ' ' + emp.middle_name : ''} ${emp.last_name}`,
           }));
           setStaffOptions(options);
         })
-        .catch((err) => console.error('Error fetching staff for branch manager:', err));
+        .catch((err) => console.error('Error fetching staff list:', err));
     }
   }, [orgId]);
+  // useEffect(() => {
+  //   if (orgId) {
+  //     request
+  //       .get(`/api/staff?organization_id=${orgId}&skip=0&limit=1000`)
+  //       .then((response) => {
+  //         const options = response.data.map((emp) => ({
+  //           value: emp.id,
+  //           label: `${emp.title} ${emp.first_name}${emp.middle_name ? ' ' + emp.middle_name : ''} ${emp.last_name}`,
+  //         }));
+  //         setStaffOptions(options);
+  //       })
+  //       .catch((err) => console.error('Error fetching staff for branch manager:', err));
+  //   }
+  // }, [orgId]);
 
   const initialValues = {
     branchName: '',
