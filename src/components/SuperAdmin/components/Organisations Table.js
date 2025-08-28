@@ -46,7 +46,8 @@ const SuperAdminDashboard = () => {
       
       console.log('Fetching organizations from API...');
       
-      const response = await axios.get('https://staff-records-backend.onrender.com/api/organizations/');
+      //const response = await axios.get('https://staff-records-backend.onrender.com/api/organizations/');
+      const response = await axios.get('https://staff-records-backend-1b65.onrender.com/api/organizations/');
       
       console.log('API Response:', {
         status: response.status,
