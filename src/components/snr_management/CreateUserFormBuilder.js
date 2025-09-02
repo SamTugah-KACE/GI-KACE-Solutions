@@ -314,12 +314,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { motion } from 'framer-motion';
+// import { motion, AnimatePresence } from 'framer-motion'; // Temporarily disabled for drag and drop debugging
 import './FormBuilderModal.css';
 import request from '../request';
 import FieldConfiguration from './FieldConfiguration';
 import { FaTrashAlt } from 'react-icons/fa'; // For remove button
 import { toast } from 'react-toastify';
+import { compileForm, validateFormCompilation } from './FormCompiler';
 
 // Define the available fields.
 const availableFields = [
@@ -344,11 +345,27 @@ const initialFormFields = [];
 const DraggableField = ({ field }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'FIELD',
-    item: { field },
-    collect: (monitor) => ({ isDragging: monitor.isDragging() }),
+    item: () => {
+      console.log('Drag started for field:', field); // Debug log
+      return { field };
+    },
+    collect: (monitor) => ({ 
+      isDragging: monitor.isDragging() 
+    }),
+    end: (item, monitor) => {
+      console.log('Drag ended for field:', field); // Debug log
+    },
   }));
+  
   return (
-    <div ref={drag} className="field-item" style={{ opacity: isDragging ? 0.5 : 1 }}>
+    <div 
+      ref={drag} 
+      className={`field-item ${isDragging ? 'dragging' : ''}`}
+      style={{ 
+        cursor: isDragging ? 'grabbing' : 'grab',
+        opacity: isDragging ? 0.5 : 1 
+      }}
+    >
       {field.label}
     </div>
   );
@@ -378,19 +395,16 @@ const FormFieldItem = ({ field, index, moveField, onFieldUpdate, onRemove }) => 
   });
   const [{ isDragging }, drag] = useDrag({
     type: 'BUILDER_FIELD',
-    item: { type: 'BUILDER_FIELD', id: field.id, index },
+    item: () => ({ type: 'BUILDER_FIELD', id: field.id, index }),
     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
   });
   drag(drop(ref));
 
   return (
-    <motion.div
+    <div
       ref={ref}
       className="form-field"
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
     >
       <div className="field-display">
         <strong>{field.label}</strong>
@@ -404,15 +418,18 @@ const FormFieldItem = ({ field, index, moveField, onFieldUpdate, onRemove }) => 
         </button>
       </div>
       <FieldConfiguration field={field} index={index} onFieldUpdate={onFieldUpdate} />
-    </motion.div>
+    </div>
   );
 };
 
 /** FormBuilderArea: The drop zone where fields are assembled */
 const FormBuilderArea = ({ formFields, setFormFields, moveField, updateField, removeField }) => {
-  const [, drop] = useDrop({
+  const [{ isOver, canDrop }, drop] = useDrop({
     accept: 'FIELD',
-    drop: (item) => {
+    drop: (item, monitor) => {
+      console.log('Dropped item:', item); // Debug log
+      console.log('Drop result:', monitor.getDropResult()); // Debug log
+      
       const field = availableFields.find((f) => f.id === item.field.id);
       if (field) {
         const newField = {
@@ -427,16 +444,41 @@ const FormBuilderArea = ({ formFields, setFormFields, moveField, updateField, re
             ? { regex: '^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$' }
             : {},
         };
+        console.log('Adding new field:', newField); // Debug log
         setFormFields((prev) => [...prev, newField]);
       }
     },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
   });
   return (
-    <div ref={drop} className="form-builder">
+    <div 
+      ref={drop} 
+      className={`form-builder ${isOver ? 'drag-over' : ''} ${canDrop ? 'can-drop' : ''}`}
+    >
       <h3>Your Form</h3>
+      {isOver && canDrop && (
+        <div style={{ 
+          position: 'absolute', 
+          top: '50%', 
+          left: '50%', 
+          transform: 'translate(-50%, -50%)',
+          background: 'rgba(0, 123, 255, 0.1)',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '2px dashed #007bff',
+          color: '#007bff',
+          fontWeight: 'bold',
+          zIndex: 10
+        }}>
+          Drop field here
+        </div>
+      )}
       {formFields.map((field, index) => (
         <FormFieldItem
-          key={index}
+          key={`${field.id}-${index}`}
           field={field}
           index={index}
           moveField={moveField}
@@ -466,7 +508,6 @@ const FormBuilderArea = ({ formFields, setFormFields, moveField, updateField, re
 const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess }) => {
   const [formFields, setFormFields] = useState(initialFormFields);
   const [userCreateUrl, setUserCreateUrl] = useState('');
-  const [roleOptions, setRoleOptions] = useState([]);
 
   // Fetch the user create URL.
   useEffect(() => {
@@ -485,27 +526,7 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
     fetchCreateUrl();
   }, []);
 
-  // Fetch role options.
-  useEffect(() => {
-    const fetchRoleOptions = async () => {
-      try {
-        let res = await request.get(`/fetch?organization_id=${organizationId}&skip=0&limit=100`);
-        let data = res.data;
-        if (!data?.data || data.data.length === 0) {
-          res = await request.get(`/default/fetch-all/?skip=0&limit=100`);
-          data = res.data;
-        }
-        if (data) {
-          const roles = data.map(role => ({ id: role.id, name: role.name }));
-          console.log("roles in create user form builder: ", roles);
-          setRoleOptions(roles);
-        }
-      } catch (error) {
-        console.error('Error fetching role options:', error);
-      }
-    };
-    fetchRoleOptions();
-  }, [organizationId]);
+  // Note: Role options are handled by the FieldConfiguration component
 
   // Reorder fields.
   const moveField = useCallback((dragIndex, hoverIndex) => {
@@ -549,53 +570,97 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
     return fields;
   };
 
-  // Save the form design.
+  // Save the form design with compiled HTML, CSS, and JS
   const handleSaveForm = async () => {
     console.log("userId: ", userId);
     console.log("organizationId: ", organizationId);
+    
     const fieldsWithSubmit = ensureSubmitField(formFields);
-    const formDesign = { fields: fieldsWithSubmit, submitCode: "" };
-    // Prepare a complete dashboard payload (to prevent missing fields errors)
+    
+    // Compile the form using the FormCompiler utility
+    const compiledForm = compileForm(fieldsWithSubmit);
+    
+    // Validate the compiled form
+    const validation = validateFormCompilation(compiledForm);
+    if (!validation.isValid) {
+      toast.error(`Form validation failed: ${validation.errors.join(', ')}`);
+      return;
+    }
+    
+    // Add submit code and additional metadata
+    const formDesign = {
+      ...compiledForm,
+      submitCode: "",
+      submitUrl: userCreateUrl || "/users/create"
+    };
+    
+    // Prepare a complete dashboard payload
     const dashboardPayload = {
       dashboard_name: "User Registration Form",
       dashboard_data: formDesign,
-      access_url: userCreateUrl || "", // if available
+      access_url: userCreateUrl || "",
       organization_id: organizationId,
       user_id: userId || null,
     };
+    
     try {
       const res = await request.post(
         '/dashboards/upsert',
-        JSON.stringify(dashboardPayload),
-       
+        JSON.stringify(dashboardPayload)
       );
+      
       if (res.status !== 201) {
         throw new Error('Error saving form design');
       }
+      
+      console.log('Compiled form saved successfully:', compiledForm);
+      toast.success(`Form design saved successfully! ${compiledForm.isMultiStep ? `Multi-step form with ${compiledForm.totalSteps} steps created.` : 'Single-step form created.'}`);
       onSaveSuccess();
       onClose();
     } catch (error) {
       console.error('Error saving form design:', error);
       toast.error(`Error saving form design: ${error.message}`);
-      // alert(error.message);
     }
   };
 
+  // Handle keyboard events
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  // Debug: Log when component mounts
+  useEffect(() => {
+    console.log('CreateUserFormBuilder mounted');
+    console.log('Available fields:', availableFields);
+  }, []);
+
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="modal-overlay">
-        <div className="modal-content">
+      <div className="modal-overlay" onClick={onClose}>
+        <div 
+          className="modal-content" 
+          onClick={(e) => e.stopPropagation()}
+        >
           <h2>Form Builder</h2>
-        {/* provide a close button which aligns at the extreme right corner of the above h2 tag using style with size 20 x 20, and leverage on onClose function */}
-          <button  style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '20px', cursor: 'pointer' }} onClick={onClose}>
+          <button 
+            className="close-btn" 
+            onClick={onClose} 
+            aria-label="Close modal"
+            tabIndex={0}
+          >
             &times;
           </button>
-
-
-          {/*center the p tag below using style */}
-          <span style={{ textAlign: 'center', marginBottom: '5px' }}>
+          
+          <div className="description">
             Drag fields from the palette to build your form. Configure each field as needed.
-          </span>
+          </div>
 
           <div className="builder-container">
             <div className="field-palette">
@@ -613,13 +678,16 @@ const CreateUserFormBuilder = ({ organizationId, userId, onClose, onSaveSuccess 
             />
           </div>
           <div className="modal-actions">
-            <button onClick={handleSaveForm}>Save Form Design</button>
-            <button onClick={onClose}>Cancel</button>
+            <button onClick={handleSaveForm}>
+              Save Form Design
+            </button>
+            <button onClick={onClose}>
+              Cancel
+            </button>
           </div>
         </div>
       </div>
     </DndProvider>
-    
   );
 };
 

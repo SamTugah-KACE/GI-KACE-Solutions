@@ -67,9 +67,9 @@ function App() {
           <Route path="/:orgSlug/staff" element={<Staff />} />
           {/* Add more protected routes here */}
         </Route>
-        {/* <Route path="/dev/dashboard" element={<SuperAdminDashboard />} />
+        {/* <Route path="/dev/dashboard" element={<SuperAdminDashboard />} /> */}
     
-      <Route path="/dashboard" element={<Dashboard />} /> */}
+      {/* <Route path="/dashboard" element={<Dashboard />} />  */}
       <Route path="/oauth/login" element={<SuperAdminLoginPage />} />
  {/* <Route path="/staff" element={<Staff />} /> */}
     </Routes>

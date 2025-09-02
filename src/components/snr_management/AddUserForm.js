@@ -7,6 +7,7 @@ import request from '../request';
 import { toast } from 'react-toastify';
 import AddRoleModal from './AddRoleModal';
 import { mapEmployeeFields } from '../utils/mappingUtil';
+import CompiledFormRenderer from './CompiledFormRenderer';
 
 
 /**
@@ -244,7 +245,16 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       try {
         const data = JSON.parse(event.data);
         setFormDesign(data.formDesign);
-        if (data.formDesign?.fields && data.formDesign.fields.length > 0) {
+        
+        // Check if this is a compiled form (has html, css, js properties)
+        const isCompiledForm = data.formDesign?.html && data.formDesign?.css && data.formDesign?.js;
+        
+        if (isCompiledForm) {
+          console.log("Compiled form detected:", data.formDesign);
+          // For compiled forms, we don't need to set up the traditional form state
+          // The CompiledFormRenderer will handle everything
+        } else if (data.formDesign?.fields && data.formDesign.fields.length > 0) {
+          // Traditional form setup for non-compiled forms
           const initValues = {};
           data.formDesign.fields.forEach((field) => {
             // Use field.label as the unique key; for checkboxes initialize as an array.
@@ -472,7 +482,8 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       </div>
     );
   }
-  if (!formDesign || !formDesign.fields || formDesign.fields.length === 0) {
+  
+  if (!formDesign || (!formDesign.fields && !formDesign.html)) {
     return (
       <div className="modal-overlay">
         <div className="modal-content">
@@ -485,6 +496,22 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         </div>
        
       </div>
+    );
+  }
+
+  // Check if this is a compiled form (has html, css, js properties)
+  const isCompiledForm = formDesign?.html && formDesign?.css && formDesign?.js;
+  
+  if (isCompiledForm) {
+    return (
+      <CompiledFormRenderer
+        formDesign={formDesign}
+        organizationId={organizationId}
+        onClose={onClose}
+        onUserAdded={onUserAdded}
+        roleOptions={roleOptions}
+        departments={departments}
+      />
     );
   }
 
