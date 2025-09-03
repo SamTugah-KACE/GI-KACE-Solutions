@@ -231,16 +231,41 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   const departments = useDepartments(organizationId);
   const [isLoading, setIsLoading] = useState(true);
   const [isRolesLoading, setIsRolesLoading] = useState(true);
+  
+  // Force loading to stop after 15 seconds regardless of WebSocket status
+  useEffect(() => {
+    const forceStopLoading = setTimeout(() => {
+      console.warn("Force stopping loading after 15 seconds");
+      setIsLoading(false);
+      setIsRolesLoading(false);
+    }, 15000);
+    
+    return () => clearTimeout(forceStopLoading);
+  }, []);
 
   // --- WebSocket: Fetch precompiled form design ---
   useEffect(() => {
+    // Check if we have the required parameters
+    if (!organizationId || !userId) {
+      console.error("Missing required parameters:", { organizationId, userId });
+      toast.error("Missing required parameters for form loading.");
+      setIsLoading(false);
+      return;
+    }
+
     const wsUrl = `wss://staff-records-backend.onrender.com/ws/form-design/${organizationId}/${userId}`;
+    console.log("Connecting to WebSocket:", wsUrl);
+    
     const ws = new WebSocket(wsUrl);
     let timeoutId = setTimeout(() => {
+      console.error("WebSocket timeout - no response received");
       toast.error("Form design load timeout. Please try again later.");
       setIsLoading(false);
     }, 10000); // 10-second timeout
-    ws.onopen = () => console.info("WebSocket connected to form-design endpoint.");
+    
+    ws.onopen = () => {
+      console.info("WebSocket connected to form-design endpoint:", wsUrl);
+    };
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -274,6 +299,13 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
           }
         } else {
           console.warn("No valid form design found in WebSocket data:", data);
+          // Set a fallback form design to prevent infinite loading
+          setFormDesign({ 
+            fields: [], 
+            html: null, 
+            css: null, 
+            js: null 
+          });
         }
       } catch (error) {
         console.error("Error parsing form design:", error);
@@ -285,12 +317,17 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     };
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
+      console.error("WebSocket URL was:", wsUrl);
+      toast.error("Failed to connect to form server. Please check your connection.");
       setFormDesign({ fields: [] });
       setIsLoading(false);
       clearTimeout(timeoutId);
     };
-    ws.onclose = () => {
-      console.info("WebSocket closed.");
+    ws.onclose = (event) => {
+      console.info("WebSocket closed:", event.code, event.reason);
+      if (event.code !== 1000) { // Not a normal closure
+        toast.error("Connection to form server was lost.");
+      }
       setIsLoading(false);
       clearTimeout(timeoutId);
     };
@@ -483,19 +520,20 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   // Check if this is a compiled form (has html, css, js properties)
   const isCompiledForm = formDesign?.html && formDesign?.css && formDesign?.js;
   
+  // Debug logging
+  console.log("AddUserForm render state:", {
+    isLoading,
+    isRolesLoading,
+    isCompiledForm,
+    hasFormDesign: !!formDesign,
+    formDesignKeys: formDesign ? Object.keys(formDesign) : null,
+    organizationId,
+    userId
+  });
+  
   // For compiled forms, we don't need to wait for roles loading since the form handles its own role population
   if (isCompiledForm) {
-    if (isLoading) {
-      return (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <p>Loading form…</p>
-            {/* Replace with a spinner graphic if desired */}
-          </div>
-        </div>
-      );
-    }
-    
+    console.log("Rendering compiled form");
     return (
       <CompiledFormRenderer
         formDesign={formDesign}
@@ -524,14 +562,14 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     return (
       <div className="modal-overlay">
         <div className="modal-content">
+          <h2>Add New User</h2>
           <p>No form design available. Please contact your administrator.</p>
-           <div className="modal-footer">
-          <button onClick={onClose} className="footer-btn close-btn">
-            Close
-          </button>
+          <div style={{ marginTop: '20px' }}>
+            <button onClick={onClose} className="footer-btn close-btn">
+              Close
+            </button>
+          </div>
         </div>
-        </div>
-       
       </div>
     );
   }
