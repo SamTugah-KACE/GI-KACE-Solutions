@@ -297,6 +297,23 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
           } else {
             setSteps([formDesignData.fields]);
           }
+        } else if (isCompiledForm && formDesignData?.fields) {
+          // Handle compiled form as traditional form for presentation
+          console.log("Using compiled form fields as traditional form:", formDesignData.fields);
+          const initValues = {};
+          formDesignData.fields.forEach((field) => {
+            if (field.id !== 'submit') { // Skip submit fields
+              initValues[field.label] = field.id === 'checkbox' ? [] : '';
+            }
+          });
+          setFieldValues(initValues);
+          const nonSubmitFields = formDesignData.fields.filter(f => f.id !== 'submit');
+          if (nonSubmitFields.length > 4) {
+            setSteps(chunkArray(nonSubmitFields, 4));
+            setCurrentStep(0);
+          } else {
+            setSteps([nonSubmitFields]);
+          }
         } else {
           console.warn("No valid form design found in WebSocket data:", data);
           // Set a fallback form design to prevent infinite loading
@@ -532,7 +549,8 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   });
   
   // For compiled forms, we don't need to wait for roles loading since the form handles its own role population
-  if (isCompiledForm) {
+  // TEMPORARILY DISABLED FOR PRESENTATION - using traditional form instead
+  if (false && isCompiledForm) {
     console.log("Rendering compiled form");
     return (
       <CompiledFormRenderer
