@@ -280,8 +280,20 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         
         if (isCompiledForm) {
           console.log("Compiled form detected:", formDesignData);
-          // For compiled forms, we don't need to set up the traditional form state
-          // The CompiledFormRenderer will handle everything
+          // Handle compiled form as traditional form for presentation
+          console.log("Using compiled form fields as traditional form:", formDesignData.fields);
+          const initValues = {};
+          const nonSubmitFields = formDesignData.fields.filter(f => f.id !== 'submit');
+          nonSubmitFields.forEach((field) => {
+            initValues[field.label] = field.id === 'checkbox' ? [] : '';
+          });
+          setFieldValues(initValues);
+          if (nonSubmitFields.length > 4) {
+            setSteps(chunkArray(nonSubmitFields, 4));
+            setCurrentStep(0);
+          } else {
+            setSteps([nonSubmitFields]);
+          }
         } else if (formDesignData?.fields && formDesignData.fields.length > 0) {
           console.log("Traditional form detected:", formDesignData);
           // Traditional form setup for non-compiled forms
@@ -297,21 +309,7 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
           } else {
             setSteps([formDesignData.fields]);
           }
-        } else if (isCompiledForm && formDesignData?.fields) {
-          // Handle compiled form as traditional form for presentation
-          console.log("Using compiled form fields as traditional form:", formDesignData.fields);
-          const initValues = {};
-          const nonSubmitFields = formDesignData.fields.filter(f => f.id !== 'submit');
-          nonSubmitFields.forEach((field) => {
-            initValues[field.label] = field.id === 'checkbox' ? [] : '';
-          });
-          setFieldValues(initValues);
-          if (nonSubmitFields.length > 4) {
-            setSteps(chunkArray(nonSubmitFields, 4));
-            setCurrentStep(0);
-          } else {
-            setSteps([nonSubmitFields]);
-          }
+
         } else {
           console.warn("No valid form design found in WebSocket data:", data);
           // Set a fallback form design to prevent infinite loading
