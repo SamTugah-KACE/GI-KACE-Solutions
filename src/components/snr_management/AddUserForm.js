@@ -301,13 +301,11 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
           // Handle compiled form as traditional form for presentation
           console.log("Using compiled form fields as traditional form:", formDesignData.fields);
           const initValues = {};
-          formDesignData.fields.forEach((field) => {
-            if (field.id !== 'submit') { // Skip submit fields
-              initValues[field.label] = field.id === 'checkbox' ? [] : '';
-            }
+          const nonSubmitFields = formDesignData.fields.filter(f => f.id !== 'submit');
+          nonSubmitFields.forEach((field) => {
+            initValues[field.label] = field.id === 'checkbox' ? [] : '';
           });
           setFieldValues(initValues);
-          const nonSubmitFields = formDesignData.fields.filter(f => f.id !== 'submit');
           if (nonSubmitFields.length > 4) {
             setSteps(chunkArray(nonSubmitFields, 4));
             setCurrentStep(0);
@@ -514,6 +512,9 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
 
   const renderFields = () => {
     const fieldsToRender = steps[currentStep];
+    if (!fieldsToRender || !Array.isArray(fieldsToRender)) {
+      return <div>No fields to render</div>;
+    }
     return fieldsToRender.map((field, index) => {
       const key = `${currentStep}-${field.id}-${index}`;
       return (
@@ -601,20 +602,20 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
       <div className="modal-content">
         <form onSubmit={handleSubmit}>
           {renderFields()}
-          {steps.length > 1 && (
+          {steps && steps.length > 1 && (
             <div className="step-indicator">
               <span>Step {currentStep + 1} of {steps.length}</span>
             </div>
           )}
           <div className="modal-actions">
-            {steps.length > 1 && currentStep > 0 && (
+            {steps && steps.length > 1 && currentStep > 0 && (
               <button type="button" onClick={prevStep}>Back</button>
             )}
-            {steps.length > 1 && currentStep < steps.length - 1 && (
+            {steps && steps.length > 1 && currentStep < steps.length - 1 && (
               <button type="button" onClick={nextStep}>Next</button>
             )}
             {/* Render a submit button only if no submit field exists in the design */}
-            {!hasSubmitField && (steps.length <= 1 || currentStep === steps.length - 1) && (
+            {!hasSubmitField && (!steps || steps.length <= 1 || currentStep === steps.length - 1) && (
               <button type="submit">Submit</button>
             )}
             {/* <button type="submit">Add User</button> */}
