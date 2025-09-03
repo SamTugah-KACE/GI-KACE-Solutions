@@ -244,32 +244,40 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        setFormDesign(data.formDesign);
+        console.log("WebSocket received data:", data);
+        
+        // Handle both direct form design and nested formDesign structure
+        const formDesignData = data.formDesign || data;
+        setFormDesign(formDesignData);
         
         // Check if this is a compiled form (has html, css, js properties)
-        const isCompiledForm = data.formDesign?.html && data.formDesign?.css && data.formDesign?.js;
+        const isCompiledForm = formDesignData?.html && formDesignData?.css && formDesignData?.js;
         
         if (isCompiledForm) {
-          console.log("Compiled form detected:", data.formDesign);
+          console.log("Compiled form detected:", formDesignData);
           // For compiled forms, we don't need to set up the traditional form state
           // The CompiledFormRenderer will handle everything
-        } else if (data.formDesign?.fields && data.formDesign.fields.length > 0) {
+        } else if (formDesignData?.fields && formDesignData.fields.length > 0) {
+          console.log("Traditional form detected:", formDesignData);
           // Traditional form setup for non-compiled forms
           const initValues = {};
-          data.formDesign.fields.forEach((field) => {
+          formDesignData.fields.forEach((field) => {
             // Use field.label as the unique key; for checkboxes initialize as an array.
             initValues[field.label] = field.id === 'checkbox' ? [] : '';
           });
           setFieldValues(initValues);
-          if (data.formDesign.fields.length > 4) {
-            setSteps(chunkArray(data.formDesign.fields, 4));
+          if (formDesignData.fields.length > 4) {
+            setSteps(chunkArray(formDesignData.fields, 4));
             setCurrentStep(0);
           } else {
-            setSteps([data.formDesign.fields]);
+            setSteps([formDesignData.fields]);
           }
+        } else {
+          console.warn("No valid form design found in WebSocket data:", data);
         }
       } catch (error) {
         console.error("Error parsing form design:", error);
+        toast.error("Error loading form design. Please try again.");
       } finally {
         setIsLoading(false);
         clearTimeout(timeoutId);
@@ -472,6 +480,35 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
     });
   };
 
+  // Check if this is a compiled form (has html, css, js properties)
+  const isCompiledForm = formDesign?.html && formDesign?.css && formDesign?.js;
+  
+  // For compiled forms, we don't need to wait for roles loading since the form handles its own role population
+  if (isCompiledForm) {
+    if (isLoading) {
+      return (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <p>Loading form…</p>
+            {/* Replace with a spinner graphic if desired */}
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <CompiledFormRenderer
+        formDesign={formDesign}
+        organizationId={organizationId}
+        onClose={onClose}
+        onUserAdded={onUserAdded}
+        roleOptions={roleOptions}
+        departments={departments}
+      />
+    );
+  }
+
+  // For traditional forms, wait for both form and roles loading
   if (isLoading || isRolesLoading) {
     return (
       <div className="modal-overlay">
@@ -496,22 +533,6 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         </div>
        
       </div>
-    );
-  }
-
-  // Check if this is a compiled form (has html, css, js properties)
-  const isCompiledForm = formDesign?.html && formDesign?.css && formDesign?.js;
-  
-  if (isCompiledForm) {
-    return (
-      <CompiledFormRenderer
-        formDesign={formDesign}
-        organizationId={organizationId}
-        onClose={onClose}
-        onUserAdded={onUserAdded}
-        roleOptions={roleOptions}
-        departments={departments}
-      />
     );
   }
 

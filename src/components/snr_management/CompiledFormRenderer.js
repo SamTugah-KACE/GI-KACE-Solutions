@@ -15,19 +15,33 @@ const CompiledFormRenderer = ({
   // const [currentStep, setCurrentStep] = useState(0); // Not needed for compiled forms
 
   useEffect(() => {
-    if (!formDesign || !formContainerRef.current) return;
+    if (!formDesign || !formContainerRef.current) {
+      console.log("CompiledFormRenderer: Missing formDesign or container ref");
+      return;
+    }
+
+    console.log("CompiledFormRenderer: Rendering form with design:", formDesign);
 
     try {
       // Clear previous content
       formContainerRef.current.innerHTML = '';
 
       // Create a style element for the CSS
-      const styleElement = document.createElement('style');
-      styleElement.textContent = formDesign.css;
-      document.head.appendChild(styleElement);
+      if (formDesign.css) {
+        const styleElement = document.createElement('style');
+        styleElement.textContent = formDesign.css;
+        styleElement.setAttribute('data-form-styles', 'true'); // Add identifier for cleanup
+        document.head.appendChild(styleElement);
+      }
 
       // Set the HTML content
-      formContainerRef.current.innerHTML = formDesign.html;
+      if (formDesign.html) {
+        formContainerRef.current.innerHTML = formDesign.html;
+      } else {
+        console.error("No HTML content found in form design");
+        setIsLoading(false);
+        return;
+      }
 
       // Execute the JavaScript
       if (formDesign.js) {
@@ -39,6 +53,7 @@ const CompiledFormRenderer = ({
         // Create and execute the JavaScript
         const scriptElement = document.createElement('script');
         scriptElement.textContent = formDesign.js;
+        scriptElement.setAttribute('data-form-script', 'true'); // Add identifier for cleanup
         document.head.appendChild(scriptElement);
 
         // Clean up script after execution
@@ -47,10 +62,12 @@ const CompiledFormRenderer = ({
             scriptElement.parentNode.removeChild(scriptElement);
           }
         }, 100);
+      } else {
+        console.warn("No JavaScript found in form design");
       }
 
       // Populate role options if available
-      if (roleOptions.length > 0) {
+      if (roleOptions && roleOptions.length > 0) {
         const roleSelects = formContainerRef.current.querySelectorAll('select[name*="role"], select[name*="Role"]');
         roleSelects.forEach(select => {
           // Clear existing options except the first one
@@ -69,7 +86,7 @@ const CompiledFormRenderer = ({
       }
 
       // Populate department options if available
-      if (departments.length > 0) {
+      if (departments && departments.length > 0) {
         const deptSelects = formContainerRef.current.querySelectorAll('select[name*="department"], select[name*="Department"]');
         deptSelects.forEach(select => {
           // Clear existing options except the first one
@@ -96,13 +113,12 @@ const CompiledFormRenderer = ({
 
     // Cleanup function
     return () => {
-      // Remove the style element when component unmounts
-      const styleElements = document.head.querySelectorAll('style');
-      styleElements.forEach(style => {
-        if (style.textContent.includes('dynamic-form-container')) {
-          style.remove();
-        }
-      });
+      // Remove the style and script elements when component unmounts
+      const styleElements = document.head.querySelectorAll('style[data-form-styles="true"]');
+      styleElements.forEach(style => style.remove());
+      
+      const scriptElements = document.head.querySelectorAll('script[data-form-script="true"]');
+      scriptElements.forEach(script => script.remove());
     };
   }, [formDesign, organizationId, onClose, onUserAdded, roleOptions, departments]);
 
