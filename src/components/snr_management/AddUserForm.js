@@ -480,8 +480,10 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
         // Object.entries(payloadData).forEach(([label, value]) => {
         //   payload[label] = value;
         // });
-        // response = await request.post(formDesign.submitUrl || '/users/create', JSON.stringify(payloadData));
-        response = await request.post('/users/create', JSON.stringify(payloadData));
+        // Use the submitUrl from the form design if available, otherwise use default
+        const submitUrl = formDesign.submitUrl || '/users/create';
+        console.log("Submitting to URL:", submitUrl);
+        response = await request.post(submitUrl, JSON.stringify(payloadData));
       }
       if ( ![200, 201].includes(response.status)) {
         const errorData = response.data;
@@ -594,6 +596,9 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
   // Check if the precompiled design already contains a submit field.
   const hasSubmitField = formDesign.fields.some(f => f.id === 'submit');
   console.log("hasSubmitField: ", hasSubmitField);
+  
+  // For compiled forms, we always want to show a submit button
+  const shouldShowSubmitButton = !hasSubmitField || (formDesign?.html && formDesign?.css && formDesign?.js);
 
   return (
     <div className="modal-overlay">
@@ -612,9 +617,9 @@ const AddUserForm = ({ organizationId, userId, onClose, onUserAdded }) => {
             {steps && steps.length > 1 && currentStep < steps.length - 1 && (
               <button type="button" onClick={nextStep}>Next</button>
             )}
-            {/* Render a submit button only if no submit field exists in the design */}
-            {!hasSubmitField && (!steps || steps.length <= 1 || currentStep === steps.length - 1) && (
-              <button type="submit">Submit</button>
+            {/* Render a submit button */}
+            {shouldShowSubmitButton && (!steps || steps.length <= 1 || currentStep === steps.length - 1) && (
+              <button type="submit" className="submit-button">Add New User</button>
             )}
             {/* <button type="submit">Add User</button> */}
             <button type="button" onClick={onClose}>Cancel</button>
